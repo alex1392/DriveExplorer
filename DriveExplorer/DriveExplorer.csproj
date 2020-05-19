@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="doc.png" />
+    <None Remove="drive.png" />
+    <None Remove="file.png" />
+    <None Remove="folder.png" />
+    <None Remove="img.png" />
+    <None Remove="ppt.png" />
+    <None Remove="txt.png" />
+    <None Remove="xls.png" />
+    <None Remove="zip.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\doc.png" />
+    <Resource Include="Resources\file.png" />
+    <Resource Include="Resources\drive.png" />
+    <Resource Include="Resources\folder.png" />
+    <Resource Include="Resources\img.png" />
+    <Resource Include="Resources\ppt.png" />
+    <Resource Include="Resources\txt.png" />
+    <Resource Include="Resources\xls.png" />
+    <Resource Include="Resources\zip.png" />
+  </ItemGroup>
+
+</Project>
