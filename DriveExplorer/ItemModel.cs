@@ -9,7 +9,7 @@ namespace DriveExplorer {
         public ItemModel(Types type, string fullPath, bool isRoot = false) {
             Type = type;
             FullPath = fullPath ?? throw new ArgumentNullException(nameof(fullPath));
-            Name = isRoot ? 
+            Name = isRoot ?
                 fullPath.Replace(Path.DirectorySeparatorChar, ' ').Trim() :
                 Path.GetFileName(fullPath);
         }

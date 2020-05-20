@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Windows.Data;
-using System.Windows.Markup;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace DriveExplorer {
@@ -13,7 +9,7 @@ namespace DriveExplorer {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             try {
                 return new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{value.ToString().ToLower()}.png"));
-            } catch (Exception) {   
+            } catch (Exception) {
                 return new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/file.png"));
             }
         }

@@ -46,7 +46,7 @@ namespace DriveExplorer {
             e.Handled = true; // avoid recursive calls of treeViewItem.select
         }
         internal void ListBoxItem_Selected(object sender, MouseButtonEventArgs e) {
-            if (!(sender is ListBoxItem listBoxItem) || 
+            if (!(sender is ListBoxItem listBoxItem) ||
                 !(listBoxItem.DataContext is ListBoxItemVM vm)) {
                 Console.WriteLine("invalid sender");
                 return;

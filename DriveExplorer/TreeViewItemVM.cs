@@ -29,10 +29,10 @@ namespace DriveExplorer {
         /// Twoway bound to <see cref="TreeViewItem"/>, to change its state from ViewModel.
         /// </summary>
         public bool IsSelected {
-            get => isSelected; 
+            get => isSelected;
             set {
                 if (value != IsSelected) {
-                isSelected = value;
+                    isSelected = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
                 }
             }
