@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveExplorer", "DriveExplorer\DriveExplorer.csproj", "{2F8F9569-92B6-4803-AA81-F2EFFA95A5FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveExplorerTests", "DriveExplorerTests\DriveExplorerTests.csproj", "{3A2516BE-FD88-4E1A-8BB8-6D53DA6010A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveExplorerTests", "DriveExplorerTests\DriveExplorerTests.csproj", "{3A2516BE-FD88-4E1A-8BB8-6D53DA6010A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TreeViewTest", "TreeViewTest\TreeViewTest.csproj", "{32989376-BAFD-4597-9C8D-F9EB5AC819FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{3A2516BE-FD88-4E1A-8BB8-6D53DA6010A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A2516BE-FD88-4E1A-8BB8-6D53DA6010A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A2516BE-FD88-4E1A-8BB8-6D53DA6010A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32989376-BAFD-4597-9C8D-F9EB5AC819FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32989376-BAFD-4597-9C8D-F9EB5AC819FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32989376-BAFD-4597-9C8D-F9EB5AC819FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32989376-BAFD-4597-9C8D-F9EB5AC819FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
