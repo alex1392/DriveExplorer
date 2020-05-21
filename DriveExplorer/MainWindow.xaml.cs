@@ -20,10 +20,6 @@ namespace DriveExplorer {
             vm = DataContext as MainWindowVM;
         }
 
-        private void TreeViewItem_Expanded(object sender, RoutedEventArgs e) {
-            vm.TreeViewItem_Expanded(sender, e);
-        }
-
         private void TreeViewItem_Selected(object sender, RoutedEventArgs e) {
             vm.TreeViewItem_Selected(sender, e);
         }
