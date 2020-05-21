@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,51 +11,47 @@ using System.Windows.Input;
 namespace DriveExplorer {
     public class MainWindowVM : INotifyPropertyChanged {
         public event PropertyChangedEventHandler PropertyChanged;
-        public ObservableCollection<TreeViewItemVM> treeViewItems { get; set; } = new ObservableCollection<TreeViewItemVM>();
+        public ObservableCollection<TreeViewItemVM> treeViewItemVMs { get; set; } = new ObservableCollection<TreeViewItemVM>();
 
-        public ObservableCollection<ListBoxItemVM> listBoxItems { get; set; } = new ObservableCollection<ListBoxItemVM>();
+        public ObservableCollection<ListBoxItemVM> listBoxItemVMs { get; set; } = new ObservableCollection<ListBoxItemVM>();
 
         public MainWindowVM() {
             var drivePaths = Directory.GetLogicalDrives();
             foreach (var drivePath in drivePaths) {
-                var model = new ItemModel(ItemModel.Types.Drive, drivePath, true);
-                treeViewItems.Add(new TreeViewItemVM(model));
-                listBoxItems.Add(new ListBoxItemVM(model));
+                var model = new ItemModel(drivePath);
+                treeViewItemVMs.Add(new TreeViewItemVM(model));
+                listBoxItemVMs.Add(new ListBoxItemVM(model));
             }
         }
 
-        internal void TreeViewItem_Expanded(object sender, RoutedEventArgs e) {
-            if (!(sender is TreeViewItem treeViewItem) ||
-                !(treeViewItem.DataContext is TreeViewItemVM vm)) {
-                Console.WriteLine("invalid sender");
-                return;
-            }
-            vm.Expand();
-        }
-        internal void TreeViewItem_Selected(object sender, RoutedEventArgs e) {
-            if (!(sender is TreeViewItem treeViewItem) ||
-                !(treeViewItem.DataContext is TreeViewItemVM vm)) {
-                Console.WriteLine("invalid sender");
-                return;
-            }
+        public void TreeViewItem_Selected(object sender, RoutedEventArgs e = null) {
+            var vm = (sender as TreeViewItemVM) ??
+                (sender as TreeViewItem).DataContext as TreeViewItemVM ??
+                throw new ArgumentException("invalid sender");
             // update list box items
-            vm.Expand(); // in case there's no items as it hasn't been expanded 
-            listBoxItems.Clear();
+            vm.IsExpanded = true; // in case there's no items as it hasn't been expanded 
+            listBoxItemVMs.Clear();
+            // add all folders
             foreach (var item in vm.Items) {
-                listBoxItems.Add(new ListBoxItemVM(item.Model));
+                listBoxItemVMs.Add(new ListBoxItemVM(item.Model));
             }
-            e.Handled = true; // avoid recursive calls of treeViewItem.select
+            // add all files
+            var filePaths = Directory.GetFiles(vm.Model.FullPath);
+            foreach (var filePath in filePaths) {
+                listBoxItemVMs.Add(new ListBoxItemVM(filePath));
+            }
+            if (e != null) {
+                e.Handled = true; // avoid recursive calls of treeViewItem.select
+            }
         }
-        internal void ListBoxItem_Selected(object sender, MouseButtonEventArgs e) {
-            if (!(sender is ListBoxItem listBoxItem) ||
-                !(listBoxItem.DataContext is ListBoxItemVM vm)) {
-                Console.WriteLine("invalid sender");
-                return;
-            }
+        public void ListBoxItem_Selected(object sender, MouseButtonEventArgs e = null) {
+            var vm = (sender as ListBoxItemVM) ??
+                (sender as ListBoxItem).DataContext as ListBoxItemVM ??
+                throw new ArgumentException("invalid sender");
             // expand all treeViewItems
             var directories = vm.Model.FullPath.Split(Path.DirectorySeparatorChar)
                                          .Where(s => !string.IsNullOrEmpty(s));
-            var parent = treeViewItems;
+            var parent = treeViewItemVMs;
             var child = TreeViewItemVM.Empty;
             foreach (var dir in directories) {
                 child = parent.First(vm => vm.Model.Name == dir);
@@ -64,5 +61,11 @@ namespace DriveExplorer {
             child.IsSelected = true;
         }
 
+        public void TreeViewItem_Selected(object sender, EventArgs e) {
+            TreeViewItem_Selected(sender);
+        }
+        public void ListBoxItem_Selected(object sender, EventArgs e) {
+            ListBoxItem_Selected(sender);
+        }
     }
 }
