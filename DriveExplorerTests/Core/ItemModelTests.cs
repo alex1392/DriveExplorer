@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DriveExplorer.Tests {
+namespace DriveExplorer.Core {
     public class ItemModelTests {
         [Theory]
         [InlineData(@"C:\", ItemModel.Types.Drive)]

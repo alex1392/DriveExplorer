@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 
-namespace DriveExplorer.Tests {
+namespace DriveExplorer.Core {
     public class TreeViewItemVMTests {
 
         [Fact()]

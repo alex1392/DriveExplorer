@@ -7,7 +7,7 @@ using System.Windows.Media;
 using System.IO.Packaging;
 using System.Windows;
 
-namespace DriveExplorer.Tests {
+namespace DriveExplorer.Core {
     public class TypeImageConverterTests {
         private TypeImageConverter converter;
 
