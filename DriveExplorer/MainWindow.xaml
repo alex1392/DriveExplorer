@@ -21,8 +21,6 @@
             </TreeView.Resources>
             <TreeView.ItemContainerStyle>
                 <Style TargetType="TreeViewItem">
-                    <EventSetter Event="Expanded"
-                                 Handler="TreeViewItem_Expanded" />
                     <EventSetter Event="Selected"
                                  Handler="TreeViewItem_Selected" />
                     <Setter Property="IsExpanded"
@@ -47,6 +45,8 @@
                 <Style TargetType="ListBoxItem">
                     <EventSetter Event="MouseDoubleClick"
                                  Handler="ListBoxItem_MouseDoubleClick" />
+                    <Setter Property="IsSelected"
+                            Value="{Binding IsSelected, Mode=TwoWay}" />
                 </Style>
             </ListBox.ItemContainerStyle>
             <!--<ListBox.ItemsPanel>
