@@ -7,30 +7,33 @@ using System.Windows.Controls;
 
 namespace DriveExplorer {
     public class TreeViewItemVM : INotifyPropertyChanged {
-        public static readonly TreeViewItemVM Empty = new TreeViewItemVM();
         private bool isExpanded;
         private bool isSelected;
 
+        public static TreeViewItemVM Empty { get; } = new TreeViewItemVM();
         public ItemModel Model { get; private set; }
-        /// <summary>
-        /// Twoway bound to <see cref="TreeViewItem"/>, to change its state from ViewModel.
-        /// </summary>
+
         public bool IsExpanded {
             get => isExpanded;
             set {
+                if (value == true) {
+                    Expand();
+                    Expanded?.Invoke(this, null);
+                }
                 if (value != isExpanded) {
                     isExpanded = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isExpanded)));
-                    System.Diagnostics.Debug.WriteLine("expanded");
                 }
             }
         }
-        /// <summary>
-        /// Twoway bound to <see cref="TreeViewItem"/>, to change its state from ViewModel.
-        /// </summary>
+
         public bool IsSelected {
             get => isSelected;
             set {
+                if (value == true) {
+                    Select();
+                    Selected?.Invoke(this, null);
+                }
                 if (value != IsSelected) {
                     isSelected = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
@@ -44,27 +47,32 @@ namespace DriveExplorer {
         };
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler Expanded;
+        public event EventHandler Selected;
 
-        public TreeViewItemVM(ItemModel.Types type, string fullpath, bool isRoot = false) {
-            Model = new ItemModel(type, fullpath, isRoot);
+        public TreeViewItemVM(string fullpath) {
+            Model = new ItemModel(fullpath);
         }
 
         public TreeViewItemVM(ItemModel model) {
             Model = model ?? throw new ArgumentNullException(nameof(model));
         }
 
+        public override string ToString() {
+            return $"{Model.Name}, Items: {Items.Count}";
+        }
+
         private TreeViewItemVM() {
         }
 
         private bool HaveExpanded =>
-            Items.Count > 1 || Items[0] != null;
-
+            Items.Count != 1 || Items[0] != null;
 
         /// <summary>
         /// Add subfolders to <see cref="Items"/>, returns <see cref="true"/> if succeeded.
         /// </summary>
         /// <returns><see cref="bool"/> indicating whether this operation is successful.</returns>
-        public bool Expand() {
+        private bool Expand() {
             if (HaveExpanded) {
                 return false;
             }
@@ -72,7 +80,7 @@ namespace DriveExplorer {
             try {
                 var subfolderPaths = Directory.GetDirectories(Model.FullPath);
                 foreach (var subfolderPath in subfolderPaths) {
-                    Items.Add(new TreeViewItemVM(ItemModel.Types.Folder, subfolderPath));
+                    Items.Add(new TreeViewItemVM(subfolderPath));
                 }
                 return true;
             } catch (UnauthorizedAccessException ex) {
@@ -81,8 +89,9 @@ namespace DriveExplorer {
             }
         }
 
-        public override string ToString() {
-            return $"{Model.Name}, Items: {Items.Count}";
+        private void Select() {
+
         }
+
     }
 }
