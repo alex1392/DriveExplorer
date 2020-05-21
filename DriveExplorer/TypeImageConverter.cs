@@ -7,11 +7,7 @@ namespace DriveExplorer {
     public class TypeImageConverter : IValueConverter {
         public static readonly TypeImageConverter Instance = new TypeImageConverter();
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            try {
-                return new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{value.ToString().ToLower()}.png"));
-            } catch (Exception) {
-                return new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/file.png"));
-            }
+            return new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{value.ToString().ToLower()}.png"));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
