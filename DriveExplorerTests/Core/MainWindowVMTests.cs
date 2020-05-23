@@ -4,13 +4,30 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
+using DriveExplorer.IoC;
+using Microsoft.Graph;
+using DriveExplorer.MicrosoftApi;
 
 namespace DriveExplorer.Core {
-    public class MainWindowVMTests {
+    public class MainWindowVMTestFixture {
+        public MainWindowVM mainWindowVM;
+
+        public MainWindowVMTestFixture() {
+            IocContainer.Default.Register<IAuthenticationProvider>(() => AuthProvider.Default);
+            IocContainer.Default.Register<AuthProvider>(() => AuthProvider.Default);
+            IocContainer.Default.Register<GraphManager>();
+            IocContainer.Default.Register<MainWindowVM>();
+            IocContainer.Default.Register<LocalItemFactory>();
+            IocContainer.Default.Register<OneDriveItemFactory>();
+            IocContainer.Default.Register<OneDriveItem>();
+            mainWindowVM = IocContainer.Default.GetSingleton<MainWindowVM>();
+        }
+    }
+    public class MainWindowVMTests : IClassFixture<MainWindowVMTestFixture> {
         private readonly MainWindowVM mainWindowVM;
 
-        public MainWindowVMTests() {
-            mainWindowVM = new MainWindowVM(null,null);
+        public MainWindowVMTests(MainWindowVMTestFixture fixture) {
+            mainWindowVM = fixture.mainWindowVM;
             foreach (var item in mainWindowVM.ItemVMs) {
                 item.Selected += async (sender, e) => await mainWindowVM.TreeViewItem_SelectedAsync(sender);
             }

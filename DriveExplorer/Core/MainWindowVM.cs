@@ -17,13 +17,28 @@ namespace DriveExplorer {
     public class MainWindowVM : INotifyPropertyChanged {
         private readonly AuthProvider authProvider;
         private readonly GraphManager graphManager;
+        private readonly LocalItemFactory localItemFactory;
+        private OneDriveItemFactory oneDriveItemFactory;
 
         public event PropertyChangedEventHandler PropertyChanged;
         public ObservableCollection<ItemVM> ItemVMs { get; set; } = new ObservableCollection<ItemVM>();
 
         public ObservableCollection<ItemVM> listBoxItemVMs { get; set; } = new ObservableCollection<ItemVM>();
 
-        public MainWindowVM() {
+        public MainWindowVM(
+            AuthProvider authProvider,
+            GraphManager graphManager,
+            LocalItemFactory localItemFactory,
+            OneDriveItemFactory oneDriveItemFactory) {
+
+            this.authProvider = authProvider;
+            this.graphManager = graphManager;
+            this.localItemFactory = localItemFactory;
+            this.oneDriveItemFactory = oneDriveItemFactory;
+            GetLocalDrives();
+        }
+
+        public void GetLocalDrives() {
             string[] drivePaths = null;
             try {
                 drivePaths = Directory.GetLogicalDrives();
@@ -31,26 +46,15 @@ namespace DriveExplorer {
                 MessageBox.Show(ex.Message);
             }
             foreach (var drivePath in drivePaths) {
-                var model = IocContainer.Default.GetSingleton<LocalItemFactory>().Create(drivePath);
-                var item = new ItemVM(model);
-                ItemVMs.Add(item);
-                listBoxItemVMs.Add(item);
+                var model = localItemFactory.Create(drivePath);
+                ItemVMs.Add(new ItemVM(model));
+                listBoxItemVMs.Add(new ItemVM(model));
             }
         }
 
-        [PreferredConstructor]
-        public MainWindowVM(AuthProvider authProvider, GraphManager graphManager) : this() {
-            this.authProvider = authProvider;
-            this.graphManager = graphManager;
-            var _ =Task.Run(() => authProvider.GetAccessToken()).Result;
-            var root = Task.Run(() => graphManager.GetDriveRootAsync()).Result;
-            var item = new ItemVM(IocContainer.Default.GetSingleton<OneDriveItemFactory>().Create(root));
-            ItemVMs.Add(item);
-        }
-
-        public async Task LoginOneDriveAsync() {
+        public async Task GetOneDriveAsync() {
             var root = await graphManager.GetDriveRootAsync();
-            var item = new ItemVM(IocContainer.Default.GetSingleton<OneDriveItemFactory>().Create(root));
+            var item = new ItemVM(oneDriveItemFactory.Create(root));
             ItemVMs.Add(item);
         }
 
@@ -64,8 +68,8 @@ namespace DriveExplorer {
             // update list box items
             await vm.ExpandAsync(); // in case there's no items as it hasn't been expanded 
             listBoxItemVMs.Clear();
-            foreach (var item in vm.Children) {
-                listBoxItemVMs.Add(item);
+            foreach (var itemVM in vm.Children) {
+                listBoxItemVMs.Add(new ItemVM(itemVM.Item));
             }
 
         }
@@ -73,7 +77,7 @@ namespace DriveExplorer {
             var vm = (sender as ItemVM) ??
                 (sender as ListBoxItem).DataContext as ItemVM ??
                 throw new ArgumentException("invalid sender");
-            if (ItemTypes.Folder.Add(ItemTypes.Drive).Contains(vm.Item.Type)) {
+            if (!vm.Item.Type.Is(ItemTypes.Folders)) {
                 return;
             }
             // expand all treeViewItems

@@ -7,6 +7,9 @@ using DriveExplorer.IoC;
 
 namespace DriveExplorer.Core {
     public class ItemModelTests {
+        public ItemModelTests() {
+            IocContainer.Default.Register<LocalItemFactory>();
+        }
         [Theory]
         [InlineData(@"C:\", ItemTypes.Drive)]
         [InlineData(@"C:\path\doc.png", ItemTypes.IMG)]

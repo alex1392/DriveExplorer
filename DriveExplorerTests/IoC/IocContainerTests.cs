@@ -19,9 +19,12 @@ namespace DriveExplorer.IoC {
 		[Fact]
 		public void GetMainWindowVM() {
 			ioc.Register<IAuthenticationProvider>(() => AuthProvider.Default);
+			ioc.Register<AuthProvider>(() => AuthProvider.Default);
 			ioc.Register<GraphManager>();
 			ioc.Register<MainWindowVM>();
-			var authProvider = ioc.GetSingleton<IAuthenticationProvider>();
+			ioc.Register<LocalItemFactory>();
+			ioc.Register<OneDriveItemFactory>();
+			var authProvider = ioc.GetSingleton<AuthProvider>();
 			var graphManager = ioc.GetSingleton<GraphManager>();
 			var mainWindowVM = ioc.GetSingleton<MainWindowVM>();
 			Assert.NotNull(authProvider);

@@ -17,18 +17,6 @@ namespace DriveExplorer {
             this.graphManager = graphManager;
         }
 
-        public async IAsyncEnumerable<IItem> GetFilesAsync() {
-            await foreach (var file in graphManager.GetFilesAsync(Id)) {
-                yield return IocContainer.Default.GetSingleton<OneDriveItemFactory>().Create(file);
-            }
-        }
-
-        public async IAsyncEnumerable<IItem> GetFoldersAsync() {
-            await foreach (var folder in graphManager.GetFolersAsync(Id)) {
-                yield return IocContainer.Default.GetSingleton<OneDriveItemFactory>().Create(folder);
-            }
-        }
-
         public async IAsyncEnumerable<IItem> GetChildrenAsync() {
             await foreach (var item in graphManager.GetChildrenAsync(Id)) {
                 yield return IocContainer.Default.GetSingleton<OneDriveItemFactory>().Create(item);

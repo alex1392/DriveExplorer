@@ -12,7 +12,17 @@ namespace DriveExplorer {
     public class ItemVM : INotifyPropertyChanged {
         private bool _isExpanded;
         private bool haveExpanded = false;
-        private bool isSelected;
+        private bool _isSelected;
+        private bool isSelected {
+            get => _isSelected;
+            set {
+                if (value != _isSelected) {
+                    _isSelected = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+                }
+            }
+        }
+
         /// <summary>
         /// Invoke <see cref="PropertyChanged"/> event
         /// </summary>
@@ -21,7 +31,7 @@ namespace DriveExplorer {
             set {
                 if (value != _isExpanded) {
                     _isExpanded = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(isExpanded)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsExpanded)));
                 }
             }
         }
@@ -29,7 +39,7 @@ namespace DriveExplorer {
         public static ItemVM Empty { get; } = new ItemVM();
         public IItem Item { get; private set; }
         /// <summary>
-        /// Invoke <see cref="ExpandAsync"/> event.
+        /// Change the state of expansion and invoke <see cref="ExpandAsync"/> without await. To expand item programmically, directly call <see cref="ExpandAsync"/> instead.
         /// </summary>
         public bool IsExpanded {
             get => isExpanded;
@@ -42,17 +52,17 @@ namespace DriveExplorer {
                 }
             }
         }
-
+        /// <summary>
+        /// Change the state of selection and invoke <see cref="Select"/> without await. To select item programmically, directly call <see cref="Select"/> instead.
+        /// </summary>
         public bool IsSelected {
             get => isSelected;
             set {
-                if (value == true) {
-                    Select();
-                    Selected?.Invoke(this, null);
-                }
                 if (value != IsSelected) {
                     isSelected = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+                }
+                if (value == true) {
+                    Select();
                 }
             }
         }
@@ -78,6 +88,9 @@ namespace DriveExplorer {
         }
 
         public async Task ExpandAsync() {
+            if (!Item.Type.Is(ItemTypes.Folders)) {
+                return;
+            }
             if (isExpanded != true) {
                 isExpanded = true; // invoke propertychanged 
             }
@@ -89,11 +102,15 @@ namespace DriveExplorer {
             await foreach (var item in Item.GetChildrenAsync()) {
                 Children.Add(new ItemVM(item));
             }
-            Expanded?.Invoke(this, null);
+            Expanded?.Invoke(this, null); // invoke event
         }
 
-        private void Select() {
+        public void Select() {
+            if (isSelected != true) {
+                isSelected = true; // invoke propertychanged
+            }
 
+            Selected?.Invoke(this, null); // invoke event
         }
 
     }

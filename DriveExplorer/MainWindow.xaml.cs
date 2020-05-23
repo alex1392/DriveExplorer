@@ -26,12 +26,12 @@ namespace DriveExplorer {
             await vm.TreeViewItem_SelectedAsync(sender, e);
         }
 
-        private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
-            vm.ListBoxItem_SelectedAsync(sender, e);
+        private async void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            await vm.ListBoxItem_SelectedAsync(sender, e);
         }
 
         private async void OneDriveButton_Click(object sender, RoutedEventArgs e) {
-            await vm.LoginOneDriveAsync();
+            await vm.GetOneDriveAsync();
         }
     }
 }
