@@ -13,6 +13,10 @@ namespace DriveExplorer {
         private bool _isExpanded;
         private bool haveExpanded = false;
         private bool _isSelected;
+		/// <summary>
+		/// Invoke <see cref="PropertyChanged"/> event
+		/// </summary>
+		/// <value></value>
         private bool isSelected {
             get => _isSelected;
             set {
@@ -53,7 +57,7 @@ namespace DriveExplorer {
             }
         }
         /// <summary>
-        /// Change the state of selection and invoke <see cref="Select"/> without await. To select item programmically, directly call <see cref="Select"/> instead.
+        /// Change the state of selection and invoke <see cref="SelectAsync"/> without await. To select item programmically, directly call <see cref="SelectAsync"/> instead.
         /// </summary>
         public bool IsSelected {
             get => isSelected;
@@ -62,7 +66,7 @@ namespace DriveExplorer {
                     isSelected = value;
                 }
                 if (value == true) {
-                    Select();
+                    SelectAsync();
                 }
             }
         }
@@ -105,12 +109,13 @@ namespace DriveExplorer {
             Expanded?.Invoke(this, null); // invoke event
         }
 
-        public void Select() {
+        public async Task SelectAsync() {
             if (isSelected != true) {
                 isSelected = true; // invoke propertychanged
             }
+			
 
-            Selected?.Invoke(this, null); // invoke event
+			Selected?.Invoke(this, null); // invoke event
         }
 
     }

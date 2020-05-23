@@ -14,7 +14,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
-        <TreeView ItemsSource="{Binding ItemVMs}">
+		<TreeView ItemsSource="{Binding TreeItemVMs}">
             <TreeView.Resources>
             </TreeView.Resources>
             <TreeView.ItemContainerStyle>
@@ -38,7 +38,7 @@
         </TreeView>
         <GridSplitter Width="5" />
 
-        <ListBox ItemsSource="{Binding listBoxItemVMs}"
+		<ListBox ItemsSource="{Binding CurrentItemVMs}"
                  Grid.Column="1">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">

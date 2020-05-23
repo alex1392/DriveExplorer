@@ -23,11 +23,11 @@ namespace DriveExplorer {
         }
 
         private async void TreeViewItem_Selected(object sender, RoutedEventArgs e) {
-            await vm.TreeViewItem_SelectedAsync(sender, e);
+            await vm.TreeItem_SelectedAsync(sender, e);
         }
 
         private async void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
-            await vm.ListBoxItem_SelectedAsync(sender, e);
+            await vm.CurrentItem_SelectedAsync(sender, e);
         }
 
         private async void OneDriveButton_Click(object sender, RoutedEventArgs e) {

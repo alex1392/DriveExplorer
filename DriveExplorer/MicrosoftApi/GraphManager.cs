@@ -27,7 +27,7 @@ namespace DriveExplorer.MicrosoftApi {
             }
             private set => userCache = value;
         }
-        public GraphManager(IAuthenticationProvider authProvider = null) {
+        public GraphManager(AuthProvider authProvider = null) {
             if (authProvider is null) {
                 authProvider = AuthProvider.Default;
             }

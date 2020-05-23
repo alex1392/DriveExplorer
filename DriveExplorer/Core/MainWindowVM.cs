@@ -1,12 +1,9 @@
-﻿using DriveExplorer.IoC;
-using DriveExplorer.MicrosoftApi;
-using Microsoft.Graph;
+﻿using DriveExplorer.MicrosoftApi;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,9 +18,9 @@ namespace DriveExplorer {
         private OneDriveItemFactory oneDriveItemFactory;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public ObservableCollection<ItemVM> ItemVMs { get; set; } = new ObservableCollection<ItemVM>();
+        public ObservableCollection<ItemVM> TreeItemVMs { get; set; } = new ObservableCollection<ItemVM>();
 
-        public ObservableCollection<ItemVM> listBoxItemVMs { get; set; } = new ObservableCollection<ItemVM>();
+        public ObservableCollection<ItemVM> CurrentItemVMs { get; set; } = new ObservableCollection<ItemVM>();
 
         public MainWindowVM(
             AuthProvider authProvider,
@@ -36,6 +33,11 @@ namespace DriveExplorer {
             this.localItemFactory = localItemFactory;
             this.oneDriveItemFactory = oneDriveItemFactory;
             GetLocalDrives();
+
+            // must create the second IoC object within the same thread of the first creating object, otherwise the syncLock would be held by the first thread, the second thread would be block until the first thread is finished. However, the first object need the second object in order to complete its creation. Consequently, a deadlock occurs.
+            var root = Task.Run(async () => await graphManager.GetDriveRootAsync()).Result;
+            var item = new ItemVM(oneDriveItemFactory.Create(root)); 
+            TreeItemVMs.Add(item);
         }
 
         public void GetLocalDrives() {
@@ -47,18 +49,18 @@ namespace DriveExplorer {
             }
             foreach (var drivePath in drivePaths) {
                 var model = localItemFactory.Create(drivePath);
-                ItemVMs.Add(new ItemVM(model));
-                listBoxItemVMs.Add(new ItemVM(model));
+                TreeItemVMs.Add(new ItemVM(model));
+                CurrentItemVMs.Add(new ItemVM(model));
             }
         }
-
+        
         public async Task GetOneDriveAsync() {
             var root = await graphManager.GetDriveRootAsync();
             var item = new ItemVM(oneDriveItemFactory.Create(root));
-            ItemVMs.Add(item);
+            TreeItemVMs.Add(item);
         }
 
-        public async Task TreeViewItem_SelectedAsync(object sender, RoutedEventArgs e = null) {
+        public async Task TreeItem_SelectedAsync(object sender, RoutedEventArgs e = null) {
             var vm = (sender as ItemVM) ??
                 (sender as TreeViewItem).DataContext as ItemVM ??
                 throw new ArgumentException("invalid sender");
@@ -67,13 +69,13 @@ namespace DriveExplorer {
             }
             // update list box items
             await vm.ExpandAsync(); // in case there's no items as it hasn't been expanded 
-            listBoxItemVMs.Clear();
+            CurrentItemVMs.Clear();
             foreach (var itemVM in vm.Children) {
-                listBoxItemVMs.Add(new ItemVM(itemVM.Item));
+                CurrentItemVMs.Add(new ItemVM(itemVM.Item));
             }
 
         }
-        public async Task ListBoxItem_SelectedAsync(object sender, MouseButtonEventArgs e = null) {
+        public async Task CurrentItem_SelectedAsync(object sender, MouseButtonEventArgs e = null) {
             var vm = (sender as ItemVM) ??
                 (sender as ListBoxItem).DataContext as ItemVM ??
                 throw new ArgumentException("invalid sender");
@@ -82,7 +84,7 @@ namespace DriveExplorer {
             }
             // expand all treeViewItems
             var directories = vm.Item.FullPath.Split(Path.DirectorySeparatorChar).Where(s => !string.IsNullOrEmpty(s));
-            var parent = ItemVMs;
+            var parent = TreeItemVMs;
             var child = ItemVM.Empty;
             foreach (var dir in directories) {
                 child = parent.First(vm => vm.Item.Name == dir);

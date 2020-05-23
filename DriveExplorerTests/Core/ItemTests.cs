@@ -6,8 +6,8 @@ using System.Text;
 using DriveExplorer.IoC;
 
 namespace DriveExplorer.Core {
-    public class ItemModelTests {
-        public ItemModelTests() {
+    public class ItemTests {
+        public ItemTests() {
             IocContainer.Default.Register<LocalItemFactory>();
         }
         [Theory]

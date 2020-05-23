@@ -7,6 +7,17 @@ using System.Diagnostics;
 
 namespace DriveExplorer.MicrosoftApi {
     public class AuthProviderTests{
+
+		[Fact]
+		public async Task WithUsernameInAppConfig_GetAccessTokenWithUsername_ResultNotNullAsync()
+		{
+			//Given
+			var authProvider = new AuthProvider(new ConfigurationBuilder().AddUserSecrets<AuthProviderTests>().Build(), Urls.Auth.Organizations);
+			//When
+			var token = await authProvider.GetAccessTokenWithUsernamePassword();
+			//Then
+			Assert.NotNull(token);
+		}
        
         [Fact]
         public void EmptyAppConfig_GetAuthProvider_Throws() {
@@ -19,16 +30,6 @@ namespace DriveExplorer.MicrosoftApi {
             var authProvider = new AuthProvider(null, Urls.Auth.Organizations);
             var token = await authProvider.GetAccessTokenWithUsernamePassword();
             Assert.Null(token);
-        }
-
-        [Fact]
-        public async Task WithUsernameInAppConfig_GetAccessTokenWithUsername_ResultNotNullAsync() {
-            //Given
-            var authProvider = new AuthProvider(new ConfigurationBuilder().AddUserSecrets<AuthProviderTests>().Build(), Urls.Auth.Organizations);
-            //When
-            var token = await authProvider.GetAccessTokenWithUsernamePassword();
-            //Then
-            Assert.NotNull(token);
         }
 
         [Fact(Skip = "Need user interaction")]
