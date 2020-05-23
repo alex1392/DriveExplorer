@@ -6,7 +6,13 @@
     <UserSecretsId>6ac524fd-d337-4506-bd8e-21e87bc91907</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="dotcover\**" />
+    <EmbeddedResource Remove="dotcover\**" />
+    <None Remove="dotcover\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="coverage.json" />
+    <None Remove="dotcover.html" />
     <None Remove="lcov.info" />
   </ItemGroup>
   <ItemGroup>

@@ -35,13 +35,13 @@ namespace TreeViewTest {
                 return;
             }
             foreach (var drivePath in drives) {
-                ItemModel item = new ItemModel
+                var item = new ItemModel
                 {
                     Type = ItemModel.Types.Drive,
                     Name = drivePath.Replace(Path.DirectorySeparatorChar, ' ').Trim(),
                     FullPath = drivePath,
                 };
-                TreeViewItem driveItem = new TreeViewItem
+                var driveItem = new TreeViewItem
                 {
                     DataContext = item,
                 };
@@ -73,7 +73,7 @@ namespace TreeViewTest {
             }
 
             foreach (var subfolderPath in subfolderPaths) {
-                TreeViewItem subfolderItem = new TreeViewItem
+                var subfolderItem = new TreeViewItem
                 {
                     DataContext = new ItemModel
                     {
@@ -106,7 +106,7 @@ namespace TreeViewTest {
 
             ItemView.Items.Clear();
             foreach (var subfolderPath in subfolderPaths) {
-                ItemModel subfolderItem = new ItemModel()
+                var subfolderItem = new ItemModel()
                 {
                     Type = ItemModel.Types.Folder,
                     Name = Path.GetFileName(subfolderPath),
@@ -169,7 +169,7 @@ namespace TreeViewTest {
                 return;
             }
             // expand tree view folder
-            string fullPath = item.FullPath;
+            var fullPath = item.FullPath;
             var paths = fullPath.Split(Path.DirectorySeparatorChar).Where(s => !string.IsNullOrEmpty(s)).ToList();
             var treeView = FolderTreeView as ItemsControl;
             foreach (var path in paths) {

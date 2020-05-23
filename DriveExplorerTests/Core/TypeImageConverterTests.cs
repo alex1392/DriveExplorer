@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace DriveExplorer.Core {
     public class TypeImageConverterTests {
-        private TypeImageConverter converter;
+        private readonly TypeImageConverter converter;
 
         public TypeImageConverterTests() {
             converter = new TypeImageConverter();
@@ -17,9 +17,9 @@ namespace DriveExplorer.Core {
         }
 
         [Theory]
-        [InlineData(ItemModel.Types.IMG)]
-        [InlineData(ItemModel.Types.File)]
-        public void ConvertTest(ItemModel.Types type) {
+        [InlineData(ItemTypes.IMG)]
+        [InlineData(ItemTypes.File)]
+        public void ConvertTest(ItemTypes type) {
             var source = converter.Convert(type, typeof(ImageSource), null, null);
             Assert.NotNull(source);
         }

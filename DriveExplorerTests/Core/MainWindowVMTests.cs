@@ -7,30 +7,30 @@ using System.Diagnostics;
 
 namespace DriveExplorer.Core {
     public class MainWindowVMTests {
-        private MainWindowVM mainWindowVM;
+        private readonly MainWindowVM mainWindowVM;
 
         public MainWindowVMTests() {
-            mainWindowVM = new MainWindowVM();
-            foreach (var item in mainWindowVM.treeViewItemVMs) {
-                item.Selected += mainWindowVM.TreeViewItem_Selected;
+            mainWindowVM = new MainWindowVM(null,null);
+            foreach (var item in mainWindowVM.ItemVMs) {
+                item.Selected += async (sender, e) => await mainWindowVM.TreeViewItem_SelectedAsync(sender);
             }
             foreach (var item in mainWindowVM.listBoxItemVMs) {
-                item.Selected += mainWindowVM.ListBoxItem_Selected;
+                item.Selected += async (sender, e) => await mainWindowVM.ListBoxItem_SelectedAsync(sender);
             }
         }
 
         [Fact()]
         public void TreeViewItem_SelectedTest() {
             Debug.WriteLine($"listBoxItems: {mainWindowVM.listBoxItemVMs.Count}"); // should be only one item (C:\)
-            mainWindowVM.treeViewItemVMs[0].IsSelected = true;
+            mainWindowVM.ItemVMs[0].IsSelected = true;
             Assert.True(mainWindowVM.listBoxItemVMs.Count > 1);
         }
 
         [Fact()]
         public void ListBoxItem_SelectedTest() {
-            Debug.WriteLine($"IsExpanded: {mainWindowVM.treeViewItemVMs[0].IsExpanded}"); // should be false
+            Debug.WriteLine($"IsExpanded: {mainWindowVM.ItemVMs[0].IsExpanded}"); // should be false
             mainWindowVM.listBoxItemVMs[0].IsSelected = true;
-            Assert.True(mainWindowVM.treeViewItemVMs[0].IsExpanded);
+            Assert.True(mainWindowVM.ItemVMs[0].IsExpanded);
         }
     }
 }

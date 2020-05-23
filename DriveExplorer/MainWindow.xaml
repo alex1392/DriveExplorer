@@ -6,17 +6,15 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:DriveExplorer"
         mc:Ignorable="d"
-        Title="Window2" Height="450" Width="800">
-    <Window.DataContext>
-        <local:MainWindowVM />
-    </Window.DataContext>
+        Title="Window2"
+        Height="450"
+        Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
-        <TreeView Name="treeView"
-                  ItemsSource="{Binding treeViewItems}">
+        <TreeView ItemsSource="{Binding ItemVMs}">
             <TreeView.Resources>
             </TreeView.Resources>
             <TreeView.ItemContainerStyle>
@@ -27,26 +25,25 @@
                             Value="{Binding IsExpanded, Mode=TwoWay}" />
                     <Setter Property="IsSelected"
                             Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="Visibility"
+                            Value="{Binding Item.Type, Converter={x:Static local:TypeVisibilityConverter.Instance}}" />
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:TreeViewItemVM}"
-                                          ItemsSource="{Binding Items}">
-                    <TextBlock Text="{Binding Model.Name}" />
+                <HierarchicalDataTemplate DataType="{x:Type local:ItemVM}"
+                                          ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding Item.Name}" />
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
         <GridSplitter Width="5" />
 
-        <ListBox Name="listBox"
-                 Grid.Column="1"
-                 ItemsSource="{Binding listBoxItems}">
+        <ListBox ItemsSource="{Binding listBoxItemVMs}"
+                 Grid.Column="1">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <EventSetter Event="MouseDoubleClick"
                                  Handler="ListBoxItem_MouseDoubleClick" />
-                    <Setter Property="IsSelected"
-                            Value="{Binding IsSelected, Mode=TwoWay}" />
                 </Style>
             </ListBox.ItemContainerStyle>
             <!--<ListBox.ItemsPanel>
@@ -55,11 +52,16 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>-->
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type local:ListBoxItemVM}">
-                    <TextBlock Text="{Binding Model.Name}" />
+                <DataTemplate DataType="{x:Type local:ItemVM}">
+                    <TextBlock Text="{Binding Item.Name}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         
+        <Button Content="Login OneDrive" 
+                Click="OneDriveButton_Click"
+                Grid.Column="1"
+                Margin="462,373,10,10" />
+
     </Grid>
 </Window>

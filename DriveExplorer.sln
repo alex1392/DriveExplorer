@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveExplorer", "DriveExplo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveExplorerTests", "DriveExplorerTests\DriveExplorerTests.csproj", "{3A2516BE-FD88-4E1A-8BB8-6D53DA6010A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TreeViewTest", "TreeViewTest\TreeViewTest.csproj", "{32989376-BAFD-4597-9C8D-F9EB5AC819FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TreeViewTest", "TreeViewTest\TreeViewTest.csproj", "{32989376-BAFD-4597-9C8D-F9EB5AC819FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{16B333E7-7720-476A-A3DA-32AB4F7ED74D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

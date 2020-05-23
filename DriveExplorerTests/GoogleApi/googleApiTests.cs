@@ -13,9 +13,9 @@ using Google;
 namespace DriveExplorer.GoogleApi {
 	public class GoogleApiTests {
 		private const string ClientSecretsPath = "GoogleApi/client_secret.json";
-		private string[] scopes;
-		private UserCredential credential;
-		private DriveService service;
+		private readonly string[] scopes;
+		private readonly UserCredential credential;
+		private readonly DriveService service;
 
 		public GoogleApiTests() {
 			scopes = new[] { DriveService.Scope.Drive };
@@ -42,8 +42,8 @@ namespace DriveExplorer.GoogleApi {
 			getRequest.Fields = "*";
 			var about = await getRequest.ExecuteAsync();
 			foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(about)) {
-				string name = descriptor.Name;
-				object value = descriptor.GetValue(about);
+				var name = descriptor.Name;
+				var value = descriptor.GetValue(about);
 				Console.WriteLine($"{name}: {value}");
 			}
 			//Then

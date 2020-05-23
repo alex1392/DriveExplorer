@@ -22,7 +22,8 @@ namespace DriveExplorer
 
 	public static class Timeouts
 	{
-		public static readonly TimeSpan Silent = TimeSpan.FromSeconds(5);
+		public static readonly TimeSpan Silent = TimeSpan.FromSeconds(10);
 		public static readonly TimeSpan Interactive = TimeSpan.FromMinutes(1);
 	}
+
 }

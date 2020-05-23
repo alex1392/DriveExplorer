@@ -15,13 +15,12 @@ namespace DriveExplorer.GoogleApi {
 		/// <param name="scopes">The scopes needed for the client application.</param>
 		/// <returns>UserCredential class</returns>
 		public static async Task<UserCredential> FromFileAsync(string path, IEnumerable<string> scopes) {
-			using(var stream = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-				return await GoogleWebAuthorizationBroker.AuthorizeAsync(
-					GoogleClientSecrets.Load(stream).Secrets,
-					new [] { DriveService.Scope.Drive },
-					"user",
-					CancellationToken.None);
-			}
-		}
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            return await GoogleWebAuthorizationBroker.AuthorizeAsync(
+GoogleClientSecrets.Load(stream).Secrets,
+new[] { DriveService.Scope.Drive },
+"user",
+CancellationToken.None);
+        }
 	}
 }

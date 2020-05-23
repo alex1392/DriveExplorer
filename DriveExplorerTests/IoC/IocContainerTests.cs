@@ -1,13 +1,41 @@
+using DriveExplorer.MicrosoftApi;
+using Microsoft.Graph;
 using System;
 using System.Linq;
 using Xunit;
 
 namespace DriveExplorer.IoC {
-	public class IocContainerTests {
-		private IocContainer ioc;
+	public class IocContainerTests : IDisposable {
+		private readonly IocContainer ioc;
 
 		public IocContainerTests() {
 			ioc = new IocContainer();
+		}
+
+		public void Dispose() {
+			ioc.Reset();
+		}
+
+		[Fact]
+		public void GetMainWindowVM() {
+			ioc.Register<IAuthenticationProvider>(() => AuthProvider.Default);
+			ioc.Register<GraphManager>();
+			ioc.Register<MainWindowVM>();
+			var authProvider = ioc.GetSingleton<IAuthenticationProvider>();
+			var graphManager = ioc.GetSingleton<GraphManager>();
+			var mainWindowVM = ioc.GetSingleton<MainWindowVM>();
+			Assert.NotNull(authProvider);
+			Assert.NotNull(graphManager);
+			Assert.NotNull(mainWindowVM);
+		}
+
+		[Fact]
+		public void GetTrasient() {
+			ioc.Register<IAuthenticationProvider>(() => AuthProvider.Default);
+			ioc.Register<GraphManager>();
+			var graph1 = ioc.GetTransient<GraphManager>();
+			var graph2 = ioc.GetTransient<GraphManager>();
+			Assert.NotEqual(graph1, graph2);
 		}
 
 		[Fact]
@@ -28,7 +56,7 @@ namespace DriveExplorer.IoC {
 			//When
 			ioc.Reset();
 			//Then
-			bool condition = ioc.IsRegistered<MyClass>();
+			var condition = ioc.IsRegistered<MyClass>();
 			Assert.False(condition);
 		}
 
@@ -85,17 +113,6 @@ namespace DriveExplorer.IoC {
 			var instance = ioc.GetInstance<DependentClass>();
 			//Then
 			Assert.NotNull(instance);
-		}
-
-		[Fact]
-		public void NoRegisterDependedClass_GetDependentClassInstance_Throws() {
-			//Given
-
-			ioc.Register<DependentClass>();
-			//When
-			Func<DependentClass> func = ioc.GetInstance<DependentClass>;
-			//Then
-			Assert.Throws<InvalidOperationException>(func);
 		}
 
 		[Fact]
@@ -179,43 +196,11 @@ namespace DriveExplorer.IoC {
 		}
 
 		[Fact]
-		public void RegisterClassTwice_ThrowError() {
-			//Given
-
-			ioc.Register<MyClass>();
-			//When
-			Action action = ioc.Register<MyClass>;
-			//Then
-			Assert.Throws<InvalidOperationException>(action);
-		}
-
-		[Fact]
-		public void RegisterInterfaceTwice_ThorwsError() {
-			//Given
-
-			ioc.Register<IClass, MyClass>();
-			//When
-			Action action = ioc.Register<IClass, MyClass>;
-			//Then
-			Assert.Throws<InvalidOperationException>(action);
-		}
-
-		[Fact]
 		public void RegisterInterfaceWithRegisterClass_Throws() {
 			//Given
 
 			//When
 			Action action = ioc.Register<IClass>;
-			//Then
-			Assert.Throws<ArgumentException>(action);
-		}
-
-		[Fact]
-		public void RegisterClassWithRegisterInterface_Throws() {
-			//Given
-
-			//When
-			Action action = ioc.Register<MyClass, MyClass>;
 			//Then
 			Assert.Throws<ArgumentException>(action);
 		}
@@ -251,8 +236,10 @@ namespace DriveExplorer.IoC {
 			//When
 			Action action = ioc.Register<ClassWithoutPublicCtor>;
 			//Then
-			Assert.Throws<ArgumentException>(action);
+			Assert.Throws<InvalidOperationException>(action);
 		}
+
+
 	}
 
 	public class DependedClass {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DriveExplorer.IoC;
+using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
@@ -13,19 +14,24 @@ namespace DriveExplorer {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
-        private MainWindowVM vm;
+        private readonly MainWindowVM vm;
 
         public MainWindow() {
             InitializeComponent();
-            vm = DataContext as MainWindowVM;
+            vm = IocContainer.Default.GetSingleton<MainWindowVM>();
+            DataContext = vm;
         }
 
-        private void TreeViewItem_Selected(object sender, RoutedEventArgs e) {
-            vm.TreeViewItem_Selected(sender, e);
+        private async void TreeViewItem_Selected(object sender, RoutedEventArgs e) {
+            await vm.TreeViewItem_SelectedAsync(sender, e);
         }
 
         private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
-            vm.ListBoxItem_Selected(sender, e);
+            vm.ListBoxItem_SelectedAsync(sender, e);
+        }
+
+        private async void OneDriveButton_Click(object sender, RoutedEventArgs e) {
+            await vm.LoginOneDriveAsync();
         }
     }
 }
