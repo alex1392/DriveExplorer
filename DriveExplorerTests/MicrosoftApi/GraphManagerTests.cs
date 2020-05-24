@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Xunit;
 using System;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using System.Linq;
 using System.IO;
@@ -12,15 +11,11 @@ using System.Threading.Tasks;
 
 namespace DriveExplorer.MicrosoftApi {
     public class GraphManagerFixture {
-        public IConfigurationRoot appConfig;
         public AuthProvider authProvider;
         public GraphManager graphManager;
 
         public GraphManagerFixture() {
-            appConfig = new ConfigurationBuilder()
-                            .AddUserSecrets<GraphManagerTests>()
-                            .Build();
-            authProvider = new AuthProvider(appConfig, Urls.Auth.Organizations);
+            authProvider = new AuthProvider(Urls.Auth.Organizations);
             graphManager = new GraphManager(authProvider);
             var _ = authProvider.GetAccessTokenWithUsernamePassword().Result;
         }
@@ -33,27 +28,13 @@ namespace DriveExplorer.MicrosoftApi {
 
     [Collection(GraphManagerCollection.Name)]
     public class GraphManagerTests {
-        private readonly IConfigurationRoot appConfig;
         private readonly AuthProvider authProvider;
         private readonly GraphManager graphManager;
 
         public GraphManagerTests(GraphManagerFixture fixture) {
-            appConfig = fixture.appConfig;
             authProvider = fixture.authProvider;
             graphManager = fixture.graphManager;
             Debug.WriteLine(graphManager.GetHashCode());
-        }
-
-        [Fact]
-        public async Task GetUser_UserMailEqualToUsernameInAppConfigAsync() {
-            //Given
-            authProvider.Scopes = new[] { Permissions.User.Read };
-            string Username = appConfig[nameof(Username)];
-            //When
-            var user = await graphManager.GetMeAsync();
-            Debug.WriteLine(user.DisplayName);
-            //Then
-            Assert.Equal(Username, user.Mail);
         }
 
         [Fact]

@@ -1,28 +1,20 @@
-﻿using System.Linq;
-using Xunit;
+﻿using Xunit;
 using DriveExplorer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Diagnostics;
-using DriveExplorer.IoC;
-using Microsoft.Graph;
-using DriveExplorer.MicrosoftApi;
-using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using DriveExplorer.MicrosoftApi;
+using DriveExplorer.IoC;
+using System.Diagnostics;
 
 namespace DriveExplorer.Core {
 	public class MainWindowVMTestFixture {
 		public MainWindowVM mainWindowVM;
 
 		public MainWindowVMTestFixture() {
-			Func<AuthProvider> factory = () =>
-				new AuthProvider(
-					new ConfigurationBuilder()
-					.AddUserSecrets<AuthProviderTests>()
-					.Build()
-					, Urls.Auth.Organizations);
-			IocContainer.Default.Register<AuthProvider>(factory);
+			IocContainer.Default.Register<AuthProvider>(() => new AuthProvider(Urls.Auth.Organizations));
 			IocContainer.Default.Register<GraphManager>();
 			IocContainer.Default.Register<MainWindowVM>();
 			IocContainer.Default.Register<LocalItemFactory>();
@@ -88,5 +80,39 @@ namespace DriveExplorer.Core {
 			Assert.True(mainWindowVM.TreeItemVMs[1].IsExpanded);
 		}
 
+		[Fact()]
+		public void ResetTest() {
+			throw new NotImplementedException();
+		}
+
+		[Fact()]
+		public void LoginOneDriveTest() {
+			throw new NotImplementedException();
+		}
+
+		[Fact()]
+		public void GetLocalDrivesTest() {
+			throw new NotImplementedException();
+		}
+
+		[Fact()]
+		public void GetOneDriveAsyncTest() {
+			throw new NotImplementedException();
+		}
+
+		[Fact()]
+		public void StartPageTest() {
+			throw new NotImplementedException();
+		}
+
+		[Fact()]
+		public void TreeItem_SelectedAsyncTest() {
+			throw new NotImplementedException();
+		}
+
+		[Fact()]
+		public void CurrentItem_SelectedAsyncTest() {
+			throw new NotImplementedException();
+		}
 	}
 }
