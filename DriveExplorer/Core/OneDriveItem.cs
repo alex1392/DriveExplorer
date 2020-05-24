@@ -20,7 +20,7 @@ namespace DriveExplorer {
 
         public async IAsyncEnumerable<IItem> GetChildrenAsync() {
             await foreach (var item in graphManager.GetChildrenAsync(Id).ConfigureAwait(false)) {
-                yield return IocContainer.Default.GetSingleton<OneDriveItemFactory>().Create(item);
+                yield return IocContainer.Default.GetSingleton<OneDriveItemFactory>().CreateChild(item, this);
             }
         }
     }

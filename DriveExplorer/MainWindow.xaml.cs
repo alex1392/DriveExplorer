@@ -20,10 +20,14 @@ namespace DriveExplorer {
         public MainWindow() {
             InitializeComponent();
             vm = IocContainer.Default.GetSingleton<MainWindowVM>();
-            vm.GetLocalDrives();
-            Task.Run(async () => await vm.LoginOneDrive()).Wait();
-            vm.StartPage();
             DataContext = vm;
+            this.Loaded += MainWindow_Loaded;
+        }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
+            vm.GetLocalDrives();
+            await vm.LoginOneDrive().ConfigureAwait(true);
+            vm.StartPage();
         }
 
         private async void TreeViewItem_Selected(object sender, RoutedEventArgs e) {

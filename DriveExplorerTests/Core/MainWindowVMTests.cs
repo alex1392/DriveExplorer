@@ -35,7 +35,7 @@ namespace DriveExplorer.Core {
 
 		private async Task SetupAsync() {
 			mainWindowVM.GetLocalDrives();
-			await mainWindowVM.GetOneDriveAsync();
+			await mainWindowVM.LoginOneDrive();
 			mainWindowVM.StartPage();
 			AttachEvent();
 		}

@@ -45,12 +45,6 @@ namespace DriveExplorer {
 			TreeItemVMs.Clear();
 			CurrentItemVMs.Clear();
 		}
-		public async Task LoginOneDrive() {
-			var token = await authProvider.GetAccessToken().ConfigureAwait(true);
-			if (token != null) {
-				await GetOneDriveAsync().ConfigureAwait(false);
-			}
-		}
 		/// <summary>
 		/// Attach all local drives to <see cref="TreeItemVMs"/>. This method should be called at the startup of application.
 		/// </summary>
@@ -66,17 +60,20 @@ namespace DriveExplorer {
 				TreeItemVMs.Add(new ItemVM(model));
 			}
 		}
-		/// <summary>
-		/// Attach user onedrive to <see cref="TreeItemVMs"/>. This method should be called after user logged into a onedrive account.
-		/// </summary>
-		public async Task GetOneDriveAsync() {
-			var	root = await graphManager.GetDriveRootAsync().ConfigureAwait(true);
+
+		public async Task LoginOneDrive() {
+			var token = await authProvider.GetAccessToken().ConfigureAwait(true);
+			if (token == null) {
+				return;
+			}
+			var root = await graphManager.GetDriveRootAsync().ConfigureAwait(true);
 			if (root == null) {
 				return;
 			}
-			var item = new ItemVM(oneDriveItemFactory.Create(root));
+			var item = new ItemVM(await oneDriveItemFactory.CreateRootAsync(root).ConfigureAwait(true));
 			TreeItemVMs.Add(item);
 		}
+
 		/// <summary>
 		/// Set up start page of <see cref="CurrentItemVMs"/>. This method should be called after all drives have been attached to <see cref="TreeItemVMs"/>.
 		/// </summary>

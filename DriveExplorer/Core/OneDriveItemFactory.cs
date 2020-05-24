@@ -1,7 +1,8 @@
-﻿using Microsoft.Graph;
+﻿using DriveExplorer.IoC;
 using DriveExplorer.MicrosoftApi;
-using DriveExplorer.IoC;
+using Microsoft.Graph;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace DriveExplorer {
     public class OneDriveItemFactory {
@@ -10,25 +11,24 @@ namespace DriveExplorer {
             this.graphManager = graphManager;
         }
 
-        public IItem Create(DriveItem driveItem) {
+        public async Task<IItem> CreateRootAsync(DriveItem driveItem) {
             var item = IocContainer.Default.GetTransient<OneDriveItem>();
             item.Id = driveItem.Id;
-            var isRoot = IsRoot(driveItem);
-            var rootName = graphManager.UserCache.UserPrincipalName ?? driveItem.ParentReference.DriveId;
-            item.Name = isRoot ? rootName : driveItem.Name;
-            item.Type = isRoot ? ItemTypes.OneDrive :
-                            IsFolder(driveItem) ? ItemTypes.Folder :
-                                ItemFactoryHelper.GetFileType(driveItem.Name);
-            item.FullPath = isRoot ? rootName : GetFilePath(driveItem);
+            var user = await graphManager.GetMeAsync().ConfigureAwait(false);
+            item.Name = user?.UserPrincipalName ?? driveItem.ParentReference.DriveId;
+            item.Type = ItemTypes.OneDrive;
+            item.FullPath = item.Name;
             return item;
+        }
 
-            string GetFilePath(DriveItem driveItem) {
-                var path = driveItem.ParentReference.Path
-                    .Replace("/drive/root:", rootName)
-                    .Replace('/', Path.DirectorySeparatorChar);
-                path = Path.Combine(path, item.Name);
-                return path;
-            }
+        public IItem CreateChild(DriveItem driveItem, IItem parent) {
+            var item = IocContainer.Default.GetTransient<OneDriveItem>();
+            item.Id = driveItem.Id;
+            item.Name = driveItem.Name;
+            item.Type = IsFolder(driveItem) ? ItemTypes.Folder :
+                                ItemFactoryHelper.GetFileType(driveItem.Name);
+            item.FullPath = Path.Combine(parent.FullPath, item.Name);
+            return item;
         }
 
 
@@ -36,8 +36,5 @@ namespace DriveExplorer {
             return driveItem.Folder != null;
         }
 
-        private bool IsRoot(DriveItem driveItem) {
-            return driveItem.Name == "root" && driveItem.ParentReference.Path == null;
-        }
     }
 }

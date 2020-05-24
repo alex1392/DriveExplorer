@@ -84,6 +84,8 @@ namespace DriveExplorer.MicrosoftApi {
 											 .ExecuteAsync(cts.Token).ConfigureAwait(false); ;
 				userAccount = result?.Account;
 				return result?.AccessToken;
+			} catch (MsalUiRequiredException) {
+				return null;
 			} catch (Exception ex) {
 				Logger.ShowException(ex);
 				return null;
@@ -133,7 +135,7 @@ namespace DriveExplorer.MicrosoftApi {
 		/// <returns></returns>
 		public async Task AuthenticateRequestAsync(HttpRequestMessage request) {
 			// attach authentication to the header of http request
-			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", await GetAccessToken().ConfigureAwait(false));
+			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", await GetAccessTokenSilently().ConfigureAwait(false));
 		}
 
 	}

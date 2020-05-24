@@ -13,36 +13,26 @@ namespace DriveExplorer.MicrosoftApi {
 	/// Handles all graph api calling, includes error handling. If there's any error occurs in the api call, returns null
 	/// </summary>
 	public class GraphManager {
+		private readonly AuthProvider authProvider;
 		private readonly GraphServiceClient client;
-		private User userCache = null;
 
 		/// <summary>
 		/// Get default <see cref="GraphManager"/> with <see cref="AuthProvider.Default"/>
 		/// </summary>
 		public static GraphManager Default { get; private set; } = new GraphManager();
-		public User UserCache {
-			get {
-				if (userCache == null) {
-					userCache = Task.Run(async () => await GetMeAsync()).Result;
-				}
-				return userCache;
-			}
-			private set => userCache = value;
-		}
+
 		public GraphManager(AuthProvider authProvider = null) {
 			if (authProvider is null) {
 				authProvider = AuthProvider.Default;
 			}
-
+			this.authProvider = authProvider;
 			client = new GraphServiceClient(authProvider);
 		}
 
 		public async Task<User> GetMeAsync() {
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
-				var user = await client.Me.Request().GetAsync(cts.Token).ConfigureAwait(false);
-				UserCache = user;
-				return user;
+				return await client.Me.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
 				Logger.ShowException(ex);
 				return null;
@@ -59,12 +49,6 @@ namespace DriveExplorer.MicrosoftApi {
 			}
 		}
 
-		/// <summary>
-		/// Requires scopes: <see cref="Permissions.Files.Read"/>
-		/// </summary>
-		/// <param name="query"><see cref="string"/> of search query</param>
-		/// <param name="options"><see cref="IEnumerable{T}"/> of strings to select</param>
-		/// <returns></returns>
 		public async Task<IDriveItemSearchCollectionPage> SearchDriveAsync(string query, IEnumerable<QueryOption> options = null) {
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
