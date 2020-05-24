@@ -18,8 +18,7 @@ namespace DriveExplorer.IoC {
 
 		[Fact]
 		public void GetMainWindowVM() {
-			ioc.Register<IAuthenticationProvider>(() => AuthProvider.Default);
-			ioc.Register<AuthProvider>(() => AuthProvider.Default);
+			ioc.Register(() => AuthProvider.Default);
 			ioc.Register<GraphManager>();
 			ioc.Register<MainWindowVM>();
 			ioc.Register<LocalItemFactory>();
@@ -34,7 +33,7 @@ namespace DriveExplorer.IoC {
 
 		[Fact]
 		public void GetTrasient() {
-			ioc.Register<IAuthenticationProvider>(() => AuthProvider.Default);
+			ioc.Register(() => AuthProvider.Default);
 			ioc.Register<GraphManager>();
 			var graph1 = ioc.GetTransient<GraphManager>();
 			var graph2 = ioc.GetTransient<GraphManager>();

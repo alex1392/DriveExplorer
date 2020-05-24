@@ -12,90 +12,80 @@ using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.Core {
-    public class MainWindowVMTestFixture {
-        public MainWindowVM mainWindowVM;
+	public class MainWindowVMTestFixture {
+		public MainWindowVM mainWindowVM;
 
-        public MainWindowVMTestFixture() {
-			Func<AuthProvider> factory = () => 
+		public MainWindowVMTestFixture() {
+			Func<AuthProvider> factory = () =>
 				new AuthProvider(
 					new ConfigurationBuilder()
 					.AddUserSecrets<AuthProviderTests>()
 					.Build()
 					, Urls.Auth.Organizations);
-            IocContainer.Default.Register<AuthProvider>(factory);
-            IocContainer.Default.Register<GraphManager>();
-            IocContainer.Default.Register<MainWindowVM>();
-            IocContainer.Default.Register<LocalItemFactory>();
-            IocContainer.Default.Register<OneDriveItemFactory>();
-            IocContainer.Default.Register<OneDriveItem>();
+			IocContainer.Default.Register<AuthProvider>(factory);
+			IocContainer.Default.Register<GraphManager>();
+			IocContainer.Default.Register<MainWindowVM>();
+			IocContainer.Default.Register<LocalItemFactory>();
+			IocContainer.Default.Register<OneDriveItemFactory>();
+			IocContainer.Default.Register<OneDriveItem>();
 			var authProvider = IocContainer.Default.GetSingleton<AuthProvider>();
 			var token = authProvider.GetAccessTokenWithUsernamePassword().Result;
-            mainWindowVM = IocContainer.Default.GetSingleton<MainWindowVM>();
+			mainWindowVM = IocContainer.Default.GetSingleton<MainWindowVM>();
 		}
-    }
-    public class MainWindowVMTests : IClassFixture<MainWindowVMTestFixture>, IDisposable {
-        private readonly MainWindowVM mainWindowVM;
+	}
+	public class MainWindowVMTests : IClassFixture<MainWindowVMTestFixture>, IDisposable {
+		private readonly MainWindowVM mainWindowVM;
 
 
-        public MainWindowVMTests(MainWindowVMTestFixture fixture) {
-            mainWindowVM = fixture.mainWindowVM;
-        }
+		public MainWindowVMTests(MainWindowVMTestFixture fixture) {
+			mainWindowVM = fixture.mainWindowVM;
+		}
 
-		public async Task SetupAsync()
-		{
+		private async Task SetupAsync() {
 			mainWindowVM.GetLocalDrives();
 			await mainWindowVM.GetOneDriveAsync();
-			AttachEvent();
 			mainWindowVM.StartPage();
+			AttachEvent();
 		}
 
 		/// <summary>
 		/// Should be called everytime new items added to MainWindowVM
 		/// </summary>
-		private void AttachEvent()
-		{
-			foreach (var item in mainWindowVM.TreeItemVMs)
-			{
+		private void AttachEvent() {
+			foreach (var item in mainWindowVM.TreeItemVMs) {
 				item.Selected += async (sender, e) =>
 					await mainWindowVM.TreeItem_SelectedAsync(sender);
 			}
-			foreach (var item in mainWindowVM.CurrentItemVMs)
-			{
+			foreach (var item in mainWindowVM.CurrentItemVMs) {
 				item.Selected += async (sender, e) =>
 					await mainWindowVM.CurrentItem_SelectedAsync(sender);
 			}
 		}
 
-		public void Dispose()
-		{
+		public void Dispose() {
 			mainWindowVM.Reset();
 		}
 
-        [Fact()]
-        public async Task TreeViewItem_SelectedTestAsync() {
+		[Fact()]
+		public async Task TreeViewItem_SelectedTestAsync() {
 			await SetupAsync();
 			Debug.WriteLine($"listBoxItems: {mainWindowVM.CurrentItemVMs.Count}"); // should be only one item (C:\)
-			await mainWindowVM.TreeItemVMs[0].SelectAsync();
+			await mainWindowVM.TreeItemVMs[0].SetIsSelectedAsync(true);
 			Assert.True(mainWindowVM.CurrentItemVMs.Count > 1);
-        }
+		}
 
-        [Fact()]
-        public async Task ListBoxItem_SelectedTestAsync() {
+		[Fact()]
+		public async Task ListBoxItem_SelectedTestAsync() {
 			await SetupAsync();
-			await mainWindowVM.CurrentItemVMs
-				.FirstOrDefault(itemVM => itemVM.Item.Type.Is(ItemTypes.Folders))
-				.SelectAsync();
-            Assert.True(mainWindowVM.TreeItemVMs[0].IsExpanded);
-        }
+			await mainWindowVM.CurrentItemVMs[0].SetIsSelectedAsync(true);
+			Assert.True(mainWindowVM.TreeItemVMs[0].IsExpanded);
+		}
 
 		[Fact]
-		public void OneDriveTreeItem_SelectedTest()
-		{
-		//Given
-		
-		//When
-		
-		//Then
+		public async Task OneDriveTreeItem_SelectedTestAsync() {
+			await SetupAsync();
+			await mainWindowVM.TreeItemVMs[1].SetIsSelectedAsync(true);
+			Assert.True(mainWindowVM.TreeItemVMs[1].IsExpanded);
 		}
 
 	}

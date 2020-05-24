@@ -11,9 +11,9 @@ namespace DriveExplorer.Core {
         private ItemTypes four;
 
         public ItemTypesExtensionsTests() {
-            one = ItemTypes.Folder; // 1
-            two = ItemTypes.LocaDrive; // 2
-            four = ItemTypes.File; // 4
+            one = (ItemTypes)1; // 1
+            two = (ItemTypes)2; // 2
+            four = (ItemTypes)4; // 4
         }
         [Fact()]
         public void AddTest() {

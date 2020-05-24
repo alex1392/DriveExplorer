@@ -4,6 +4,7 @@ using System;
 using DriveExplorer.IoC;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Microsoft.Identity.Client;
 
 namespace DriveExplorer.MicrosoftApi {
     public class AuthProviderTests{
@@ -28,9 +29,8 @@ namespace DriveExplorer.MicrosoftApi {
         [Fact]
         public async Task NoUsernameInAppConfig_GetAccessTokenWithUsername_NullTokenAsync() {
             var authProvider = new AuthProvider(null, Urls.Auth.Organizations);
-            var token = await authProvider.GetAccessTokenWithUsernamePassword();
-            Assert.Null(token);
-        }
+			await Assert.ThrowsAsync<MsalClientException>(async () => await authProvider.GetAccessTokenWithUsernamePassword());
+		}
 
         [Fact(Skip = "Need user interaction")]
         public async Task GetAccessToken_SuccessWithInteractive() {
