@@ -23,7 +23,6 @@ namespace DriveExplorer.MicrosoftApi {
             authProvider = new AuthProvider(appConfig, Urls.Auth.Organizations);
             graphManager = new GraphManager(authProvider);
             var _ = authProvider.GetAccessTokenWithUsernamePassword().Result;
-            var user = authProvider.GetUserAccount().Result;
         }
     }
 
@@ -110,21 +109,6 @@ namespace DriveExplorer.MicrosoftApi {
             }
             //Then
             Assert.NotNull(children);
-        }
-
-        [Fact]
-        public async Task GetFoldersAndFilesOfRoot_ResultNotNullAsync() {
-            //Given
-            authProvider.Scopes = new[] { Permissions.Files.Read };
-            var root = await graphManager.GetDriveRootAsync();
-            //When
-            var (folders, files) = await graphManager.GetFolersFilesAsync(root.Id);
-            Debug.WriteLine("=====Folders=====");
-            folders.ForEach(folder => Debug.WriteLine(folder.Name));
-            Debug.WriteLine("=====Files=====");
-            files.ForEach(file => Debug.WriteLine(file.Name));
-            //Then
-            Assert.True(folders != null || files != null);
         }
 
         [Fact]

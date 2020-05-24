@@ -21,7 +21,7 @@ namespace DriveExplorer {
             InitializeComponent();
             vm = IocContainer.Default.GetSingleton<MainWindowVM>();
             vm.GetLocalDrives();
-            Task.Run(() => vm.GetOneDriveAsync()).Wait();
+            Task.Run(async () => await vm.GetOneDriveAsync().ConfigureAwait(false)).Wait();
             vm.StartPage();
             DataContext = vm;
         }

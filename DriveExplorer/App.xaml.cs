@@ -18,7 +18,7 @@ namespace DriveExplorer
     /// </summary>
     public partial class App : Application
     {
-        protected override async void OnStartup(StartupEventArgs e) {
+        protected override void OnStartup(StartupEventArgs e) {
             base.OnStartup(e);
             IocContainer.Default.Register(() => AuthProvider.Default);
             IocContainer.Default.Register<GraphManager>();
@@ -27,21 +27,8 @@ namespace DriveExplorer
             IocContainer.Default.Register<OneDriveItemFactory>();
             IocContainer.Default.Register<OneDriveItem>();
 
-            var task = WorkAsync();
-            ////await task;
-            task.Wait();
+
 
         }
-
-private async Task WorkAsync() {
-    var x = 1;
-    await Task.Run(() =>
-    {
-        foreach (var i in Enumerable.Range(0, 100)) {
-            Debug.WriteLine(i);
-        }
-    }).ConfigureAwait(false);
-    return;
-}
     }
 }
