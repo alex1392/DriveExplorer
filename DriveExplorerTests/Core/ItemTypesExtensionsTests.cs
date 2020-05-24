@@ -12,7 +12,7 @@ namespace DriveExplorer.Core {
 
         public ItemTypesExtensionsTests() {
             one = ItemTypes.Folder; // 1
-            two = ItemTypes.Drive; // 2
+            two = ItemTypes.LocaDrive; // 2
             four = ItemTypes.File; // 4
         }
         [Fact()]

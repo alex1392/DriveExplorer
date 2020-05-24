@@ -1,17 +1,22 @@
-﻿namespace DriveExplorer {
+﻿using System;
+
+namespace DriveExplorer {
+    [Flags]
     public enum ItemTypes {
-        Folder  = 0b000000001,
-        Drive   = 0b000000010,
-        File    = 0b000000100,
-        IMG     = 0b000001000,
-        TXT     = 0b000010000,
-        DOC     = 0b000100000,
-        XLS     = 0b001000000,
-        PPT     = 0b010000000,
-        ZIP     = 0b100000000,
-        Folders = Drive | Folder,
-        Files   = File | IMG | TXT | DOC | XLS | PPT | ZIP,
-    }
+        Unknown   = 0,
+        Folder    = 1,
+        LocaDrive = 1 << 1,
+		OneDrive  = 1 << 2,
+        File      = 1 << 3,
+        IMG       = 1 << 4,
+        TXT       = 1 << 5,
+        DOC       = 1 << 6,
+        XLS       = 1 << 7,
+        PPT       = 1 << 8,
+        ZIP       = 1 << 9,
+        Folders   = OneDrive | LocaDrive | Folder,
+        Files     = File | IMG | TXT | DOC | XLS | PPT | ZIP,
+	}
 
     public static class ItemTypesExtensions {
         public static ItemTypes Add(this ItemTypes a, ItemTypes b) {

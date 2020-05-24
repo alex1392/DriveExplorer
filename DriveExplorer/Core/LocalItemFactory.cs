@@ -9,7 +9,7 @@ namespace DriveExplorer {
                 FullPath = fullPath
             };
             var isRoot = IsRoot(fullPath);
-            item.Type = isRoot ? ItemTypes.Drive :
+            item.Type = isRoot ? ItemTypes.LocaDrive :
                             IsFolder(fullPath) ? ItemTypes.Folder :
                                                  ItemFactoryHelper.GetFileType(fullPath);
             if (isRoot) {

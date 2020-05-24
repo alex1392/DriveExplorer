@@ -12,7 +12,7 @@ namespace DriveExplorer {
             switch ((ItemTypes)value) {
                 default:
                 case ItemTypes.Folder:
-                case ItemTypes.Drive:
+                case ItemTypes.LocaDrive:
                     return Visibility.Visible;
                 case ItemTypes.File:
                 case ItemTypes.IMG:

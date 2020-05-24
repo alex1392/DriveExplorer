@@ -62,13 +62,13 @@ namespace DriveExplorer.MicrosoftApi {
 
 
         public async Task<string> GetAccessToken() {
-            return await GetAccessTokenSilently() ?? 
-                await GetAccessTokenInteractively();
+            return await GetAccessTokenSilently().ConfigureAwait(false) ?? 
+                await GetAccessTokenInteractively().ConfigureAwait(false);
         }
 
         public async Task<string> GetAccessTokenSilently() {
             // TODO: why no cache for everytime the application restarted ???
-            userAccount = await GetUserAccount();
+            userAccount = await GetUserAccount().ConfigureAwait(false);
             if (userAccount == null) {
                 return null;
             }
@@ -78,7 +78,7 @@ namespace DriveExplorer.MicrosoftApi {
                 // By doing this, MSAL will refresh the token automatically if
                 // it is expired. Otherwise it returns the cached token.
                 var result = await msalClient.AcquireTokenSilent(Scopes, userAccount)
-                                             .ExecuteAsync(cts.Token);
+                                             .ExecuteAsync(cts.Token).ConfigureAwait(false);;
                 userAccount = result?.Account;
                 return result?.AccessToken;
             } catch (MsalException ex) {
@@ -88,14 +88,14 @@ namespace DriveExplorer.MicrosoftApi {
         }
 
         public async Task<IAccount> GetUserAccount() {
-            return (await msalClient.GetAccountsAsync()).FirstOrDefault();
+            return (await msalClient.GetAccountsAsync().ConfigureAwait(false)).FirstOrDefault();
         }
 
         public async Task<string> GetAccessTokenInteractively() {
             using var cts = new CancellationTokenSource(Timeouts.Interactive);
             try {
                 var result = await msalClient.AcquireTokenInteractive(Scopes)
-                                             .ExecuteAsync(cts.Token);
+                                             .ExecuteAsync(cts.Token).ConfigureAwait(false);
                 userAccount = result?.Account;
                 return result?.AccessToken;
             } catch (MsalException ex) {
@@ -118,7 +118,7 @@ namespace DriveExplorer.MicrosoftApi {
             try {
                 var result = await msalClient
                     .AcquireTokenByUsernamePassword(Scopes, Username, secureString)
-                    .ExecuteAsync(cts.Token);
+                    .ExecuteAsync(cts.Token).ConfigureAwait(false);;
                 userAccount = result?.Account;
                 return result?.AccessToken;
             } catch (MsalException ex) {
@@ -138,7 +138,7 @@ namespace DriveExplorer.MicrosoftApi {
                     // display instructions in testing output as well
                     Trace.WriteLine(deviceCodeCallback.Message);
                     return Task.FromResult(0);
-                }).ExecuteAsync(cts.Token);
+                }).ExecuteAsync(cts.Token).ConfigureAwait(false);;
                 userAccount = result?.Account;
                 return result?.AccessToken;
 
@@ -156,7 +156,7 @@ namespace DriveExplorer.MicrosoftApi {
         /// <returns></returns>
         public async Task AuthenticateRequestAsync(HttpRequestMessage request) {
             // attach authentication to the header of http request
-            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", await GetAccessToken());
+            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", await GetAccessToken().ConfigureAwait(false));
         }
 
     }

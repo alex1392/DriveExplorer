@@ -31,42 +31,72 @@ namespace DriveExplorer.Core {
 			var authProvider = IocContainer.Default.GetSingleton<AuthProvider>();
 			var token = authProvider.GetAccessTokenWithUsernamePassword().Result;
             mainWindowVM = IocContainer.Default.GetSingleton<MainWindowVM>();
-			foreach (var item in mainWindowVM.TreeItemVMs)
-			{
-				item.Selected += async (sender, e) => 
-					await mainWindowVM.TreeItem_SelectedAsync(sender);
-			}
-			foreach (var item in mainWindowVM.CurrentItemVMs)
-			{
-				item.Selected += async (sender, e) => 
-					await mainWindowVM.CurrentItem_SelectedAsync(sender);
-			}
-        }
+		}
     }
-    public class MainWindowVMTests : IClassFixture<MainWindowVMTestFixture> {
+    public class MainWindowVMTests : IClassFixture<MainWindowVMTestFixture>, IDisposable {
         private readonly MainWindowVM mainWindowVM;
+
 
         public MainWindowVMTests(MainWindowVMTestFixture fixture) {
             mainWindowVM = fixture.mainWindowVM;
         }
 
+		public async Task SetupAsync()
+		{
+			mainWindowVM.GetLocalDrives();
+			await mainWindowVM.GetOneDriveAsync();
+			AttachEvent();
+			mainWindowVM.StartPage();
+		}
+
+		/// <summary>
+		/// Should be called everytime new items added to MainWindowVM
+		/// </summary>
+		private void AttachEvent()
+		{
+			foreach (var item in mainWindowVM.TreeItemVMs)
+			{
+				item.Selected += async (sender, e) =>
+					await mainWindowVM.TreeItem_SelectedAsync(sender);
+			}
+			foreach (var item in mainWindowVM.CurrentItemVMs)
+			{
+				item.Selected += async (sender, e) =>
+					await mainWindowVM.CurrentItem_SelectedAsync(sender);
+			}
+		}
+
+		public void Dispose()
+		{
+			mainWindowVM.Reset();
+		}
+
         [Fact()]
         public async Task TreeViewItem_SelectedTestAsync() {
-            Debug.WriteLine($"listBoxItems: {mainWindowVM.CurrentItemVMs.Count}"); // should be only one item (C:\)
+			await SetupAsync();
+			Debug.WriteLine($"listBoxItems: {mainWindowVM.CurrentItemVMs.Count}"); // should be only one item (C:\)
 			await mainWindowVM.TreeItemVMs[0].SelectAsync();
 			Assert.True(mainWindowVM.CurrentItemVMs.Count > 1);
         }
 
         [Fact()]
         public async Task ListBoxItem_SelectedTestAsync() {
-			foreach (var item in mainWindowVM.CurrentItemVMs)
-			{
-				item.Selected += async (sender, e) => await mainWindowVM.CurrentItem_SelectedAsync(sender);
-			}
+			await SetupAsync();
 			await mainWindowVM.CurrentItemVMs
 				.FirstOrDefault(itemVM => itemVM.Item.Type.Is(ItemTypes.Folders))
 				.SelectAsync();
             Assert.True(mainWindowVM.TreeItemVMs[0].IsExpanded);
         }
-    }
+
+		[Fact]
+		public void OneDriveTreeItem_SelectedTest()
+		{
+		//Given
+		
+		//When
+		
+		//Then
+		}
+
+	}
 }

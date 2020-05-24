@@ -40,5 +40,29 @@ namespace DriveExplorerTests {
                 });
             }
         }
-    }
+
+		[Fact]
+		public void AsyncTest()
+		{
+			//Given
+			var task = WorkAsync();
+			var x = 1;
+			//When
+			task.Wait();
+			//Then
+		}
+
+		private async Task WorkAsync()
+		{
+			var x = 1;
+			await Task.Run(() => 
+			{
+				foreach (var i in Enumerable.Range(0,100))
+				{
+					Debug.WriteLine(i);
+				}
+			});
+			return;
+		}
+	}
 }

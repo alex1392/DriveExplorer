@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DriveExplorer.MicrosoftApi;
 using DriveExplorer.IoC;
+using System.Threading.Tasks;
 
 namespace DriveExplorer {
     public class OneDriveItem : IItem {
@@ -18,7 +19,7 @@ namespace DriveExplorer {
         }
 
         public async IAsyncEnumerable<IItem> GetChildrenAsync() {
-            await foreach (var item in graphManager.GetChildrenAsync(Id)) {
+            await foreach (var item in graphManager.GetChildrenAsync(Id).ConfigureAwait(false)) {
                 yield return IocContainer.Default.GetSingleton<OneDriveItemFactory>().Create(item);
             }
         }

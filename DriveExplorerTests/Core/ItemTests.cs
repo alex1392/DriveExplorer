@@ -11,7 +11,7 @@ namespace DriveExplorer.Core {
             IocContainer.Default.Register<LocalItemFactory>();
         }
         [Theory]
-        [InlineData(@"C:\", ItemTypes.Drive)]
+        [InlineData(@"C:\", ItemTypes.LocaDrive)]
         [InlineData(@"C:\path\doc.png", ItemTypes.IMG)]
         [InlineData(@"C:\path\MainWindow.xaml", ItemTypes.File)]
         [InlineData(@"C:\path\", ItemTypes.Folder)]

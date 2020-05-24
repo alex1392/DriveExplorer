@@ -15,7 +15,7 @@ namespace DriveExplorer {
             item.Id = driveItem.Id;
             var isRoot = IsRoot(driveItem);
             item.Name = isRoot ? graphManager.UserCache.UserPrincipalName : driveItem.Name;
-            item.Type = isRoot ? ItemTypes.Drive :
+            item.Type = isRoot ? ItemTypes.OneDrive :
                             IsFolder(driveItem) ? ItemTypes.Folder :
                                 ItemFactoryHelper.GetFileType(driveItem.Name);
             item.FullPath = isRoot ? graphManager.UserCache.UserPrincipalName : GetFilePath(driveItem);
