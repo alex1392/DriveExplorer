@@ -37,12 +37,19 @@ namespace DriveExplorer {
 			// Task.Run(async () => await GetOneDriveAsync()).Wait();
 		}
 
+
 		/// <summary>
 		/// Reset <see cref="TreeItemVMs"/> and <see cref="CurrentItemVMs"/>.
 		/// </summary>
 		public void Reset() {
 			TreeItemVMs.Clear();
 			CurrentItemVMs.Clear();
+		}
+		public async Task LoginOneDrive() {
+			var token = await authProvider.GetAccessToken().ConfigureAwait(true);
+			if (token != null) {
+				await GetOneDriveAsync().ConfigureAwait(false);
+			}
 		}
 		/// <summary>
 		/// Attach all local drives to <see cref="TreeItemVMs"/>. This method should be called at the startup of application.
@@ -63,7 +70,7 @@ namespace DriveExplorer {
 		/// Attach user onedrive to <see cref="TreeItemVMs"/>. This method should be called after user logged into a onedrive account.
 		/// </summary>
 		public async Task GetOneDriveAsync() {
-			var	root = await graphManager.GetDriveRootAsync().ConfigureAwait(false);
+			var	root = await graphManager.GetDriveRootAsync().ConfigureAwait(true);
 			if (root == null) {
 				return;
 			}
@@ -106,7 +113,7 @@ namespace DriveExplorer {
 			var parent = TreeItemVMs;
 			var child = ItemVM.Empty;
 			foreach (var dir in directories) {
-				child = parent.First(vm => vm.Item.Name == dir);
+				child = parent.FirstOrDefault(vm => vm.Item.Name == Uri.UnescapeDataString(dir)) ?? throw new Exception("Cannot find folder to expand");
 				await child.SetIsExpandedAsync(true).ConfigureAwait(true);
 				parent = child.Children;
 			}

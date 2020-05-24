@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace DriveExplorer.MicrosoftApi {
 	/// <summary>
@@ -45,7 +44,7 @@ namespace DriveExplorer.MicrosoftApi {
 				UserCache = user;
 				return user;
 			} catch (Exception ex) {
-				ShowException(ex);
+				Logger.ShowException(ex);
 				return null;
 			}
 		}
@@ -55,7 +54,7 @@ namespace DriveExplorer.MicrosoftApi {
 			try {
 				return await client.Me.Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
-				ShowException(ex);
+				Logger.ShowException(ex);
 				return null;
 			}
 		}
@@ -71,7 +70,7 @@ namespace DriveExplorer.MicrosoftApi {
 			try {
 				return await client.Me.Drive.Root.Search(query).Request(options).GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
-				ShowException(ex);
+				Logger.ShowException(ex);
 				return null;
 			}
 		}
@@ -81,7 +80,7 @@ namespace DriveExplorer.MicrosoftApi {
 			try {
 				return await client.Me.Drive.Items[id].Content.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
-				ShowException(ex);
+				Logger.ShowException(ex);
 				return null;
 			}
 		}
@@ -94,7 +93,7 @@ namespace DriveExplorer.MicrosoftApi {
 				try {
 					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
 				} catch (Exception ex) {
-					ShowException(ex);
+					Logger.ShowException(ex);
 					yield break;
 				}
 				foreach (var file in page) {
@@ -115,7 +114,7 @@ namespace DriveExplorer.MicrosoftApi {
 				using var response = await client.HttpProvider.SendAsync(request, HttpCompletionOption.ResponseContentRead, cts.Token).ConfigureAwait(false);
 				return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 			} catch (Exception ex) {
-				ShowException(ex);
+				Logger.ShowException(ex);
 				return null;
 			}
 		}
@@ -127,18 +126,9 @@ namespace DriveExplorer.MicrosoftApi {
 			try {
 				return await request.PutAsync<DriveItem>(stream, cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
-				ShowException(ex);
+				Logger.ShowException(ex);
 				return null;
 			}
-		}
-
-		private void ShowException(Exception ex) {
-			var stringBuilder = new StringBuilder();
-			do {
-				stringBuilder.Append($"==={ex.GetType()}===\n{ex.Message}");
-				ex = ex.InnerException;
-			} while (ex != null);
-			MessageBox.Show(stringBuilder.ToString());
 		}
 	}
 

@@ -21,7 +21,7 @@ namespace DriveExplorer {
             InitializeComponent();
             vm = IocContainer.Default.GetSingleton<MainWindowVM>();
             vm.GetLocalDrives();
-            Task.Run(async () => await vm.GetOneDriveAsync().ConfigureAwait(false)).Wait();
+            Task.Run(async () => await vm.LoginOneDrive()).Wait();
             vm.StartPage();
             DataContext = vm;
         }
@@ -35,7 +35,7 @@ namespace DriveExplorer {
         }
 
         private async void OneDriveButton_Click(object sender, RoutedEventArgs e) {
-            await vm.GetOneDriveAsync().ConfigureAwait(false);
+            await vm.LoginOneDrive().ConfigureAwait(false);
         }
     }
 }

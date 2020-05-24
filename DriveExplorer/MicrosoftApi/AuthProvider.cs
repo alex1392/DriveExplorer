@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using System;
@@ -10,6 +9,8 @@ using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Configuration;
+using System.Collections.Specialized;
 
 namespace DriveExplorer.MicrosoftApi {
 	public class AuthProvider : IAuthenticationProvider {
@@ -20,8 +21,9 @@ namespace DriveExplorer.MicrosoftApi {
 		public static AuthProvider Default { get; private set; } = new AuthProvider();
 
 		private readonly IPublicClientApplication msalClient;
-		private readonly IConfigurationRoot appConfig;
 		private IAccount userAccount;
+		private readonly string username;
+		private readonly string password;
 
 		/// <summary>
 		/// Specifies the scopes of graph api would be used in the current application.
@@ -36,13 +38,9 @@ namespace DriveExplorer.MicrosoftApi {
 		/// <param name="appConfig">Must contain settings named <see cref="appId"/>.</param>
 		/// <exception cref="InvalidOperationException">Throws when getting default <see cref="AuthProvider"/> and if there's no user secrets registered.</exception>
 		/// <exception cref="ArgumentException"/>
-		public AuthProvider(IConfigurationRoot appConfig = null, string authority = Urls.Auth.Common) {
-			if (appConfig == null) {
-				appConfig = new ConfigurationBuilder()
-					.AddUserSecrets<AuthProvider>() // may throws invalid operation exception
-					.Build();
-			}
-			this.appConfig = appConfig;
+		public AuthProvider(string authority = Urls.Auth.Common) {
+			var appConfig = ConfigurationManager.AppSettings;
+
 			if (!ContainsKey(appConfig, nameof(appId))) {
 				throw new ArgumentException($"Given {nameof(appConfig)} has no  configuration key named {nameof(appId)}");
 			}
@@ -50,18 +48,22 @@ namespace DriveExplorer.MicrosoftApi {
 			if (ContainsKey(appConfig, nameof(Scopes))) {
 				Scopes = appConfig[nameof(Scopes)].Split(';');
 			}
+			username = appConfig[nameof(username)];
+			password = appConfig[nameof(password)];
 			msalClient = PublicClientApplicationBuilder
 				.Create(appId)
-				.WithAuthority(AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
-				.WithRedirectUri(Urls.LocalHost)
 				.WithAuthority(authority)
+				.WithDefaultRedirectUri()
 				.Build();
-			bool ContainsKey(IConfigurationRoot appConfig, string key) {
-				return appConfig.GetChildren().Any(item => item.Key == key);
+
+			bool ContainsKey(NameValueCollection appConfig, string key) {
+				return appConfig.AllKeys.Any(item => item == key);
 			}
 		}
 
-
+		/// <summary>
+		/// Get access token silently, if not successful, then get interactively. If both failed, return null.
+		/// </summary>
 		public async Task<string> GetAccessToken() {
 			return await GetAccessTokenSilently().ConfigureAwait(false) ??
 				await GetAccessTokenInteractively().ConfigureAwait(false);
@@ -73,58 +75,57 @@ namespace DriveExplorer.MicrosoftApi {
 			if (userAccount == null) {
 				return null;
 			}
-			// If there is an account, call AcquireTokenSilent
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			// By doing this, MSAL will refresh the token automatically if
-			// it is expired. Otherwise it returns the cached token.
-			var result = await msalClient.AcquireTokenSilent(Scopes, userAccount)
-										 .ExecuteAsync(cts.Token).ConfigureAwait(false); ;
-			userAccount = result?.Account;
-			return result?.AccessToken;
+			try {
+				// If there is an account, call AcquireTokenSilent
+				using var cts = new CancellationTokenSource(Timeouts.Silent);
+				// By doing this, MSAL will refresh the token automatically if
+				// it is expired. Otherwise it returns the cached token.
+				var result = await msalClient.AcquireTokenSilent(Scopes, userAccount)
+											 .ExecuteAsync(cts.Token).ConfigureAwait(false); ;
+				userAccount = result?.Account;
+				return result?.AccessToken;
+			} catch (Exception ex) {
+				Logger.ShowException(ex);
+				return null;
+			}
 		}
 
 		public async Task<string> GetAccessTokenInteractively() {
 			using var cts = new CancellationTokenSource(Timeouts.Interactive);
-			var result = await msalClient.AcquireTokenInteractive(Scopes)
+			try {
+				var result = await msalClient.AcquireTokenInteractive(Scopes)
 										 .ExecuteAsync(cts.Token).ConfigureAwait(false);
-			userAccount = result?.Account;
-			return result?.AccessToken;
+				userAccount = result?.Account;
+				return result?.AccessToken;
+			} catch (Exception ex) {
+				Logger.ShowException(ex);
+				return null;
+			}
 		}
 
 		/// <summary>
 		/// This method can only be used with <see cref="Urls.Auth.Organizations"/> authority
 		/// </summary>
 		public async Task<string> GetAccessTokenWithUsernamePassword() {
+			if (username == null || password == null) {
+				return null;
+			}
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			string Username = appConfig[nameof(Username)];
-			string Password = appConfig[nameof(Password)];
 			var secureString = new SecureString();
-			foreach (var c in Password ?? "") {
+			foreach (var c in password ?? "") {
 				secureString.AppendChar(c);
 			}
-			var result = await msalClient
-				.AcquireTokenByUsernamePassword(Scopes, Username, secureString)
-				.ExecuteAsync(cts.Token).ConfigureAwait(false); ;
-			userAccount = result?.Account;
-			return result?.AccessToken;
+			try {
+				var result = await msalClient
+					.AcquireTokenByUsernamePassword(Scopes, username, secureString)
+					.ExecuteAsync(cts.Token).ConfigureAwait(false); ;
+				userAccount = result?.Account;
+				return result?.AccessToken;
+			} catch (Exception ex) {
+				Logger.ShowException(ex);
+				return null;
+			}
 		}
-
-		public async Task<string> GetAccessTokenWithDeviceCode() {
-			using var cts = new CancellationTokenSource(Timeouts.Interactive);
-			// Invoke device code flow so user can sign-in with a browser
-			var result = await msalClient.AcquireTokenWithDeviceCode(Scopes, deviceCodeCallback =>
-			{
-					// display instructions to let user follow the device code flow
-					Console.WriteLine(deviceCodeCallback.Message);
-					// display instructions in testing output as well
-					Trace.WriteLine(deviceCodeCallback.Message);
-				return Task.FromResult(0);
-			}).ExecuteAsync(cts.Token).ConfigureAwait(false); ;
-			userAccount = result?.Account;
-			return result?.AccessToken;
-		}
-
-
 		/// <summary>
 		/// Implementation of <see cref="IAuthenticationProvider"/>. This method is called everytime when user make a request.
 		/// </summary>

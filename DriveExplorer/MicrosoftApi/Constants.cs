@@ -1,7 +1,10 @@
 namespace DriveExplorer.MicrosoftApi {
     public static class Urls {
         public const string Graph = "https://graph.microsoft.com/v1.0/";
-        public const string LocalHost = "http://localhost";
+        public static class RedirectUri {
+            public const string LocalHost = "http://localhost";
+            public const string NativeClient = "https://login.microsoftonline.com/common/oauth2/nativeclient";
+        }
         public static class Auth {
             public const string Organizations = "https://login.microsoftonline.com/organizations";
             public const string Comsumers = "https://login.microsoftonline.com/comsumers";

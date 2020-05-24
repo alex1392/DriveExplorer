@@ -343,3 +343,5 @@ lcov.info
 dotcover*
 coverlet.cmd
 client_secret.json
+DriveExplorer.Core/
+DriveExplorerTests

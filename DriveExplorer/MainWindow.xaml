@@ -6,7 +6,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:DriveExplorer"
         mc:Ignorable="d"
-        Title="Window2"
+        Title="MainWindow"
         Height="450"
         Width="800">
     <Grid>
