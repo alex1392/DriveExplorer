@@ -54,12 +54,9 @@ namespace DriveExplorer {
 
 		}
 		public async Task AutoLoginOneDrive() {
-			var token = await authProvider.GetAccessToken().ConfigureAwait(true);
-			if (token == null) {
-				return;
+			await foreach (var _ in authProvider.GetAllAccessTokenSilently().ConfigureAwait(true)) {
+				await CreateOneDriveAsync().ConfigureAwait(true);
 			}
-			await CreateOneDriveAsync().ConfigureAwait(false);
-
 		}
 		public async Task LogoutOneDriveAsync() {
 			var treeVM = TreeItemVMs.First(vm => vm.Item.Type == ItemTypes.OneDrive);

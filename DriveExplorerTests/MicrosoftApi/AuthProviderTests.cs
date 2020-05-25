@@ -19,17 +19,5 @@ namespace DriveExplorer.MicrosoftApi {
 			Assert.NotNull(token);
 		}
 
-        [Fact(Skip = "Need user interaction")]
-        public async Task GetAccessToken_SuccessWithInteractive() {
-            var authProvider = AuthProvider.Default;
-            try {
-                var token = await authProvider.GetAccessToken();
-                Assert.NotNull(token);
-            } catch (OperationCanceledException ex) {
-                Debug.WriteLine(ex.Message);
-            }
-        }
-
-
     }
 }

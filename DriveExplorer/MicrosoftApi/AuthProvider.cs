@@ -47,6 +47,7 @@ namespace DriveExplorer.MicrosoftApi {
 		/// </summary>
 		public Dictionary<string, IAccount> UserIdAccountRegistry { get; } = new Dictionary<string, IAccount>();
 
+
 		/// <summary>
 		/// Get <see cref="AuthProvider"/> with <see cref="IConfigurationRoot"/>
 		/// </summary>
@@ -88,12 +89,24 @@ namespace DriveExplorer.MicrosoftApi {
 			Console.ResetColor();
 		}
 
-		/// <summary>
-		/// Get access token silently, if not successful, then get interactively. If both failed, return null.
-		/// </summary>
-		public async Task<string> GetAccessToken() {
-			return await GetAccessTokenSilently().ConfigureAwait(false) ??
-				await GetAccessTokenInteractively().ConfigureAwait(false);
+		public async IAsyncEnumerable<string> GetAllAccessTokenSilently() {
+			var users = await msalClient.GetAccountsAsync().ConfigureAwait(false);
+			foreach (var user in users) {
+				AuthenticationResult result;
+				try {
+					using var cts = new CancellationTokenSource(Timeouts.Silent);
+					result = await msalClient.AcquireTokenSilent(Scopes, user)
+												 .ExecuteAsync(cts.Token)
+												 .ConfigureAwait(false);
+					CurrentUserAccount = result?.Account;
+				} catch (MsalUiRequiredException) {
+					continue;
+				} catch	(Exception ex) {
+					Logger.ShowException(ex);
+					continue;
+				}
+				yield return result?.AccessToken;
+			}
 		}
 
 		public async Task<string> GetAccessTokenSilently(IAccount userAccount = null) {
