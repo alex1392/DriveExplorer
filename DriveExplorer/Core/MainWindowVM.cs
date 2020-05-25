@@ -15,18 +15,27 @@ namespace DriveExplorer {
 	public class MainWindowVM : INotifyPropertyChanged {
 		private readonly AuthProvider authProvider;
 		private readonly GraphManager graphManager;
+		private Visibility spinnerVisibility = Visibility.Collapsed;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		public ObservableCollection<ItemVM> TreeItemVMs { get; } = new ObservableCollection<ItemVM>();
 
 		public ObservableCollection<ItemVM> CurrentItemVMs { get; } = new ObservableCollection<ItemVM>();
 
+		public Visibility SpinnerVisibility {
+			get { return spinnerVisibility; }
+			set {
+				if (value != spinnerVisibility) {
+					spinnerVisibility = value;
+					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SpinnerVisibility)));
+				}
+			}
+		}
+
+
 		public MainWindowVM(AuthProvider authProvider, GraphManager graphManager) {
 			this.authProvider = authProvider;
 			this.graphManager = graphManager;
-			// must not call GetOneDriveAsync in the constructor of MainWindowVM, 
-			// as if user uses ioc to create MainWindowVM, the thread passes through syncLock in ioc, while here it tries to create OneDriveItem within the constructor, which causes another thread tring to get into the syncLock, which has been held by the former thread. Consequently, a deadlock occurs.
-			// Task.Run(async () => await GetOneDriveAsync()).Wait();
 		}
 
 		/// <summary>
@@ -46,25 +55,30 @@ namespace DriveExplorer {
 			}
 		}
 		public async Task LoginOneDrive() {
+			SpinnerVisibility = Visibility.Visible;
 			var token = await authProvider.GetAccessTokenInteractively().ConfigureAwait(true);
 			if (token == null) {
 				return;
 			}
 			await CreateOneDriveAsync().ConfigureAwait(false);
-
+			SpinnerVisibility = Visibility.Collapsed;
 		}
 		public async Task AutoLoginOneDrive() {
+			SpinnerVisibility = Visibility.Visible;
 			await foreach (var _ in authProvider.GetAllAccessTokenSilently().ConfigureAwait(true)) {
 				await CreateOneDriveAsync().ConfigureAwait(true);
 			}
+			SpinnerVisibility = Visibility.Collapsed;
 		}
 		public async Task LogoutOneDriveAsync() {
+			SpinnerVisibility = Visibility.Visible;
 			var treeVM = TreeItemVMs.First(vm => vm.Item.Type == ItemTypes.OneDrive);
 			var item = treeVM.Item as OneDriveItem;
 			if (await authProvider.LogoutAsync(item.UserId).ConfigureAwait(true)) {
 				TreeItemVMs.Remove(treeVM);
 				CurrentItemVMs.Remove(CurrentItemVMs.FirstOrDefault(vm => vm == treeVM));
 			}
+			SpinnerVisibility = Visibility.Collapsed;
 		}
 		private async Task CreateOneDriveAsync() {
 			var userAccount = authProvider.CurrentUserAccount;
