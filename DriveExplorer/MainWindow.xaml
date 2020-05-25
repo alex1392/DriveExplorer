@@ -61,9 +61,12 @@
         </ListBox>
         
         <Button Content="Login OneDrive" 
-                Click="OneDriveButton_Click"
+                Click="LoginOneDriveButton_Click"
                 Grid.Column="1"
                 Margin="462,373,10,10" />
-
-    </Grid>
+		<Button Content="Logout OneDrive"
+				Click="LogoutOneDriveButton_Click"
+				Grid.Column="1"
+				Margin="10.333,374,461.333,9.667" />
+	</Grid>
 </Window>

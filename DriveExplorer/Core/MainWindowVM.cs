@@ -50,7 +50,7 @@ namespace DriveExplorer {
 				return;
 			}
 			await CreateOneDriveAsync().ConfigureAwait(false);
-			
+
 		}
 		public async Task AutoLoginOneDrive() {
 			var token = await authProvider.GetAccessToken().ConfigureAwait(true);
@@ -58,12 +58,15 @@ namespace DriveExplorer {
 				return;
 			}
 			await CreateOneDriveAsync().ConfigureAwait(false);
-			
+
 		}
-		public void LogoutOneDrive() {
-			throw new NotImplementedException();
-			//authProvider.UserAccountIdRegistry.Remove(userAccount);
-			//TreeItemVMs.Remove(item);
+		public async Task LogoutOneDriveAsync() {
+			var treeVM = TreeItemVMs.First(vm => vm.Item.Type == ItemTypes.OneDrive);
+			var item = treeVM.Item as OneDriveItem;
+			if (await authProvider.LogoutAsync(item.UserId).ConfigureAwait(true)) {
+				TreeItemVMs.Remove(treeVM);
+				CurrentItemVMs.Remove(CurrentItemVMs.FirstOrDefault(vm => vm == treeVM));
+			}
 		}
 		private async Task CreateOneDriveAsync() {
 			var userAccount = authProvider.CurrentUserAccount;
@@ -75,12 +78,16 @@ namespace DriveExplorer {
 			if (user == null) {
 				return;
 			}
+			if (authProvider.UserIdAccountRegistry.ContainsKey(user.Id)) {
+				MessageBox.Show("User has already signed in.");
+				return;
+			}
 			var root = await graphManager.GetDriveRootAsync().ConfigureAwait(true);
 			if (root == null) {
 				return;
 			}
 
-			authProvider.UserAccountIdRegistry.Add(user.Id, userAccount);
+			authProvider.UserIdAccountRegistry.Add(user.Id, userAccount);
 			var item = new ItemVM(OneDriveItemFactory.CreateRoot(root, user));
 			TreeItemVMs.Add(item);
 		}

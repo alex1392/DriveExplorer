@@ -14,7 +14,7 @@ namespace DriveExplorer.Core {
 		public MainWindowVM mainWindowVM;
 
 		public MainWindowVMTestFixture() {
-			IocContainer.Default.Register<AuthProvider>(() => new AuthProvider(Urls.Auth.Organizations));
+			IocContainer.Default.Register<AuthProvider>(() => new AuthProvider(AuthProvider.Authority.Organizations));
 			IocContainer.Default.Register<GraphManager>();
 			IocContainer.Default.Register<MainWindowVM>();
 			IocContainer.Default.Register<LocalItemFactory>();

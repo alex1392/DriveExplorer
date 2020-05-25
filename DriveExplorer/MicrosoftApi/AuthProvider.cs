@@ -16,6 +16,15 @@ using System.IO;
 
 namespace DriveExplorer.MicrosoftApi {
 	public class AuthProvider : IAuthenticationProvider {
+		public static class Authority {
+			public const string Organizations = "https://login.microsoftonline.com/organizations";
+			public const string Comsumers = "https://login.microsoftonline.com/comsumers";
+			public const string Common = "https://login.microsoftonline.com/common";
+		}
+		public static class RedirectUrl {
+			public const string LocalHost = "http://localhost";
+			public const string NativeClient = "https://login.microsoftonline.com/common/oauth2/nativeclient";
+		}
 		/// <summary>
 		/// Get default singleton of <see cref="AuthProvider"/> with default app configuration, which will automatically search for user secrets within this assembly.
 		/// </summary>
@@ -32,7 +41,10 @@ namespace DriveExplorer.MicrosoftApi {
 		/// </summary>
 		public string[] Scopes { get; set; }
 		public IAccount CurrentUserAccount { get; private set; }
-		public Dictionary<string, IAccount> UserAccountIdRegistry { get; } = new Dictionary<string, IAccount>();
+		/// <summary>
+		/// This property is used to find the corresponding <see cref="IAccount"/> from the given user id. They should be registered just after an user logged in.
+		/// </summary>
+		public Dictionary<string, IAccount> UserIdAccountRegistry { get; } = new Dictionary<string, IAccount>();
 
 		/// <summary>
 		/// Get <see cref="AuthProvider"/> with <see cref="IConfigurationRoot"/>
@@ -40,7 +52,7 @@ namespace DriveExplorer.MicrosoftApi {
 		/// <param name="appConfig">Must contain settings named <see cref="appId"/>.</param>
 		/// <exception cref="InvalidOperationException">Throws when getting default <see cref="AuthProvider"/> and if there's no user secrets registered.</exception>
 		/// <exception cref="ArgumentException"/>
-		public AuthProvider(string authority = Urls.Auth.Common) {
+		public AuthProvider(string authority = Authority.Common) {
 			var appConfig = ConfigurationManager.AppSettings;
 
 			if (!ContainsKey(appConfig, nameof(appId))) {
@@ -73,7 +85,9 @@ namespace DriveExplorer.MicrosoftApi {
 		}
 
 		public async Task<string> GetAccessTokenSilently(IAccount userAccount = null) {
-			CurrentUserAccount = userAccount ?? CurrentUserAccount ?? (await msalClient.GetAccountsAsync().ConfigureAwait(false)).FirstOrDefault();
+			CurrentUserAccount = userAccount ??
+				CurrentUserAccount ??
+				(await msalClient.GetAccountsAsync().ConfigureAwait(false)).FirstOrDefault();
 
 			if (CurrentUserAccount == null) {
 				return null;
@@ -89,7 +103,7 @@ namespace DriveExplorer.MicrosoftApi {
 				return result?.AccessToken;
 			} catch (MsalUiRequiredException) {
 				return null;
-			} catch (Exception ex) {
+			} catch (MsalException ex) {
 				Logger.ShowException(ex);
 				return null;
 			}
@@ -102,14 +116,14 @@ namespace DriveExplorer.MicrosoftApi {
 										 .ExecuteAsync(cts.Token).ConfigureAwait(false);
 				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
-			} catch (Exception ex) {
+			} catch (MsalException ex) {
 				Logger.ShowException(ex);
 				return null;
 			}
 		}
 
 		/// <summary>
-		/// This method can only be used with <see cref="Urls.Auth.Organizations"/> authority
+		/// This method can only be used with <see cref="Authority.Organizations"/> 
 		/// </summary>
 		public async Task<string> GetAccessTokenWithUsernamePassword() {
 			if (username == null || password == null) {
@@ -126,7 +140,7 @@ namespace DriveExplorer.MicrosoftApi {
 					.ExecuteAsync(cts.Token).ConfigureAwait(false); ;
 				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
-			} catch (Exception ex) {
+			} catch (MsalException ex) {
 				Logger.ShowException(ex);
 				return null;
 			}
@@ -145,14 +159,29 @@ namespace DriveExplorer.MicrosoftApi {
 				var paths = url.Split('/').ToList();
 				var i = paths.IndexOf("users");
 				var userId = paths[i + 1];
-				if (!UserAccountIdRegistry.ContainsKey(userId)) {
+				if (!UserIdAccountRegistry.ContainsKey(userId)) {
 					throw new InvalidOperationException();
 				}
-				var userAccount = UserAccountIdRegistry[userId];
+				var userAccount = UserIdAccountRegistry[userId];
 				token = await GetAccessTokenSilently(userAccount).ConfigureAwait(false);
 			}
 			// attach authentication to the header of http request
 			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+		}
+
+		public async Task<bool> LogoutAsync(string userId) {
+			var account = UserIdAccountRegistry[userId];
+			if (!UserIdAccountRegistry.ContainsKey(userId)) {
+				throw new InvalidOperationException();
+			}
+			try {
+				await msalClient.RemoveAsync(account).ConfigureAwait(false);
+				UserIdAccountRegistry.Remove(userId);
+				return true;
+			} catch (MsalException ex) {
+				Logger.ShowException(ex);
+				return false;
+			}
 		}
 
 	}

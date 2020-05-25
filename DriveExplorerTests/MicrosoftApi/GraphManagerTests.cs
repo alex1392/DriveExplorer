@@ -15,7 +15,7 @@ namespace DriveExplorer.MicrosoftApi {
         public GraphManager graphManager;
 
         public GraphManagerFixture() {
-            authProvider = new AuthProvider(Urls.Auth.Organizations);
+            authProvider = new AuthProvider(AuthProvider.Authority.Organizations);
             graphManager = new GraphManager(authProvider);
             var _ = authProvider.GetAccessTokenWithUsernamePassword().Result;
         }

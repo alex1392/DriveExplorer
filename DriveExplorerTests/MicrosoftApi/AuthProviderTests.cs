@@ -12,7 +12,7 @@ namespace DriveExplorer.MicrosoftApi {
 		public async Task WithUsernameInAppConfig_GetAccessTokenWithUsername_ResultNotNullAsync()
 		{
 			//Given
-			var authProvider = new AuthProvider(Urls.Auth.Organizations);
+			var authProvider = new AuthProvider(AuthProvider.Authority.Organizations);
 			//When
 			var token = await authProvider.GetAccessTokenWithUsernamePassword();
 			//Then

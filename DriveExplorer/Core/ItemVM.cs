@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace DriveExplorer {
-	public class ItemVM : INotifyPropertyChanged {
+	public class ItemVM : INotifyPropertyChanged, IEquatable<ItemVM> {
 		private ItemVM() {
 		}
 		public static ItemVM Empty { get; } = new ItemVM();
@@ -102,5 +103,33 @@ namespace DriveExplorer {
 			Selected?.Invoke(this, null); // invoke event
 		}
 
+		public override bool Equals(object obj) {
+			return Equals(obj as ItemVM);
+		}
+
+		public bool Equals(ItemVM other) {
+			return other != null &&
+				Item.Name == other.Item.Name &&
+				Item.Type == other.Item.Type &&
+				Item.FullPath == other.Item.FullPath;
+		}
+
+		public override int GetHashCode() {
+			var hashCode = 424228742;
+			hashCode = hashCode * -1521134295 + isExpanded.GetHashCode();
+			hashCode = hashCode * -1521134295 + haveExpanded.GetHashCode();
+			hashCode = hashCode * -1521134295 + isSelected.GetHashCode();
+			hashCode = hashCode * -1521134295 + EqualityComparer<IItem>.Default.GetHashCode(Item);
+			hashCode = hashCode * -1521134295 + EqualityComparer<ObservableCollection<ItemVM>>.Default.GetHashCode(Children);
+			return hashCode;
+		}
+
+		public static bool operator ==(ItemVM left, ItemVM right) {
+			return EqualityComparer<ItemVM>.Default.Equals(left, right);
+		}
+
+		public static bool operator !=(ItemVM left, ItemVM right) {
+			return !(left == right);
+		}
 	}
 }

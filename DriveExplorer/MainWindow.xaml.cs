@@ -38,8 +38,12 @@ namespace DriveExplorer {
             await vm.CurrentItem_SelectedAsync(sender, e).ConfigureAwait(false);
         }
 
-        private async void OneDriveButton_Click(object sender, RoutedEventArgs e) {
+        private async void LoginOneDriveButton_Click(object sender, RoutedEventArgs e) {
             await vm.LoginOneDrive().ConfigureAwait(false);
+        }
+
+        private void LogoutOneDriveButton_Click(object sender, RoutedEventArgs e) {
+            vm.LogoutOneDriveAsync();
         }
     }
 }
