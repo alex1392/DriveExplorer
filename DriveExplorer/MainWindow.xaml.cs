@@ -21,12 +21,12 @@ namespace DriveExplorer {
             InitializeComponent();
             vm = IocContainer.Default.GetSingleton<MainWindowVM>();
             DataContext = vm;
-            this.Loaded += MainWindow_Loaded;
+            Loaded += MainWindow_Loaded;
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
             vm.GetLocalDrives();
-            await vm.LoginOneDrive().ConfigureAwait(true);
+            await vm.AutoLoginOneDrive().ConfigureAwait(true);
             vm.StartPage();
         }
 

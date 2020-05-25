@@ -15,36 +15,20 @@ namespace DriveExplorer {
 	public class MainWindowVM : INotifyPropertyChanged {
 		private readonly AuthProvider authProvider;
 		private readonly GraphManager graphManager;
-		private readonly LocalItemFactory localItemFactory;
-		private OneDriveItemFactory oneDriveItemFactory;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		public ObservableCollection<ItemVM> TreeItemVMs { get; } = new ObservableCollection<ItemVM>();
 
 		public ObservableCollection<ItemVM> CurrentItemVMs { get; } = new ObservableCollection<ItemVM>();
 
-		public MainWindowVM(
-			AuthProvider authProvider,
-			GraphManager graphManager,
-			LocalItemFactory localItemFactory,
-			OneDriveItemFactory oneDriveItemFactory) {
+		public MainWindowVM(AuthProvider authProvider, GraphManager graphManager) {
 			this.authProvider = authProvider;
 			this.graphManager = graphManager;
-			this.localItemFactory = localItemFactory;
-			this.oneDriveItemFactory = oneDriveItemFactory;
 			// must not call GetOneDriveAsync in the constructor of MainWindowVM, 
 			// as if user uses ioc to create MainWindowVM, the thread passes through syncLock in ioc, while here it tries to create OneDriveItem within the constructor, which causes another thread tring to get into the syncLock, which has been held by the former thread. Consequently, a deadlock occurs.
 			// Task.Run(async () => await GetOneDriveAsync()).Wait();
 		}
 
-
-		/// <summary>
-		/// Reset <see cref="TreeItemVMs"/> and <see cref="CurrentItemVMs"/>.
-		/// </summary>
-		public void Reset() {
-			TreeItemVMs.Clear();
-			CurrentItemVMs.Clear();
-		}
 		/// <summary>
 		/// Attach all local drives to <see cref="TreeItemVMs"/>. This method should be called at the startup of application.
 		/// </summary>
@@ -56,21 +40,48 @@ namespace DriveExplorer {
 				MessageBox.Show(ex.Message);
 			}
 			foreach (var drivePath in drivePaths) {
-				var model = localItemFactory.Create(drivePath);
+				var model = LocalItemFactory.Create(drivePath);
 				TreeItemVMs.Add(new ItemVM(model));
 			}
 		}
-
 		public async Task LoginOneDrive() {
+			var token = await authProvider.GetAccessTokenInteractively().ConfigureAwait(true);
+			if (token == null) {
+				return;
+			}
+			await CreateOneDriveAsync().ConfigureAwait(false);
+			
+		}
+		public async Task AutoLoginOneDrive() {
 			var token = await authProvider.GetAccessToken().ConfigureAwait(true);
 			if (token == null) {
+				return;
+			}
+			await CreateOneDriveAsync().ConfigureAwait(false);
+			
+		}
+		public void LogoutOneDrive() {
+			throw new NotImplementedException();
+			//authProvider.UserAccountIdRegistry.Remove(userAccount);
+			//TreeItemVMs.Remove(item);
+		}
+		private async Task CreateOneDriveAsync() {
+			var userAccount = authProvider.CurrentUserAccount;
+			if (TreeItemVMs.Any(vm => vm.Item.Name == userAccount.Username)) {
+				MessageBox.Show("User has already signed in.");
+				return;
+			}
+			var user = await graphManager.GetMeAsync().ConfigureAwait(true);
+			if (user == null) {
 				return;
 			}
 			var root = await graphManager.GetDriveRootAsync().ConfigureAwait(true);
 			if (root == null) {
 				return;
 			}
-			var item = new ItemVM(await oneDriveItemFactory.CreateRootAsync(root).ConfigureAwait(true));
+
+			authProvider.UserAccountIdRegistry.Add(user.Id, userAccount);
+			var item = new ItemVM(OneDriveItemFactory.CreateRoot(root, user));
 			TreeItemVMs.Add(item);
 		}
 
@@ -115,6 +126,14 @@ namespace DriveExplorer {
 				parent = child.Children;
 			}
 			await child.SetIsSelectedAsync(true).ConfigureAwait(true);
+		}
+
+		/// <summary>
+		/// Reset <see cref="TreeItemVMs"/> and <see cref="CurrentItemVMs"/>.
+		/// </summary>
+		public void Reset() {
+			TreeItemVMs.Clear();
+			CurrentItemVMs.Clear();
 		}
 	}
 }

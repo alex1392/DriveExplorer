@@ -26,7 +26,7 @@ namespace DriveExplorer {
                 yield break;
             }
             foreach (var path in paths) {
-                yield return IocContainer.Default.GetSingleton<LocalItemFactory>().Create(path);
+                yield return LocalItemFactory.Create(path);
             }
         }
     }

@@ -23,12 +23,7 @@ namespace DriveExplorer
             IocContainer.Default.Register(() => AuthProvider.Default);
             IocContainer.Default.Register<GraphManager>();
             IocContainer.Default.Register<MainWindowVM>();
-            IocContainer.Default.Register<LocalItemFactory>();
-            IocContainer.Default.Register<OneDriveItemFactory>();
             IocContainer.Default.Register<OneDriveItem>();
-
-
-
         }
     }
 }

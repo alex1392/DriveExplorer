@@ -16,7 +16,7 @@ namespace DriveExplorer.Core {
         [InlineData(@"C:\path\MainWindow.xaml", ItemTypes.File)]
         [InlineData(@"C:\path\", ItemTypes.Folder)]
         public void ItemModelTypeTest(string fullPath, ItemTypes expected) {
-            var item = IocContainer.Default.GetSingleton<LocalItemFactory>().Create(fullPath);
+            var item = LocalItemFactory.Create(fullPath);
             var actual = item.Type;
             Assert.Equal(expected, actual);
         }
@@ -27,7 +27,7 @@ namespace DriveExplorer.Core {
         [InlineData(@"C:\path\MainWindow.xaml", "MainWindow.xaml")]
         [InlineData(@"C:\path\", "path")]
         public void ItemModelNameTest(string fullPath, string expected) {
-            var item = IocContainer.Default.GetSingleton<LocalItemFactory>().Create(fullPath);
+            var item = LocalItemFactory.Create(fullPath);
             var actual = item.Name;
             Assert.Equal(expected, actual);
         }

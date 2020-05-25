@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Configuration;
 using System.Collections.Specialized;
+using System.Collections.Generic;
+using System.IO;
 
 namespace DriveExplorer.MicrosoftApi {
 	public class AuthProvider : IAuthenticationProvider {
@@ -21,7 +23,7 @@ namespace DriveExplorer.MicrosoftApi {
 		public static AuthProvider Default { get; private set; } = new AuthProvider();
 
 		private readonly IPublicClientApplication msalClient;
-		private IAccount userAccount;
+		private readonly string appId;
 		private readonly string username;
 		private readonly string password;
 
@@ -29,8 +31,8 @@ namespace DriveExplorer.MicrosoftApi {
 		/// Specifies the scopes of graph api would be used in the current application.
 		/// </summary>
 		public string[] Scopes { get; set; }
-
-		private readonly string appId;
+		public IAccount CurrentUserAccount { get; private set; }
+		public Dictionary<string, IAccount> UserAccountIdRegistry { get; } = new Dictionary<string, IAccount>();
 
 		/// <summary>
 		/// Get <see cref="AuthProvider"/> with <see cref="IConfigurationRoot"/>
@@ -55,6 +57,7 @@ namespace DriveExplorer.MicrosoftApi {
 				.WithAuthority(authority)
 				.WithDefaultRedirectUri()
 				.Build();
+			TokenCacheHelper.EnableSerialization(msalClient.UserTokenCache);
 
 			bool ContainsKey(NameValueCollection appConfig, string key) {
 				return appConfig.AllKeys.Any(item => item == key);
@@ -69,20 +72,20 @@ namespace DriveExplorer.MicrosoftApi {
 				await GetAccessTokenInteractively().ConfigureAwait(false);
 		}
 
-		public async Task<string> GetAccessTokenSilently() {
-			// TODO: why no cache for everytime the application restarted ???
-			userAccount = (await msalClient.GetAccountsAsync().ConfigureAwait(false)).FirstOrDefault();
-			if (userAccount == null) {
+		public async Task<string> GetAccessTokenSilently(IAccount userAccount = null) {
+			CurrentUserAccount = userAccount ?? CurrentUserAccount ?? (await msalClient.GetAccountsAsync().ConfigureAwait(false)).FirstOrDefault();
+
+			if (CurrentUserAccount == null) {
 				return null;
 			}
 			try {
-				// If there is an account, call AcquireTokenSilent
 				using var cts = new CancellationTokenSource(Timeouts.Silent);
+				// If there is an account, call AcquireTokenSilent
 				// By doing this, MSAL will refresh the token automatically if
 				// it is expired. Otherwise it returns the cached token.
-				var result = await msalClient.AcquireTokenSilent(Scopes, userAccount)
+				var result = await msalClient.AcquireTokenSilent(Scopes, CurrentUserAccount)
 											 .ExecuteAsync(cts.Token).ConfigureAwait(false); ;
-				userAccount = result?.Account;
+				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
 			} catch (MsalUiRequiredException) {
 				return null;
@@ -97,7 +100,7 @@ namespace DriveExplorer.MicrosoftApi {
 			try {
 				var result = await msalClient.AcquireTokenInteractive(Scopes)
 										 .ExecuteAsync(cts.Token).ConfigureAwait(false);
-				userAccount = result?.Account;
+				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
 			} catch (Exception ex) {
 				Logger.ShowException(ex);
@@ -121,7 +124,7 @@ namespace DriveExplorer.MicrosoftApi {
 				var result = await msalClient
 					.AcquireTokenByUsernamePassword(Scopes, username, secureString)
 					.ExecuteAsync(cts.Token).ConfigureAwait(false); ;
-				userAccount = result?.Account;
+				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
 			} catch (Exception ex) {
 				Logger.ShowException(ex);
@@ -134,8 +137,22 @@ namespace DriveExplorer.MicrosoftApi {
 		/// <param name="request"></param>
 		/// <returns></returns>
 		public async Task AuthenticateRequestAsync(HttpRequestMessage request) {
+			var url = request.RequestUri.ToString().ToLower();
+			string token;
+			if (!url.Contains("users")) {
+				token = await GetAccessTokenSilently().ConfigureAwait(false);
+			} else {
+				var paths = url.Split('/').ToList();
+				var i = paths.IndexOf("users");
+				var userId = paths[i + 1];
+				if (!UserAccountIdRegistry.ContainsKey(userId)) {
+					throw new InvalidOperationException();
+				}
+				var userAccount = UserAccountIdRegistry[userId];
+				token = await GetAccessTokenSilently(userAccount).ConfigureAwait(false);
+			}
 			// attach authentication to the header of http request
-			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", await GetAccessTokenSilently().ConfigureAwait(false));
+			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
 		}
 
 	}
