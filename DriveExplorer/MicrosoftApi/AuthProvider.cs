@@ -13,6 +13,7 @@ using System.Configuration;
 using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.IO;
+using Prompt = Microsoft.Identity.Client.Prompt;
 
 namespace DriveExplorer.MicrosoftApi {
 	public class AuthProvider : IAuthenticationProvider {
@@ -64,16 +65,27 @@ namespace DriveExplorer.MicrosoftApi {
 			}
 			username = appConfig[nameof(username)];
 			password = appConfig[nameof(password)];
+
 			msalClient = PublicClientApplicationBuilder
 				.Create(appId)
+				.WithBroker(true)
 				.WithAuthority(authority)
 				.WithDefaultRedirectUri()
+				.WithLogging(Log, LogLevel.Verbose, true)
 				.Build();
 			TokenCacheHelper.EnableSerialization(msalClient.UserTokenCache);
 
 			bool ContainsKey(NameValueCollection appConfig, string key) {
 				return appConfig.AllKeys.Any(item => item == key);
 			}
+		}
+
+		private void Log(LogLevel level, string message, bool containsPii) {
+			if (containsPii) {
+				Console.ForegroundColor = ConsoleColor.Red;
+			}
+			Console.WriteLine($"{level} {message}");
+			Console.ResetColor();
 		}
 
 		/// <summary>
@@ -98,7 +110,8 @@ namespace DriveExplorer.MicrosoftApi {
 				// By doing this, MSAL will refresh the token automatically if
 				// it is expired. Otherwise it returns the cached token.
 				var result = await msalClient.AcquireTokenSilent(Scopes, CurrentUserAccount)
-											 .ExecuteAsync(cts.Token).ConfigureAwait(false); ;
+											 .ExecuteAsync(cts.Token)
+											 .ConfigureAwait(false);
 				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
 			} catch (MsalUiRequiredException) {
@@ -112,8 +125,9 @@ namespace DriveExplorer.MicrosoftApi {
 		public async Task<string> GetAccessTokenInteractively() {
 			using var cts = new CancellationTokenSource(Timeouts.Interactive);
 			try {
-				var result = await msalClient.AcquireTokenInteractive(Scopes)
-										 .ExecuteAsync(cts.Token).ConfigureAwait(false);
+				var result = await msalClient.AcquireTokenInteractive(Scopes)				 
+					.ExecuteAsync(cts.Token)
+					.ConfigureAwait(false);
 				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
 			} catch (MsalException ex) {

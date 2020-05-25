@@ -40,8 +40,9 @@ namespace DriveExplorer {
 				MessageBox.Show(ex.Message);
 			}
 			foreach (var drivePath in drivePaths) {
-				var model = LocalItemFactory.Create(drivePath);
-				TreeItemVMs.Add(new ItemVM(model));
+				var item = LocalItemFactory.Create(drivePath);
+				TreeItemVMs.Add(new ItemVM(item));
+				CurrentItemVMs.Add(new ItemVM(item));
 			}
 		}
 		public async Task LoginOneDrive() {
@@ -88,17 +89,9 @@ namespace DriveExplorer {
 			}
 
 			authProvider.UserIdAccountRegistry.Add(user.Id, userAccount);
-			var item = new ItemVM(OneDriveItemFactory.CreateRoot(root, user));
-			TreeItemVMs.Add(item);
-		}
-
-		/// <summary>
-		/// Set up start page of <see cref="CurrentItemVMs"/>. This method should be called after all drives have been attached to <see cref="TreeItemVMs"/>.
-		/// </summary>
-		public void StartPage() {
-			foreach (var itemVM in TreeItemVMs) {
-				CurrentItemVMs.Add(new ItemVM(itemVM.Item));
-			}
+			var item = OneDriveItemFactory.CreateRoot(root, user);
+			TreeItemVMs.Add(new ItemVM(item));
+			CurrentItemVMs.Add(new ItemVM(item));
 		}
 
 		public async Task TreeItem_SelectedAsync(object sender, RoutedEventArgs e = null) {
