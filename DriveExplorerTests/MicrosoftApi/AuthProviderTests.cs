@@ -1,12 +1,9 @@
 ﻿using NUnit.Framework;
-using DriveExplorer.MicrosoftApi;
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
 	[TestFixtureSource(typeof(MicrosoftApiSource))]
@@ -63,7 +60,7 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 		[Test()]
 		public void LogoutAsyncTest() {
 			Console.WriteLine(authProvider.CurrentUserAccount);
-			
+
 			//authProvider.LogoutAsync()
 		}
 	}

@@ -58,15 +58,14 @@ namespace DriveExplorer.MicrosoftApi {
 		/// Specifies the scopes of graph api would be used in the current application.
 		/// </summary>
 		public string[] Scopes { get; set; }
-		public IAccount CurrentUserAccount { get; private set; }
 		/// <summary>
-		/// This property is used to find the corresponding <see cref="IAccount"/> from the given user id. They should be registered just after an user logged in.
+		/// Should be set before everytime <see cref="GraphManager"/> makes a call
 		/// </summary>
-		public Dictionary<string, IAccount> UserIdAccountRegistry { get; } = new Dictionary<string, IAccount>();
+		public IAccount CurrentUserAccount { get; set; }
 
 		public AuthProvider(ILogger logger = null, string authority = Authority.Common) {
 			this.logger = logger;
-			
+
 			var appConfig = ConfigurationManager.AppSettings;
 			if (!ContainsKey(appConfig, nameof(appId))) {
 				throw new ArgumentException($"Given {nameof(appConfig)} has no  configuration key named {nameof(appId)}");
@@ -177,37 +176,16 @@ namespace DriveExplorer.MicrosoftApi {
 			}
 		}
 		/// <summary>
-		/// Implementation of <see cref="IAuthenticationProvider"/>. This method is called everytime when user make a request.
+		/// Implementation of <see cref="IAuthenticationProvider"/>. This method is called everytime when <see cref="GraphManager"/> make a request.
 		/// </summary>
-		/// <param name="request"></param>
-		/// <returns></returns>
 		public async Task AuthenticateRequestAsync(HttpRequestMessage request) {
-			var url = request.RequestUri.ToString().ToLower();
-			string token;
-			if (!url.Contains("users")) {
-				token = await GetAccessTokenSilently().ConfigureAwait(false);
-			} else {
-				var paths = url.Split('/').ToList();
-				var i = paths.IndexOf("users");
-				var userId = paths[i + 1];
-				if (!UserIdAccountRegistry.ContainsKey(userId)) {
-					throw new InvalidOperationException();
-				}
-				var userAccount = UserIdAccountRegistry[userId];
-				token = await GetAccessTokenSilently(userAccount).ConfigureAwait(false);
-			}
 			// attach authentication to the header of http request
-			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", await GetAccessTokenSilently().ConfigureAwait(false));
 		}
 
-		public async Task<bool> LogoutAsync(string userId) {
-			var account = UserIdAccountRegistry[userId];
-			if (!UserIdAccountRegistry.ContainsKey(userId)) {
-				throw new InvalidOperationException();
-			}
+		public async Task<bool> LogoutAsync(IAccount account) {
 			try {
 				await msalClient.RemoveAsync(account).ConfigureAwait(false);
-				UserIdAccountRegistry.Remove(userId);
 				return true;
 			} catch (MsalException ex) {
 				logger.Log(ex);

@@ -2,6 +2,7 @@
 
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
+
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;

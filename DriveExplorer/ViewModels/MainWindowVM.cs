@@ -34,12 +34,10 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
-
 		public MainWindowVM(AuthProvider authProvider, GraphManager graphManager) {
 			this.authProvider = authProvider;
 			this.graphManager = graphManager;
 		}
-
 		/// <summary>
 		/// Attach all local drives to <see cref="TreeItemVMs"/>. This method should be called at the startup of application.
 		/// </summary>
@@ -52,8 +50,8 @@ namespace DriveExplorer.ViewModels {
 			}
 			foreach (var drivePath in drivePaths) {
 				var item = new LocalItem(drivePath);
-				TreeItemVMs.Add(new ItemVM(item));
-				CurrentItemVMs.Add(new ItemVM(item));
+				TreeItemVMs.Add(new ItemVM(this, item));
+				CurrentItemVMs.Add(new ItemVM(this, item));
 			}
 		}
 		public async Task LoginOneDrive() {
@@ -73,11 +71,13 @@ namespace DriveExplorer.ViewModels {
 		}
 		public async Task LogoutOneDriveAsync() {
 			SpinnerVisibility = Visibility.Visible;
+			// TODO: logout specific user
 			var treeVM = TreeItemVMs.First(vm => vm.Item.Type == ItemTypes.OneDrive);
 			var item = treeVM.Item as OneDriveItem;
-			if (await authProvider.LogoutAsync(item.UserId).ConfigureAwait(true)) {
+			if (await authProvider.LogoutAsync(item.UserAccount).ConfigureAwait(true)) {
 				TreeItemVMs.Remove(treeVM);
 				CurrentItemVMs.Remove(CurrentItemVMs.FirstOrDefault(vm => vm == treeVM));
+				graphManager.UserIdAccountRegistry.Remove(item.UserId);
 			}
 			SpinnerVisibility = Visibility.Collapsed;
 		}
@@ -91,7 +91,7 @@ namespace DriveExplorer.ViewModels {
 			if (user == null) {
 				return;
 			}
-			if (authProvider.UserIdAccountRegistry.ContainsKey(user.Id)) {
+			if (graphManager.UserIdAccountRegistry.ContainsKey(user.Id)) {
 				MessageBox.Show("User has already signed in.");
 				return;
 			}
@@ -100,10 +100,10 @@ namespace DriveExplorer.ViewModels {
 				return;
 			}
 
-			authProvider.UserIdAccountRegistry.Add(user.Id, userAccount);
+			graphManager.UserIdAccountRegistry.Add(user.Id, userAccount);
 			var item = new OneDriveItem(graphManager, root, user, userAccount);
-			TreeItemVMs.Add(new ItemVM(item));
-			CurrentItemVMs.Add(new ItemVM(item));
+			TreeItemVMs.Add(new ItemVM(this, item));
+			CurrentItemVMs.Add(new ItemVM(this, item));
 		}
 
 		public async Task TreeItem_SelectedAsync(object sender, RoutedEventArgs e = null) {
@@ -113,13 +113,14 @@ namespace DriveExplorer.ViewModels {
 			if (e != null) {
 				e.Handled = true; // avoid recursive calls of treeViewItem.select
 			}
-			// update list box items
-			await vm.SetIsExpandedAsync(true).ConfigureAwait(true); // in case there's no items as it hasn't been expanded 
+			SpinnerVisibility = Visibility.Visible;
+			// update list box items, in case there's no items as it hasn't been expanded 
+			await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
 			CurrentItemVMs.Clear();
 			foreach (var itemVM in vm.Children) {
-				CurrentItemVMs.Add(new ItemVM(itemVM.Item));
+				CurrentItemVMs.Add(new ItemVM(this, itemVM.Item));
 			}
-
+			SpinnerVisibility = Visibility.Collapsed;
 		}
 		public async Task CurrentItem_SelectedAsync(object sender, MouseButtonEventArgs e = null) {
 			var vm = (sender as ItemVM) ??
@@ -128,16 +129,19 @@ namespace DriveExplorer.ViewModels {
 			if (!vm.Item.Type.Is(ItemTypes.Folders)) {
 				return;
 			}
+
+			SpinnerVisibility = Visibility.Visible;
 			// expand all treeViewItems
 			var directories = vm.Item.FullPath.Split(Path.DirectorySeparatorChar).Where(s => !string.IsNullOrEmpty(s));
 			var parent = TreeItemVMs;
-			var child = ItemVM.Empty;
+			var child = new ItemVM();
 			foreach (var dir in directories) {
 				child = parent.FirstOrDefault(vm => vm.Item.Name == Uri.UnescapeDataString(dir)) ?? throw new Exception("Cannot find folder to expand");
 				await child.SetIsExpandedAsync(true).ConfigureAwait(true);
 				parent = child.Children;
 			}
 			await child.SetIsSelectedAsync(true).ConfigureAwait(true);
+			SpinnerVisibility = Visibility.Collapsed;
 		}
 
 		/// <summary>

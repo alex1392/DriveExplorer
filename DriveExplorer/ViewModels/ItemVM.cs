@@ -5,12 +5,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DriveExplorer.ViewModels {
 	public class ItemVM : INotifyPropertyChanged, IEquatable<ItemVM> {
-		private ItemVM() {
-		}
-		public static ItemVM Empty { get; } = new ItemVM();
+
 		private bool isExpanded;
 		private bool haveExpanded = false;
 		private bool isSelected;
@@ -45,6 +44,8 @@ namespace DriveExplorer.ViewModels {
 				}
 			}
 		}
+
+		private readonly MainWindowVM mainWindowVM;
 		public IItem Item { get; private set; }
 
 		public ObservableCollection<ItemVM> Children { get; set; } = new ObservableCollection<ItemVM>
@@ -56,8 +57,12 @@ namespace DriveExplorer.ViewModels {
 		public event EventHandler Expanded;
 		public event EventHandler Selected;
 
-		public ItemVM(IItem model) {
-			Item = model ?? throw new ArgumentNullException(nameof(model));
+		public ItemVM() {
+
+		}
+		public ItemVM(MainWindowVM mainWindowVM, IItem model = null) {
+			this.mainWindowVM = mainWindowVM;
+			Item = model;
 		}
 
 		/// <summary>
@@ -80,29 +85,33 @@ namespace DriveExplorer.ViewModels {
 			}
 			await SelectAsync().ConfigureAwait(false);
 		}
-		public override string ToString() {
-			return $"{Item.Name}, Items: {Children.Count}";
-		}
 
 		private async Task ExpandAsync() {
 			if (!Item.Type.Is(ItemTypes.Folders)) {
 				return;
 			}
 			// attach children
-			if (!haveExpanded) {
-				haveExpanded = true;
-				Children.Clear(); // clear dummy item
-				await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
-					Children.Add(new ItemVM(item));
-				}
-				Expanded?.Invoke(this, null); // invoke event
+			if (haveExpanded) {
+				return;
 			}
+			mainWindowVM.SpinnerVisibility = Visibility.Visible;
+			haveExpanded = true;
+			Children.Clear(); // clear dummy item
+			await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
+				Children.Add(new ItemVM(mainWindowVM, item));
+			}
+			Expanded?.Invoke(this, null); // invoke event
+			mainWindowVM.SpinnerVisibility = Visibility.Collapsed;
 		}
 
 		private async Task SelectAsync() {
 
 
 			Selected?.Invoke(this, null); // invoke event
+		}
+
+		public override string ToString() {
+			return $"{Item.Name}, Items: {Children.Count}";
 		}
 
 		public override bool Equals(object obj) {

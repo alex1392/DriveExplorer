@@ -1,4 +1,5 @@
 using Microsoft.Graph;
+using Microsoft.Identity.Client;
 
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,11 @@ namespace DriveExplorer.MicrosoftApi {
 		private readonly GraphServiceClient client;
 		private readonly ILogger logger;
 
+		/// <summary>
+		/// This property is used to find the corresponding <see cref="IAccount"/> from the given user id. They should be registered just after an user logged in and be removed just after an user logged out.
+		/// </summary>
+		public Dictionary<string, IAccount> UserIdAccountRegistry { get; } = new Dictionary<string, IAccount>();
+
 		public GraphManager(AuthProvider authProvider, ILogger logger = null) {
 			this.authProvider = authProvider ?? throw new ArgumentNullException(nameof(authProvider));
 			client = new GraphServiceClient(authProvider);
@@ -51,6 +57,9 @@ namespace DriveExplorer.MicrosoftApi {
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
 				var requestBuilder = userId == null ? client.Me : client.Users[userId];
+				if (userId != null) {
+					authProvider.CurrentUserAccount = UserIdAccountRegistry[userId];
+				}
 				var user = await requestBuilder.Request().GetAsync(cts.Token).ConfigureAwait(false);
 				return user;
 			} catch (Exception ex) {
@@ -95,6 +104,9 @@ namespace DriveExplorer.MicrosoftApi {
 		public async IAsyncEnumerable<DriveItem> GetChildrenAsync(string parentId, string userId = null) {
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			var requestBuilder = userId == null ? client.Me : client.Users[userId];
+			if (userId != null) {
+				authProvider.CurrentUserAccount = UserIdAccountRegistry[userId];
+			}
 			var request = requestBuilder.Drive.Items[parentId].Children.Request();
 			do {
 				IDriveItemChildrenCollectionPage page;
