@@ -1,10 +1,11 @@
-﻿<Window x:Class="DriveExplorer.MainWindow"
+﻿<Window x:Class="DriveExplorer.Views.MainWindow"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:fa="http://schemas.fontawesome.io/icons/"
-		xmlns:local="clr-namespace:DriveExplorer"
+		xmlns:views="clr-namespace:DriveExplorer.Views"
+		xmlns:vm="clr-namespace:DriveExplorer.ViewModels"
 		mc:Ignorable="d"
 		Title="MainWindow"
 		Height="450"
@@ -27,11 +28,11 @@
 						<Setter Property="IsSelected"
 								Value="{Binding IsSelected, Mode=TwoWay}" />
 						<Setter Property="Visibility"
-								Value="{Binding Item.Type, Converter={x:Static local:TypeVisibilityConverter.Instance}}" />
+								Value="{Binding Item.Type, Converter={x:Static views:TypeVisibilityConverter.Instance}}" />
 					</Style>
 				</TreeView.ItemContainerStyle>
 				<TreeView.ItemTemplate>
-					<HierarchicalDataTemplate DataType="{x:Type local:ItemVM}"
+					<HierarchicalDataTemplate DataType="{x:Type vm:ItemVM}"
 											  ItemsSource="{Binding Children}">
 						<TextBlock Text="{Binding Item.Name}" />
 					</HierarchicalDataTemplate>
@@ -55,7 +56,7 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>-->
 				<ListBox.ItemTemplate>
-					<DataTemplate DataType="{x:Type local:ItemVM}">
+					<DataTemplate DataType="{x:Type vm:ItemVM}">
 						<TextBlock Text="{Binding Item.Name}" />
 					</DataTemplate>
 				</ListBox.ItemTemplate>

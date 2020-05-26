@@ -1,6 +1,6 @@
 ﻿using DriveExplorer.MicrosoftApi;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Graph;
+using DriveExplorer.Models;
+
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,14 +10,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
 using Directory = System.IO.Directory;
 
-namespace DriveExplorer {
+namespace DriveExplorer.ViewModels {
 	public class MainWindowVM : INotifyPropertyChanged {
 		private readonly AuthProvider authProvider;
 		private readonly GraphManager graphManager;
-		private readonly LocalItemFactory localItemFactory;
-		private readonly OneDriveItemFactory oneDriveItemFactory;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -26,7 +25,7 @@ namespace DriveExplorer {
 		public ObservableCollection<ItemVM> CurrentItemVMs { get; } = new ObservableCollection<ItemVM>();
 
 		public Visibility SpinnerVisibility {
-			get { return spinnerVisibility; }
+			get => spinnerVisibility;
 			set {
 				if (value != spinnerVisibility) {
 					spinnerVisibility = value;
@@ -36,11 +35,9 @@ namespace DriveExplorer {
 		}
 
 
-		public MainWindowVM(IServiceProvider serviceProvider) {
-			authProvider = serviceProvider.GetService<AuthProvider>();
-			graphManager = serviceProvider.GetService<GraphManager>();
-			localItemFactory = serviceProvider.GetService<LocalItemFactory>();
-			oneDriveItemFactory = serviceProvider.GetService<OneDriveItemFactory>();
+		public MainWindowVM(AuthProvider authProvider, GraphManager graphManager) {
+			this.authProvider = authProvider;
+			this.graphManager = graphManager;
 		}
 
 		/// <summary>
@@ -54,7 +51,7 @@ namespace DriveExplorer {
 				MessageBox.Show(ex.Message);
 			}
 			foreach (var drivePath in drivePaths) {
-				var item = localItemFactory.Create(drivePath);
+				var item = new LocalItem(drivePath);
 				TreeItemVMs.Add(new ItemVM(item));
 				CurrentItemVMs.Add(new ItemVM(item));
 			}
@@ -105,7 +102,7 @@ namespace DriveExplorer {
 			}
 
 			authProvider.UserIdAccountRegistry.Add(user.Id, userAccount);
-			var item = oneDriveItemFactory.CreateRoot(root, user);
+			var item = new OneDriveItem(graphManager, root, user);
 			TreeItemVMs.Add(new ItemVM(item));
 			CurrentItemVMs.Add(new ItemVM(item));
 		}

@@ -1,19 +1,16 @@
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
+
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Configuration;
-using System.Collections.Specialized;
-using System.Collections.Generic;
-using System.IO;
-using Prompt = Microsoft.Identity.Client.Prompt;
 
 
 namespace DriveExplorer.MicrosoftApi {
@@ -119,7 +116,7 @@ namespace DriveExplorer.MicrosoftApi {
 					CurrentUserAccount = result?.Account;
 				} catch (MsalUiRequiredException) {
 					continue;
-				} catch	(Exception ex) {
+				} catch (Exception ex) {
 					Logger.ShowException(ex);
 					continue;
 				}
@@ -156,7 +153,7 @@ namespace DriveExplorer.MicrosoftApi {
 		public async Task<string> GetAccessTokenInteractively() {
 			using var cts = new CancellationTokenSource(Timeouts.Interactive);
 			try {
-				var result = await msalClient.AcquireTokenInteractive(Scopes)				 
+				var result = await msalClient.AcquireTokenInteractive(Scopes)
 					.ExecuteAsync(cts.Token)
 					.ConfigureAwait(false);
 				CurrentUserAccount = result?.Account;
@@ -182,7 +179,8 @@ namespace DriveExplorer.MicrosoftApi {
 			try {
 				var result = await msalClient
 					.AcquireTokenByUsernamePassword(Scopes, username, secureString)
-					.ExecuteAsync(cts.Token).ConfigureAwait(false); ;
+					.ExecuteAsync(cts.Token).ConfigureAwait(false);
+				;
 				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
 			} catch (MsalException ex) {

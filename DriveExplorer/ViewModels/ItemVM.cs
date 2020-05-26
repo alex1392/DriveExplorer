@@ -1,10 +1,12 @@
-﻿using System;
+﻿using DriveExplorer.Models;
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace DriveExplorer {
+namespace DriveExplorer.ViewModels {
 	public class ItemVM : INotifyPropertyChanged, IEquatable<ItemVM> {
 		private ItemVM() {
 		}
