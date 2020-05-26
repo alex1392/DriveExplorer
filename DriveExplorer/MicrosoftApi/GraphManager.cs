@@ -36,16 +36,8 @@ namespace DriveExplorer.MicrosoftApi {
         private readonly AuthProvider authProvider;
         private readonly GraphServiceClient client;
 
-        /// <summary>
-        /// Get default <see cref="GraphManager"/> with <see cref="AuthProvider.Default"/>
-        /// </summary>
-        public static GraphManager Default { get; private set; } = new GraphManager();
-
-        public GraphManager(AuthProvider authProvider = null) {
-            if (authProvider is null) {
-                authProvider = AuthProvider.Default;
-            }
-            this.authProvider = authProvider;
+        public GraphManager(AuthProvider authProvider) {
+            this.authProvider = authProvider ?? throw new ArgumentNullException(nameof(authProvider));
             client = new GraphServiceClient(authProvider);
         }
 

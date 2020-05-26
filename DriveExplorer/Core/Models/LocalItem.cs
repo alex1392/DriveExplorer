@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Directory = System.IO.Directory;
 using System.Threading.Tasks;
-using DriveExplorer.IoC;
 using System.Windows;
 using System.IO;
 
 namespace DriveExplorer {
-
     public class LocalItem : IItem {
+        private readonly LocalItemFactory localItemFactory;
+
         public ItemTypes Type { get; set; }
         public string Name { get; set; }
         public string FullPath { get; set; }
+
+        public LocalItem(LocalItemFactory localItemFactory) {
+            this.localItemFactory = localItemFactory;
+        }
 
         public async IAsyncEnumerable<IItem> GetChildrenAsync() {
             IEnumerable<string> paths;
@@ -26,7 +30,7 @@ namespace DriveExplorer {
                 yield break;
             }
             foreach (var path in paths) {
-                yield return LocalItemFactory.Create(path);
+                yield return localItemFactory.Create(path);
             }
         }
     }

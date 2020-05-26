@@ -1,4 +1,5 @@
 ﻿using DriveExplorer.MicrosoftApi;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using System;
 using System.Collections.ObjectModel;
@@ -15,6 +16,8 @@ namespace DriveExplorer {
 	public class MainWindowVM : INotifyPropertyChanged {
 		private readonly AuthProvider authProvider;
 		private readonly GraphManager graphManager;
+		private readonly LocalItemFactory localItemFactory;
+		private readonly OneDriveItemFactory oneDriveItemFactory;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -33,9 +36,11 @@ namespace DriveExplorer {
 		}
 
 
-		public MainWindowVM(AuthProvider authProvider, GraphManager graphManager) {
-			this.authProvider = authProvider;
-			this.graphManager = graphManager;
+		public MainWindowVM(IServiceProvider serviceProvider) {
+			authProvider = serviceProvider.GetService<AuthProvider>();
+			graphManager = serviceProvider.GetService<GraphManager>();
+			localItemFactory = serviceProvider.GetService<LocalItemFactory>();
+			oneDriveItemFactory = serviceProvider.GetService<OneDriveItemFactory>();
 		}
 
 		/// <summary>
@@ -49,7 +54,7 @@ namespace DriveExplorer {
 				MessageBox.Show(ex.Message);
 			}
 			foreach (var drivePath in drivePaths) {
-				var item = LocalItemFactory.Create(drivePath);
+				var item = localItemFactory.Create(drivePath);
 				TreeItemVMs.Add(new ItemVM(item));
 				CurrentItemVMs.Add(new ItemVM(item));
 			}
@@ -100,7 +105,7 @@ namespace DriveExplorer {
 			}
 
 			authProvider.UserIdAccountRegistry.Add(user.Id, userAccount);
-			var item = OneDriveItemFactory.CreateRoot(root, user);
+			var item = oneDriveItemFactory.CreateRoot(root, user);
 			TreeItemVMs.Add(new ItemVM(item));
 			CurrentItemVMs.Add(new ItemVM(item));
 		}

@@ -1,14 +1,20 @@
-﻿using DriveExplorer.IoC;
-using DriveExplorer.MicrosoftApi;
+﻿using DriveExplorer.MicrosoftApi;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace DriveExplorer {
     public class OneDriveItemFactory {
-        public static IItem CreateRoot(DriveItem driveItem, User user) {
-            var item = IocContainer.Default.GetTransient<OneDriveItem>();
+        private readonly IServiceProvider serviceProvider;
+
+        public OneDriveItemFactory(IServiceProvider serviceProvider) {
+            this.serviceProvider = serviceProvider;
+        }
+        public IItem CreateRoot(DriveItem driveItem, User user) {
+            var item = serviceProvider.GetService<OneDriveItem>();
             item.Id = driveItem.Id;
             item.Name = user.UserPrincipalName;
             item.Type = ItemTypes.OneDrive;
@@ -17,8 +23,8 @@ namespace DriveExplorer {
             return item;
         }
 
-        public static IItem CreateChild(DriveItem driveItem, OneDriveItem parent) {
-            var item = IocContainer.Default.GetTransient<OneDriveItem>();
+        public IItem CreateChild(DriveItem driveItem, OneDriveItem parent) {
+            var item = serviceProvider.GetService<OneDriveItem>();
             item.Id = driveItem.Id;
             item.Name = driveItem.Name;
             item.Type = IsFolder(driveItem) ? ItemTypes.Folder :

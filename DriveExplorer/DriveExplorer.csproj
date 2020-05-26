@@ -206,9 +206,6 @@
     <Compile Include="Core\Converters\TypeImageConverter.cs" />
     <Compile Include="Core\Converters\TypeVisibilityConverter.cs" />
     <Compile Include="GoogleApi\UserCredentialProvider.cs" />
-    <Compile Include="IoC\IIocContainer.cs" />
-    <Compile Include="IoC\IocContainer.cs" />
-    <Compile Include="IoC\PreferredConstructorAttribute.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -236,6 +233,9 @@
     <Resource Include="Resources\xls.png" />
     <Resource Include="Resources\txt.png" />
     <Resource Include="Resources\ppt.png" />
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="packages.config" />
     <None Include="Resources\onedrive.svg" />
     <Resource Include="Resources\img.png" />

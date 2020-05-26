@@ -1,7 +1,7 @@
 ﻿[*.cs]
 
-# xUnit1004: Test methods should not be skipped
-dotnet_diagnostic.xUnit1004.severity = silent
+# CS4014: Because this call is not awaited, execution of the current method continues before the call is completed
+dotnet_diagnostic.CS4014.severity = suggestion
 
-# CS0649: Field 'GraphApiCallTests.User.context' is never assigned to, and will always have its default value null
-dotnet_diagnostic.CS0649.severity = none
+# CS1998: Async method lacks 'await' operators and will run synchronously
+dotnet_diagnostic.CS1998.severity = suggestion

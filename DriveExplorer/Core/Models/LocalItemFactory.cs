@@ -1,13 +1,18 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Path = System.IO.Path;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DriveExplorer {
 	public class LocalItemFactory {
-		public static IItem Create(string fullPath) {
-			var item = new LocalItem
-			{
-				FullPath = fullPath
-			};
+		private readonly IServiceProvider serviceProvider;
+
+		public LocalItemFactory(IServiceProvider serviceProvider) {
+			this.serviceProvider = serviceProvider;
+		}
+		public IItem Create(string fullPath) {
+			var item = serviceProvider.GetService<LocalItem>();
+			item.FullPath = fullPath;
 			var isRoot = IsRoot(fullPath);
 			item.Type = isRoot ? ItemTypes.LocaDrive :
 							IsFolder(fullPath) ? ItemTypes.Folder :

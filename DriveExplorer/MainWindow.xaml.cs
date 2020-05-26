@@ -1,4 +1,6 @@
-﻿using DriveExplorer.IoC;
+﻿
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,8 +23,8 @@ namespace DriveExplorer {
             InitializeComponent();
         }
 
-        public MainWindow(IocContainer ioc) : this() {
-            vm = ioc.GetSingleton<MainWindowVM>();
+        public MainWindow(MainWindowVM vm) : this() {
+            this.vm = vm;
             DataContext = vm;
             Loaded += MainWindow_Loaded;
         }
