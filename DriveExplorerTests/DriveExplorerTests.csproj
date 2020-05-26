@@ -99,9 +99,14 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="MicrosoftApi\AuthProviderTests.cs" />
     <Compile Include="MicrosoftApi\DebugLogger.cs" />
     <Compile Include="MicrosoftApi\GraphManagerTests.cs" />
+    <Compile Include="MicrosoftApi\OneDriveItemTests.cs" />
+    <Compile Include="Models\LocalItemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\ItemVMTests.cs" />
+    <Compile Include="ViewModels\MainWindowVMTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
