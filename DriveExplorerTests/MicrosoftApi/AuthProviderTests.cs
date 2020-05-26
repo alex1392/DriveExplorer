@@ -5,43 +5,66 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Net.Http;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
-	[TestFixture()]
+	[TestFixtureSource(typeof(MicrosoftApiSource))]
 	public class AuthProviderTests {
+		private readonly AuthProvider authProvider;
+
+		public AuthProviderTests(AuthProvider authProvider, GraphManager _) {
+			this.authProvider = authProvider;
+		}
 		[Test()]
 		public void AuthProviderTest() {
-			throw new NotImplementedException();
+			Assert.NotNull(authProvider);
 		}
 
 		[Test()]
-		public void GetAllAccessTokenSilentlyTest() {
-			throw new NotImplementedException();
+		public async Task GetAllAccessTokenSilentlyTestAsync() {
+			var enumerable = authProvider.GetAllAccessTokenSilently();
+			await foreach (var token in enumerable) {
+				Console.WriteLine(token);
+				Assert.NotNull(token);
+			}
 		}
 
 		[Test()]
-		public void GetAccessTokenSilentlyTest() {
-			throw new NotImplementedException();
+		public async Task GetAccessTokenSilentlyTestAsync() {
+			var token = await authProvider.GetAccessTokenSilently().ConfigureAwait(false);
+			Console.WriteLine(token);
+			Assert.NotNull(token);
+		}
+
+		[Ignore("Required user interaction")]
+		public async Task GetAccessTokenInteractivelyTestAsync() {
+			var token = await authProvider.GetAccessTokenInteractively().ConfigureAwait(false);
+			Console.WriteLine(token);
+			Assert.NotNull(token);
 		}
 
 		[Test()]
-		public void GetAccessTokenInteractivelyTest() {
-			throw new NotImplementedException();
+		public async Task GetAccessTokenWithUsernamePasswordTestAsync() {
+			var token = await authProvider.GetAccessTokenWithUsernamePassword().ConfigureAwait(false);
+			Console.WriteLine(token);
+			Assert.NotNull(token);
 		}
 
 		[Test()]
-		public void GetAccessTokenWithUsernamePasswordTest() {
-			throw new NotImplementedException();
-		}
-
-		[Test()]
-		public void AuthenticateRequestAsyncTest() {
-			throw new NotImplementedException();
+		public async Task AuthenticateRequestAsyncTestAsync() {
+			var url = Path.Combine(GraphManager.ApiEndpoint, "me");
+			var request = new HttpRequestMessage(HttpMethod.Get, url);
+			await authProvider.AuthenticateRequestAsync(request).ConfigureAwait(false);
+			Console.WriteLine(request.Headers.Authorization);
+			Assert.NotNull(request.Headers.Authorization);
 		}
 
 		[Test()]
 		public void LogoutAsyncTest() {
-			throw new NotImplementedException();
+			Console.WriteLine(authProvider.CurrentUserAccount);
+			
+			//authProvider.LogoutAsync()
 		}
 	}
 }

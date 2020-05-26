@@ -5,26 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using System.IO;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
-	[TestFixture()]
+
+	[TestFixtureSource(typeof(MicrosoftApiSource))]
 	public class GraphManagerTests {
-		private AuthProvider authProvider;
 		private GraphManager graphManager;
 
-		[OneTimeSetUp]
-		public void OneTimeSetup() {
-			var services = new ServiceCollection();
-			services.AddSingleton<ILogger, DebugLogger>();
-			services.AddSingleton(sp => new AuthProvider(sp.GetService<ILogger>(), AuthProvider.Authority.Organizations));
-			services.AddSingleton<GraphManager>();
-			var serviceProvider = services.BuildServiceProvider();
-			authProvider = serviceProvider.GetService<AuthProvider>();
-			graphManager = serviceProvider.GetService<GraphManager>();
-			authProvider.GetAccessTokenWithUsernamePassword().Wait();
+		public GraphManagerTests(AuthProvider _, GraphManager graphManager) {
+			this.graphManager = graphManager;
 		}
 
 		[Test()]

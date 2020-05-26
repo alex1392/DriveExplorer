@@ -101,7 +101,7 @@ namespace DriveExplorer.ViewModels {
 			}
 
 			authProvider.UserIdAccountRegistry.Add(user.Id, userAccount);
-			var item = new OneDriveItem(graphManager, root, user);
+			var item = new OneDriveItem(graphManager, root, user, userAccount);
 			TreeItemVMs.Add(new ItemVM(item));
 			CurrentItemVMs.Add(new ItemVM(item));
 		}
