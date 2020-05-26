@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DriveExplorerTests")]
+[assembly: AssemblyTitle("DriveExplorerTests1")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DriveExplorerTests")]
+[assembly: AssemblyProduct("DriveExplorerTests1")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1d90bcf7-8916-4953-ba1b-c858a7daca62")]
+[assembly: Guid("25df340f-0fb9-4f2d-8e61-997f0a02b196")]
 
 // Version information for an assembly consists of the following four values:
 //
