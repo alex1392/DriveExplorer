@@ -64,19 +64,10 @@ namespace DriveExplorer.MicrosoftApi {
 		/// </summary>
 		public Dictionary<string, IAccount> UserIdAccountRegistry { get; } = new Dictionary<string, IAccount>();
 
-		public AuthProvider(ILogger logger) : this(Authority.Common) {
+		public AuthProvider(ILogger logger = null, string authority = Authority.Common) {
 			this.logger = logger;
-		}
-
-		/// <summary>
-		/// Get <see cref="AuthProvider"/> with <see cref="IConfigurationRoot"/>
-		/// </summary>
-		/// <param name="appConfig">Must contain settings named <see cref="appId"/>.</param>
-		/// <exception cref="InvalidOperationException">Throws when getting default <see cref="AuthProvider"/> and if there's no user secrets registered.</exception>
-		/// <exception cref="ArgumentException"/>
-		public AuthProvider(string authority) {
+			
 			var appConfig = ConfigurationManager.AppSettings;
-
 			if (!ContainsKey(appConfig, nameof(appId))) {
 				throw new ArgumentException($"Given {nameof(appConfig)} has no  configuration key named {nameof(appId)}");
 			}
@@ -92,21 +83,13 @@ namespace DriveExplorer.MicrosoftApi {
 				.WithBroker(true)
 				.WithAuthority(authority)
 				.WithDefaultRedirectUri()
-				.WithLogging(Log, LogLevel.Verbose, true)
 				.Build();
 			TokenCacheHelper.EnableSerialization(msalClient.UserTokenCache);
 
 			bool ContainsKey(NameValueCollection appConfig, string key) {
 				return appConfig.AllKeys.Any(item => item == key);
 			}
-		}
 
-		private void Log(LogLevel level, string message, bool containsPii) {
-			if (containsPii) {
-				Console.ForegroundColor = ConsoleColor.Red;
-			}
-			Console.WriteLine($"{level} {message}");
-			Console.ResetColor();
 		}
 
 		public async IAsyncEnumerable<string> GetAllAccessTokenSilently() {

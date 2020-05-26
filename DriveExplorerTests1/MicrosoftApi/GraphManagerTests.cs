@@ -1,4 +1,4 @@
-﻿using Xunit;
+﻿using NUnit.Framework;
 using DriveExplorer.MicrosoftApi;
 using System;
 using System.Collections.Generic;
@@ -6,14 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit.Abstractions;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
-	public class GraphManagerTestFixture {
-		private readonly AuthProvider authProvider;
-		public readonly GraphManager graphManager;
+	[TestFixture()]
+	public class GraphManagerTests {
+		private AuthProvider authProvider;
+		private GraphManager graphManager;
 
-		public GraphManagerTestFixture() {
+		[OneTimeSetUp]
+		public void OneTimeSetup() {
 			var services = new ServiceCollection();
 			services.AddSingleton<ILogger, DebugLogger>();
 			services.AddSingleton(sp => new AuthProvider(sp.GetService<ILogger>(), AuthProvider.Authority.Organizations));
@@ -23,52 +24,44 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 			graphManager = serviceProvider.GetService<GraphManager>();
 			authProvider.GetAccessTokenWithUsernamePassword().Wait();
 		}
-	}
-	public class GraphManagerTests : IClassFixture<GraphManagerTestFixture> {
-		private readonly GraphManager graphManager;
-		private readonly ITestOutputHelper logger;
 
-		public GraphManagerTests(GraphManagerTestFixture fixture, ITestOutputHelper logger) {
-			graphManager = fixture.graphManager;
-			this.logger = logger;
-		}
-		[Fact()]
+		[Test()]
 		public void GraphManagerTest() {
 			Assert.NotNull(graphManager);
 		}
 
-		[Fact()]
+		[Test()]
 		public async Task GetMeAsyncTestAsync() {
 			var user = await graphManager.GetMeAsync().ConfigureAwait(false);
 			Assert.NotNull(user);
 		}
 
-		[Fact()]
+		[Test()]
 		public void GetDriveRootAsyncTest() {
 			throw new NotImplementedException();
 		}
 
-		[Fact()]
+		[Test()]
 		public void SearchDriveAsyncTest() {
 			throw new NotImplementedException();
 		}
 
-		[Fact()]
+		[Test()]
 		public void GetFileAsyncTest() {
 			throw new NotImplementedException();
 		}
 
-		[Fact()]
+		[Test()]
 		public void GetChildrenAsyncTest() {
 			throw new NotImplementedException();
 		}
 
-		[Fact()]
+		[Test()]
 		public void UploadFileAsyncTest() {
 			throw new NotImplementedException();
 		}
 
-		[Fact()]
+		[Test()]
 		public void UpdateFileAsyncTest() {
 			throw new NotImplementedException();
 		}

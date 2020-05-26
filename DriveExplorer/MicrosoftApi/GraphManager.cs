@@ -36,12 +36,12 @@ namespace DriveExplorer.MicrosoftApi {
 		}
 
 		#endregion
-		
+
 		private readonly AuthProvider authProvider;
 		private readonly GraphServiceClient client;
 		private readonly ILogger logger;
 
-		public GraphManager(AuthProvider authProvider, ILogger logger) {
+		public GraphManager(AuthProvider authProvider, ILogger logger = null) {
 			this.authProvider = authProvider ?? throw new ArgumentNullException(nameof(authProvider));
 			client = new GraphServiceClient(authProvider);
 			this.logger = logger;
@@ -51,7 +51,8 @@ namespace DriveExplorer.MicrosoftApi {
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
 				var requestBuilder = userId == null ? client.Me : client.Users[userId];
-				return await requestBuilder.Request().GetAsync(cts.Token).ConfigureAwait(false);
+				var user = await requestBuilder.Request().GetAsync(cts.Token).ConfigureAwait(false);
+				return user;
 			} catch (Exception ex) {
 				logger.Log(ex);
 				return null;
@@ -110,7 +111,7 @@ namespace DriveExplorer.MicrosoftApi {
 			} while (request != null);
 		}
 
-		public async Task<string> UploadFileAsync(string parentId, string filename, string content, string userId = null) {
+		public async Task<HttpResponseMessage> UploadFileAsync(string parentId, string filename, string content, string userId = null) {
 			var userStr = userId == null ? "/me" : $"/users/{userId}";
 			var urlString = ApiEndpoint + $"{userStr}/drive/items/{parentId}:/{filename}:/content";
 			var uri = new Uri(urlString);
@@ -119,8 +120,7 @@ namespace DriveExplorer.MicrosoftApi {
 			using var stringContent = new StringContent(content, Encoding.UTF8);
 			request.Content = stringContent;
 			try {
-				using var response = await client.HttpProvider.SendAsync(request, HttpCompletionOption.ResponseContentRead, cts.Token).ConfigureAwait(false);
-				return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+				return await client.HttpProvider.SendAsync(request, HttpCompletionOption.ResponseContentRead, cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
 				logger.Log(ex);
 				return null;

@@ -3,18 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveExplorer.Core", "DriveExplorer.Core\DriveExplorer.Core.csproj", "{8B2EAF01-0FEC-4072-BCDE-4112405C16F6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveExplorer", "DriveExplorer\DriveExplorer.csproj", "{CBAF0616-8857-4FB3-98DE-2242E56D0128}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriveExplorerTests.Core", "DriveExplorerTests.Core\DriveExplorerTests.Core.csproj", "{CA3F4030-10F4-452F-8E23-3CFF6E67F985}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{93BC7FA4-D184-4360-95F8-760783253FEB}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveExplorerTests", "DriveExplorerTests\DriveExplorerTests.csproj", "{1D90BCF7-8916-4953-BA1B-C858A7DACA62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriveExplorerTests", "DriveExplorerTests1\DriveExplorerTests.csproj", "{25DF340F-0FB9-4F2D-8E61-997F0A02B196}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,22 +18,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8B2EAF01-0FEC-4072-BCDE-4112405C16F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8B2EAF01-0FEC-4072-BCDE-4112405C16F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8B2EAF01-0FEC-4072-BCDE-4112405C16F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8B2EAF01-0FEC-4072-BCDE-4112405C16F6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CBAF0616-8857-4FB3-98DE-2242E56D0128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CBAF0616-8857-4FB3-98DE-2242E56D0128}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBAF0616-8857-4FB3-98DE-2242E56D0128}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBAF0616-8857-4FB3-98DE-2242E56D0128}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA3F4030-10F4-452F-8E23-3CFF6E67F985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA3F4030-10F4-452F-8E23-3CFF6E67F985}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA3F4030-10F4-452F-8E23-3CFF6E67F985}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA3F4030-10F4-452F-8E23-3CFF6E67F985}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1D90BCF7-8916-4953-BA1B-C858A7DACA62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1D90BCF7-8916-4953-BA1B-C858A7DACA62}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1D90BCF7-8916-4953-BA1B-C858A7DACA62}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1D90BCF7-8916-4953-BA1B-C858A7DACA62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25DF340F-0FB9-4F2D-8E61-997F0A02B196}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25DF340F-0FB9-4F2D-8E61-997F0A02B196}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25DF340F-0FB9-4F2D-8E61-997F0A02B196}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25DF340F-0FB9-4F2D-8E61-997F0A02B196}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

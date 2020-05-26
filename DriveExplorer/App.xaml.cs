@@ -24,7 +24,7 @@ namespace DriveExplorer {
 		}
 
 		private void ConfigureServices(ServiceCollection services) {
-			services.AddSingleton(_ => new AuthProvider(AuthProvider.Authority.Common));
+			services.AddSingleton<AuthProvider>();
 			services.AddSingleton<GraphManager>();
 			services.AddSingleton<MainWindowVM>();
 			services.AddSingleton<MainWindow>();

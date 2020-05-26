@@ -59,10 +59,9 @@ namespace DriveExplorer.ViewModels {
 		public async Task LoginOneDrive() {
 			SpinnerVisibility = Visibility.Visible;
 			var token = await authProvider.GetAccessTokenInteractively().ConfigureAwait(true);
-			if (token == null) {
-				return;
+			if (token != null) {
+				await CreateOneDriveAsync().ConfigureAwait(false);
 			}
-			await CreateOneDriveAsync().ConfigureAwait(false);
 			SpinnerVisibility = Visibility.Collapsed;
 		}
 		public async Task AutoLoginOneDrive() {
