@@ -515,16 +515,16 @@ namespace DriveExplorer.IoC
 				.Select(instance => (TService)instance);
 		}
 
-		public TClass GetSingleton<TClass>() where TClass : class {
-			return GetInstance<TClass>();
+		public TService GetSingleton<TService>() where TService : class {
+			return GetInstance<TService>();
 		}
 
-		public TClass GetSingleton<TClass>(string key) where TClass : class {
-			return GetInstance<TClass>(key);
+		public TService GetSingleton<TService>(string key) where TService : class {
+			return GetInstance<TService>(key);
 		}
 
-		public TClass GetTransient<TClass>() where TClass : class {
-			return (TClass)_factories[typeof(TClass)][_defaultKey].DynamicInvoke(null);
+		public TService GetTransient<TService>() where TService : class {
+			return (TService)_factories[typeof(TService)][_defaultKey].DynamicInvoke(null);
 		}
 
 		#region Private methods

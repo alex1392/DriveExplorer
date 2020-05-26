@@ -19,7 +19,10 @@ namespace DriveExplorer {
 
         public MainWindow() {
             InitializeComponent();
-            vm = IocContainer.Default.GetSingleton<MainWindowVM>();
+        }
+
+        public MainWindow(IocContainer ioc) : this() {
+            vm = ioc.GetSingleton<MainWindowVM>();
             DataContext = vm;
             Loaded += MainWindow_Loaded;
         }

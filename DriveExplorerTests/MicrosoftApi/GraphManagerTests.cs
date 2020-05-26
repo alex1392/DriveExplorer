@@ -40,12 +40,12 @@ namespace DriveExplorer.MicrosoftApi {
         [Fact]
         public async Task SearchDrive_ResultNotNullAsync() {
             //Given
-            authProvider.Scopes = new[] { Permissions.Files.Read };
+            authProvider.Scopes = new[] { AuthProvider.Permissions.Files.Read };
             //When
             var file = (await graphManager.SearchDriveAsync("LICENSE.txt",
                 new[] {
                     new QueryOption("$top", "5"),
-                    new QueryOption("$select", Selects.name + "," + Selects.id)
+                    new QueryOption("$select", GraphManager.Selects.name + "," + GraphManager.Selects.id)
                     })).First();
             Debug.WriteLine(file.Name);
             //Then
@@ -55,7 +55,7 @@ namespace DriveExplorer.MicrosoftApi {
         [Fact]
         public async Task DownloadFile_ResultNotNullAsync() {
             //Given
-            authProvider.Scopes = new[] { Permissions.Files.Read };
+            authProvider.Scopes = new[] { AuthProvider.Permissions.Files.Read };
             var item = (await graphManager.SearchDriveAsync("LICENSE.txt")).CurrentPage.First();
             //When
             var stream = await graphManager.GetFileAsync(item.Id);
@@ -70,7 +70,7 @@ namespace DriveExplorer.MicrosoftApi {
         [Fact]
         public async Task GetDriveRoot_ResultNotNullAsync() {
             //Given
-            authProvider.Scopes = new[] { Permissions.Files.Read };
+            authProvider.Scopes = new[] { AuthProvider.Permissions.Files.Read };
             //When
             var item = await graphManager.GetDriveRootAsync();
             Debug.WriteLine(item.Name);
@@ -81,7 +81,7 @@ namespace DriveExplorer.MicrosoftApi {
         [Fact]
         public async Task GetChildrenOfRoot_ResultNotNullAsync() {
             //Given
-            authProvider.Scopes = new[] { Permissions.Files.Read };
+            authProvider.Scopes = new[] { AuthProvider.Permissions.Files.Read };
             var root = await graphManager.GetDriveRootAsync();
             //When
             var children = graphManager.GetChildrenAsync(root.Id);
@@ -95,7 +95,7 @@ namespace DriveExplorer.MicrosoftApi {
         [Fact]
         public async Task UpdateFile_ResultNotNullAsync() {
             //Given
-            authProvider.Scopes = new[] { Permissions.Files.ReadWrite };
+            authProvider.Scopes = new[] { AuthProvider.Permissions.Files.ReadWrite };
             var itemId = (await graphManager.SearchDriveAsync("LICENSE.txt")).FirstOrDefault()?.Id;
             var content = "aaa";
             //When
@@ -108,7 +108,7 @@ namespace DriveExplorer.MicrosoftApi {
         [Fact]
         public async Task UploadFile_ResultNotNullAsync() {
             //Given
-            authProvider.Scopes = new[] { Permissions.Files.ReadWrite };
+            authProvider.Scopes = new[] { AuthProvider.Permissions.Files.ReadWrite };
             var content = "aaa";
             var parentId = (await graphManager.GetDriveRootAsync()).Id;
             var filename = "aaa.txt";
@@ -147,14 +147,14 @@ namespace DriveExplorer.MicrosoftApi {
         [Fact]
         public async Task GetUserApiCall_ResultNotNullAsync() {
             //Given
-            authProvider.Scopes = new[] { Permissions.User.Read };
-            var url = Urls.Graph + "me/";
+            authProvider.Scopes = new[] { AuthProvider.Permissions.User.Read };
+            var url = GraphManager.ApiEndpoint + "me/";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             await authProvider.AuthenticateRequestAsync(request);
             //When
             using var client = new HttpClient
             {
-                Timeout = Timeouts.Silent,
+                Timeout = GraphManager.Timeouts.Silent,
             };
             var response = await client.SendAsync(request);
             var responseBody = await response.Content.ReadAsStringAsync();
