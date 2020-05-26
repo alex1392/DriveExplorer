@@ -185,7 +185,11 @@ namespace DriveExplorer.MicrosoftApi {
 
 		public async Task<bool> LogoutAsync(IAccount account) {
 			try {
+				// TODO: this method just clears the cache without truely logout the user!!
 				await msalClient.RemoveAsync(account).ConfigureAwait(false);
+				if (CurrentUserAccount == account) {
+					CurrentUserAccount = null;
+				}
 				return true;
 			} catch (MsalException ex) {
 				logger.Log(ex);

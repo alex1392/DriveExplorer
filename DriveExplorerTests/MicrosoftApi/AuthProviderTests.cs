@@ -58,10 +58,11 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 		}
 
 		[Test()]
-		public void LogoutAsyncTest() {
+		public async Task LogoutAsyncTestAsync() {
 			Console.WriteLine(authProvider.CurrentUserAccount);
 
-			//authProvider.LogoutAsync()
+			await authProvider.LogoutAsync(authProvider.CurrentUserAccount).ConfigureAwait(false);
+			Assert.Null(authProvider.CurrentUserAccount);
 		}
 	}
 }
