@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 
 namespace DriveExplorer.MicrosoftApi {
 	public class AuthProvider : IAuthenticationProvider {
+		#region Constants
+
 		public static class Authority {
 			public const string Organizations = "https://login.microsoftonline.com/organizations";
 			public const string Comsumers = "https://login.microsoftonline.com/comsumers";
@@ -44,10 +46,13 @@ namespace DriveExplorer.MicrosoftApi {
 			public static readonly TimeSpan Interactive = TimeSpan.FromMinutes(1);
 		}
 
+		#endregion
+
 		private readonly IPublicClientApplication msalClient;
 		private readonly string appId;
 		private readonly string username;
 		private readonly string password;
+		private readonly ILogger logger;
 
 		/// <summary>
 		/// Specifies the scopes of graph api would be used in the current application.
@@ -59,8 +64,8 @@ namespace DriveExplorer.MicrosoftApi {
 		/// </summary>
 		public Dictionary<string, IAccount> UserIdAccountRegistry { get; } = new Dictionary<string, IAccount>();
 
-		public AuthProvider() : this(Authority.Common) {
-
+		public AuthProvider(ILogger logger) : this(Authority.Common) {
+			this.logger = logger;
 		}
 
 		/// <summary>
@@ -117,7 +122,7 @@ namespace DriveExplorer.MicrosoftApi {
 				} catch (MsalUiRequiredException) {
 					continue;
 				} catch (Exception ex) {
-					Logger.ShowException(ex);
+					logger.Log(ex);
 					continue;
 				}
 				yield return result?.AccessToken;
@@ -145,7 +150,7 @@ namespace DriveExplorer.MicrosoftApi {
 			} catch (MsalUiRequiredException) {
 				return null;
 			} catch (MsalException ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return null;
 			}
 		}
@@ -159,7 +164,7 @@ namespace DriveExplorer.MicrosoftApi {
 				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
 			} catch (MsalException ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return null;
 			}
 		}
@@ -184,7 +189,7 @@ namespace DriveExplorer.MicrosoftApi {
 				CurrentUserAccount = result?.Account;
 				return result?.AccessToken;
 			} catch (MsalException ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return null;
 			}
 		}
@@ -222,7 +227,7 @@ namespace DriveExplorer.MicrosoftApi {
 				UserIdAccountRegistry.Remove(userId);
 				return true;
 			} catch (MsalException ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return false;
 			}
 		}

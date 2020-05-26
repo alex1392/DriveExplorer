@@ -4,8 +4,8 @@ using System.Windows;
 
 
 namespace DriveExplorer.MicrosoftApi {
-	public static class Logger {
-		public static void ShowException(Exception ex) {
+	public class MessageBoxLogger : ILogger {
+		public void Log(Exception ex) {
 			var stringBuilder = new StringBuilder();
 			do {
 				stringBuilder.Append($"====={ex.GetType()}====={Environment.NewLine}{ex.Message}");
@@ -14,5 +14,4 @@ namespace DriveExplorer.MicrosoftApi {
 			MessageBox.Show(stringBuilder.ToString());
 		}
 	}
-
 }

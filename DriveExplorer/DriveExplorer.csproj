@@ -192,6 +192,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MicrosoftApi\ILogger.cs" />
+    <Compile Include="MicrosoftApi\MessageBoxLogger.cs" />
     <Compile Include="Models\Constants.cs" />
     <Compile Include="Views\Converters\DebugConverter.cs" />
     <Compile Include="Models\IItem.cs" />
@@ -212,7 +214,6 @@
   <ItemGroup>
     <Compile Include="MicrosoftApi\AuthProvider.cs" />
     <Compile Include="MicrosoftApi\GraphManager.cs" />
-    <Compile Include="MicrosoftApi\Logger.cs" />
     <Compile Include="MicrosoftApi\TokenCacheHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

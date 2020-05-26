@@ -1,9 +1,9 @@
 ﻿using DriveExplorer.MicrosoftApi;
-using DriveExplorer.ViewModels; 
+using DriveExplorer.ViewModels;
 using DriveExplorer.Views;
+
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System;
+
 using System.Windows;
 
 namespace DriveExplorer {
@@ -28,7 +28,7 @@ namespace DriveExplorer {
 			services.AddSingleton<GraphManager>();
 			services.AddSingleton<MainWindowVM>();
 			services.AddSingleton<MainWindow>();
-			services.AddSingleton<ILogger>();
+			services.AddSingleton<ILogger, MessageBoxLogger>();
 		}
 	}
 }

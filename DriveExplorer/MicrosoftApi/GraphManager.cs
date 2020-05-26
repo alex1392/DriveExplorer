@@ -13,6 +13,7 @@ namespace DriveExplorer.MicrosoftApi {
 	/// Handles all graph api calling, includes error handling. If there's any error occurs in the api call, returns null
 	/// </summary>
 	public class GraphManager {
+		#region Constants
 		public const string ApiEndpoint = "https://graph.microsoft.com/v1.0/";
 		public static class Timeouts {
 			public static readonly TimeSpan Silent = TimeSpan.FromSeconds(10);
@@ -33,12 +34,17 @@ namespace DriveExplorer.MicrosoftApi {
 			/// </summary>
 			public const string downloadUrl = "@microsoft.graph.downloadUrl";
 		}
+
+		#endregion
+		
 		private readonly AuthProvider authProvider;
 		private readonly GraphServiceClient client;
+		private readonly ILogger logger;
 
-		public GraphManager(AuthProvider authProvider) {
+		public GraphManager(AuthProvider authProvider, ILogger logger) {
 			this.authProvider = authProvider ?? throw new ArgumentNullException(nameof(authProvider));
 			client = new GraphServiceClient(authProvider);
+			this.logger = logger;
 		}
 
 		public async Task<User> GetMeAsync(string userId = null) {
@@ -47,7 +53,7 @@ namespace DriveExplorer.MicrosoftApi {
 				var requestBuilder = userId == null ? client.Me : client.Users[userId];
 				return await requestBuilder.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return null;
 			}
 		}
@@ -58,7 +64,7 @@ namespace DriveExplorer.MicrosoftApi {
 				var requestBuilder = userId == null ? client.Me : client.Users[userId];
 				return await requestBuilder.Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return null;
 			}
 		}
@@ -69,7 +75,7 @@ namespace DriveExplorer.MicrosoftApi {
 				var requestBuilder = userId == null ? client.Me : client.Users[userId];
 				return await requestBuilder.Drive.Root.Search(query).Request(options).GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return null;
 			}
 		}
@@ -80,7 +86,7 @@ namespace DriveExplorer.MicrosoftApi {
 				var requestBuilder = userId == null ? client.Me : client.Users[userId];
 				return await requestBuilder.Drive.Items[fileId].Content.Request().GetAsync(cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return null;
 			}
 		}
@@ -94,26 +100,7 @@ namespace DriveExplorer.MicrosoftApi {
 				try {
 					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
 				} catch (Exception ex) {
-					Logger.ShowException(ex);
-					yield break;
-				}
-				foreach (var file in page) {
-					yield return file;
-				}
-				request = page?.NextPageRequest;
-			} while (request != null);
-		}
-
-		public async IAsyncEnumerable<DriveItem> GetUserChildrenAsync(string parentId, string userId = null) {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			var requestBuilder = userId == null ? client.Me : client.Users[userId];
-			var request = requestBuilder.Drive.Items[parentId].Children.Request();
-			do {
-				IDriveItemChildrenCollectionPage page;
-				try {
-					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
-				} catch (Exception ex) {
-					Logger.ShowException(ex);
+					logger.Log(ex);
 					yield break;
 				}
 				foreach (var file in page) {
@@ -135,7 +122,7 @@ namespace DriveExplorer.MicrosoftApi {
 				using var response = await client.HttpProvider.SendAsync(request, HttpCompletionOption.ResponseContentRead, cts.Token).ConfigureAwait(false);
 				return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 			} catch (Exception ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return null;
 			}
 		}
@@ -148,7 +135,7 @@ namespace DriveExplorer.MicrosoftApi {
 			try {
 				return await request.PutAsync<DriveItem>(stream, cts.Token).ConfigureAwait(false);
 			} catch (Exception ex) {
-				Logger.ShowException(ex);
+				logger.Log(ex);
 				return null;
 			}
 		}
