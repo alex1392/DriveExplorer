@@ -81,7 +81,7 @@ namespace DriveExplorer.MicrosoftApi {
 			}
 		}
 
-		public async Task<Stream> GetFileAsync(string fileId, string userId = null) {
+		public async Task<Stream> GetContentAsync(string fileId, string userId = null) {
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
 				var requestBuilder = userId == null ? client.Me : client.Users[userId];
