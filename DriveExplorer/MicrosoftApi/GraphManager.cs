@@ -116,16 +116,8 @@ namespace DriveExplorer.MicrosoftApi {
 												 .ConfigureAwait(false);
 
 					RegisterUser(result?.Account);
-				} catch (MsalUiRequiredException) {
-					continue;
-				} catch (TaskCanceledException ex) {
+				} catch (Exception ex) {
 					logger.Log(ex);
-					continue;
-				} catch (MsalException ex) {
-					Debugger.Break();
-					continue;
-				} catch (InvalidOperationException ex) {
-					Debugger.Break();
 					continue;
 				}
 				yield return (result?.AccessToken, result?.Account);
@@ -146,10 +138,10 @@ namespace DriveExplorer.MicrosoftApi {
 					.ConfigureAwait(false);
 				RegisterUser(result?.Account);
 				return (result?.AccessToken, result?.Account);
-			} catch (MsalClientException ex) {
-				Debugger.Break();
+			} catch (MsalClientException) {
+				Console.WriteLine("User cancelled");
 			} catch (MsalException ex) {
-				Debugger.Break();
+				Console.WriteLine(ex.Message);
 			} catch (InvalidOperationException ex) {
 				logger.Log(ex);
 			}
@@ -185,6 +177,9 @@ namespace DriveExplorer.MicrosoftApi {
 			var userId = GetUserId(url);
 			var userAccount = GetAccount(userId);
 			var token = await GetAccessTokenSilently(userAccount).ConfigureAwait(false);
+			if (token == null) {
+				throw new Exception("Cannot get access token");
+			}
 			// attach authentication to the header of http request
 			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
 		}
@@ -194,11 +189,8 @@ namespace DriveExplorer.MicrosoftApi {
 				await msalClient.RemoveAsync(account).ConfigureAwait(false);
 				accountList.Remove(account);
 				return true;
-			} catch (TaskCanceledException ex) {
+			} catch (Exception ex) {
 				logger.Log(ex);
-				return false;
-			} catch (MsalException ex) {
-				Debugger.Break();
 				return false;
 			}
 		}
@@ -208,11 +200,9 @@ namespace DriveExplorer.MicrosoftApi {
 			try {
 				var user = await graphClient.Users[userId].Request().GetAsync(cts.Token).ConfigureAwait(false);
 				return user;
-			} catch (TaskCanceledException ex) {
+			} catch (ServiceException ex) {
+				// onedrive server errors
 				logger.Log(ex);
-				return null;
-			} catch (MsalException ex) {
-				Debugger.Break();
 				return null;
 			}
 		}
@@ -221,14 +211,9 @@ namespace DriveExplorer.MicrosoftApi {
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
 				return await graphClient.Users[userId].Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
-			} catch (TaskCanceledException ex) {
-				logger.Log(ex);
-				return null;
-			} catch (MsalException ex) {
-				Debugger.Break();
-				return null;
 			} catch (ServiceException ex) {
-				Debugger.Break();
+				// onedrive server errors
+				logger.Log(ex);
 				return null;
 			}
 		}
@@ -243,8 +228,9 @@ namespace DriveExplorer.MicrosoftApi {
 				} catch (TaskCanceledException ex) {
 					logger.Log(ex);
 					yield break;
-				} catch (MsalException ex) {
-					Debugger.Break();
+				} catch (ServiceException ex) {
+					// onedrive server errors
+					logger.Log(ex);
 					yield break;
 				}
 				foreach (var file in page) {
@@ -275,7 +261,8 @@ namespace DriveExplorer.MicrosoftApi {
 			} catch (MsalUiRequiredException ex) {
 				var (token, _) = await GetAccessTokenInteractively(account, ex.Claims).ConfigureAwait(false);
 				return token;
-			} catch (TaskCanceledException ex) {
+			} catch (ServiceException ex) {
+				// onedrive server errors
 				logger.Log(ex);
 				return null;
 			}
@@ -302,79 +289,6 @@ namespace DriveExplorer.MicrosoftApi {
 				throw new InvalidOperationException("Cannot get account");
 			}
 			return account;
-		}
-		private async Task<User> GetUserAsync(string userId) {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			try {
-				var user = await graphClient.Users[userId].Request().GetAsync(cts.Token).ConfigureAwait(false);
-				return user;
-			} catch (TaskCanceledException ex) {
-				logger.Log(ex);
-				return null;
-			}
-		}
-		private async Task<DriveItem> GetDriveRootAsync(string userId) {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			try {
-				return await graphClient.Users[userId].Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
-			} catch (TaskCanceledException ex) {
-				logger.Log(ex);
-				return null;
-			}
-		}
-		private async IAsyncEnumerable<DriveItem> GetChildrenAsync(string parentId, string userId) {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			var request = graphClient.Users[userId].Drive.Items[parentId].Children.Request();
-			do {
-				IDriveItemChildrenCollectionPage page;
-				try {
-					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
-				} catch (TaskCanceledException ex) {
-					logger.Log(ex);
-					yield break;
-				}
-				foreach (var file in page) {
-					yield return file;
-				}
-				request = page?.NextPageRequest;
-			} while (request != null);
-		}
-		private async Task<User> GetUserAsync() {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			try {
-				var user = await graphClient.Me.Request().GetAsync(cts.Token).ConfigureAwait(false);
-				return user;
-			} catch (TaskCanceledException ex) {
-				logger.Log(ex);
-				return null;
-			}
-		}
-		private async Task<DriveItem> GetDriveRootAsync() {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			try {
-				return await graphClient.Me.Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
-			} catch (TaskCanceledException ex) {
-				logger.Log(ex);
-				return null;
-			}
-		}
-		private async IAsyncEnumerable<DriveItem> GetChildrenAsync(string parentId) {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			var requestBuilder = graphClient.Me;
-			var request = requestBuilder.Drive.Items[parentId].Children.Request();
-			do {
-				IDriveItemChildrenCollectionPage page;
-				try {
-					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
-				} catch (TaskCanceledException ex) {
-					logger.Log(ex);
-					yield break;
-				}
-				foreach (var file in page) {
-					yield return file;
-				}
-				request = page?.NextPageRequest;
-			} while (request != null);
 		}
 	}
 
