@@ -5,16 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DriveExplorer.Models;
+using System.Windows;
 
 namespace DriveExplorer.Views.Tests {
 	[TestFixture()]
 	public class TypeVisibilityConverterTests {
-		[Test()]
-		public void ConvertTest() {
-			throw new NotImplementedException();
+		private TypeVisibilityConverter converter;
+
+		[TestCase(ItemTypes.DOC, Visibility.Collapsed)]
+		[TestCase(ItemTypes.OneDrive, Visibility.Visible)]
+		public void ConvertTest(ItemTypes type, Visibility expected) {
+			converter = new TypeVisibilityConverter();
+			var actual = converter.Convert(type, null, null, null);
+			Assert.AreEqual(expected, actual);
 		}
 
-		[Test()]
+		[Ignore("Not implemented")]
 		public void ConvertBackTest() {
 			throw new NotImplementedException();
 		}
