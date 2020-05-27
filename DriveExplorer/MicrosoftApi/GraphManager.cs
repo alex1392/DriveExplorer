@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -36,7 +37,6 @@ namespace DriveExplorer.MicrosoftApi {
 			/// </summary>
 			public const string downloadUrl = "@microsoft.graph.downloadUrl";
 		}
-
 		public static class Authority {
 			public const string Organizations = "https://login.microsoftonline.com/organizations";
 			public const string Comsumers = "https://login.microsoftonline.com/comsumers";
@@ -63,10 +63,11 @@ namespace DriveExplorer.MicrosoftApi {
 		}
 		public static class Timeouts {
 			public static readonly TimeSpan Silent = TimeSpan.FromSeconds(10);
-			public static readonly TimeSpan Interactive = TimeSpan.FromMinutes(1);
 		}
 		#endregion
 
+		#region Fields
+		private readonly string[] scopes;
 		private readonly GraphServiceClient graphClient;
 		private readonly IPublicClientApplication msalClient;
 		private readonly ILogger logger;
@@ -74,16 +75,7 @@ namespace DriveExplorer.MicrosoftApi {
 		private readonly string username;
 		private readonly string password;
 		private readonly List<IAccount> accountList = new List<IAccount>();
-		/// <summary>
-		/// Specifies the scopes of graph api would be used in the current application.
-		/// </summary>
-		public string[] Scopes { get; set; }
-		/// <summary>
-		/// Should be set before everytime <see cref="GraphManager"/> makes a call
-		/// </summary>
-		/// <summary>
-		/// This property is used to find the corresponding <see cref="IAccount"/> from the given user id. They should be registered just after an user logged in and be removed just after an user logged out.
-		/// </summary>
+		#endregion
 
 		public GraphManager(ILogger logger = null, string authority = Authority.Common) {
 			graphClient = new GraphServiceClient(this);
@@ -94,8 +86,8 @@ namespace DriveExplorer.MicrosoftApi {
 				throw new ArgumentException($"Given {nameof(appConfig)} has no  configuration key named {nameof(appId)}");
 			}
 			appId = appConfig[nameof(appId)];
-			if (ContainsKey(appConfig, nameof(Scopes))) {
-				Scopes = appConfig[nameof(Scopes)].Split(';');
+			if (ContainsKey(appConfig, nameof(scopes))) {
+				scopes = appConfig[nameof(scopes)].Split(';');
 			}
 			username = appConfig[nameof(username)];
 			password = appConfig[nameof(password)];
@@ -119,42 +111,53 @@ namespace DriveExplorer.MicrosoftApi {
 				AuthenticationResult result;
 				try {
 					using var cts = new CancellationTokenSource(Timeouts.Silent);
-					result = await msalClient.AcquireTokenSilent(Scopes, account)
+					result = await msalClient.AcquireTokenSilent(scopes, account)
 												 .ExecuteAsync(cts.Token)
 												 .ConfigureAwait(false);
 
 					RegisterUser(result?.Account);
 				} catch (MsalUiRequiredException) {
 					continue;
-				} catch (Exception ex) {
+				} catch (TaskCanceledException ex) {
 					logger.Log(ex);
+					continue;
+				} catch (MsalException ex) {
+					Debugger.Break();
+					continue;
+				} catch (InvalidOperationException ex) {
+					Debugger.Break();
 					continue;
 				}
 				yield return (result?.AccessToken, result?.Account);
 			}
 		}
-
-		public async Task<(string, IAccount)> GetAccessTokenInteractively(string claims = null) {
-			using var cts = new CancellationTokenSource(Timeouts.Interactive);
+		public async Task<(string, IAccount)> GetAccessTokenInteractively(IAccount account = null, string claims = null) {
+			var requestBuilder = msalClient.AcquireTokenInteractive(scopes);
+			if (claims != null) {
+				requestBuilder = requestBuilder.WithClaims(claims);
+			}
+			if (account != null) {
+				requestBuilder = requestBuilder.WithAccount(account);
+			}
+			AuthenticationResult result;
 			try {
-				var requestBuilder = msalClient.AcquireTokenInteractive(Scopes);
-				if (claims != null) {
-					requestBuilder = requestBuilder.WithClaims(claims);
-				}
-				var result = await requestBuilder
-					.ExecuteAsync(cts.Token)
+				result = await requestBuilder
+					.ExecuteAsync()
 					.ConfigureAwait(false);
-
 				RegisterUser(result?.Account);
 				return (result?.AccessToken, result?.Account);
-			} catch (Exception ex) {
+			} catch (MsalClientException ex) {
+				Debugger.Break();
+			} catch (MsalException ex) {
+				Debugger.Break();
+			} catch (InvalidOperationException ex) {
 				logger.Log(ex);
-				return (null, null);
 			}
+			return (null, null);
 		}
-
 		/// <summary>
 		/// This method can only be used with <see cref="Authority.Organizations"/> 
+		/// Only used in test.
 		/// </summary>
 		public async Task<(string, IAccount)> GetAccessTokenWithUsernamePassword() {
 			if (username == null || password == null) {
@@ -165,44 +168,11 @@ namespace DriveExplorer.MicrosoftApi {
 			foreach (var c in password ?? "") {
 				secureString.AppendChar(c);
 			}
-			try {
-				var result = await msalClient
-					.AcquireTokenByUsernamePassword(Scopes, username, secureString)
-					.ExecuteAsync(cts.Token).ConfigureAwait(false);
-				RegisterUser(result?.Account);
-				return (result?.AccessToken, result?.Account);
-			} catch (Exception ex) {
-				logger.Log(ex);
-				return (null, null);
-			}
-		}
-
-		private void RegisterUser(IAccount account) {
-			if (accountList.Contains(account)) {
-				logger.Log(new InvalidOperationException("The user has already signed in."));
-				return;
-			}
-			accountList.Add(account);
-		}
-
-		private async Task<string> GetAccessTokenSilently(IAccount account) {
-			try {
-				using var cts = new CancellationTokenSource(Timeouts.Silent);
-				// If there is an account, call AcquireTokenSilent
-				// By doing this, MSAL will refresh the token automatically if
-				// it is expired. Otherwise it returns the cached token.
-				var result = await msalClient.AcquireTokenSilent(Scopes, account)
-											 .ExecuteAsync(cts.Token)
-											 .ConfigureAwait(false);
-
-				return result?.AccessToken;
-			} catch (MsalUiRequiredException ex) {
-				var (token, _) = await GetAccessTokenInteractively(ex.Claims).ConfigureAwait(false);
-				return token;
-			} catch (Exception ex) {
-				logger.Log(ex);
-				return null;
-			}
+			var result = await msalClient
+				.AcquireTokenByUsernamePassword(scopes, username, secureString)
+				.ExecuteAsync(cts.Token).ConfigureAwait(false);
+			RegisterUser(result?.Account);
+			return (result?.AccessToken, result?.Account);
 		}
 		/// <summary>
 		/// Implementation of <see cref="IAuthenticationProvider"/>. This method is called everytime when <see cref="GraphManager"/> make a request.
@@ -218,15 +188,17 @@ namespace DriveExplorer.MicrosoftApi {
 			// attach authentication to the header of http request
 			request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
 		}
-
 		public async Task<bool> LogoutAsync(IAccount account) {
 			try {
 				// TODO: this method just clears the cache without truely logout the user!!
 				await msalClient.RemoveAsync(account).ConfigureAwait(false);
 				accountList.Remove(account);
 				return true;
-			} catch (Exception ex) {
+			} catch (TaskCanceledException ex) {
 				logger.Log(ex);
+				return false;
+			} catch (MsalException ex) {
+				Debugger.Break();
 				return false;
 			}
 		}
@@ -236,8 +208,11 @@ namespace DriveExplorer.MicrosoftApi {
 			try {
 				var user = await graphClient.Users[userId].Request().GetAsync(cts.Token).ConfigureAwait(false);
 				return user;
-			} catch (Exception ex) {
+			} catch (TaskCanceledException ex) {
 				logger.Log(ex);
+				return null;
+			} catch (MsalException ex) {
+				Debugger.Break();
 				return null;
 			}
 		}
@@ -246,8 +221,14 @@ namespace DriveExplorer.MicrosoftApi {
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
 				return await graphClient.Users[userId].Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
-			} catch (Exception ex) {
+			} catch (TaskCanceledException ex) {
 				logger.Log(ex);
+				return null;
+			} catch (MsalException ex) {
+				Debugger.Break();
+				return null;
+			} catch (ServiceException ex) {
+				Debugger.Break();
 				return null;
 			}
 		}
@@ -259,8 +240,11 @@ namespace DriveExplorer.MicrosoftApi {
 				IDriveItemChildrenCollectionPage page;
 				try {
 					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
-				} catch (Exception ex) {
+				} catch (TaskCanceledException ex) {
 					logger.Log(ex);
+					yield break;
+				} catch (MsalException ex) {
+					Debugger.Break();
 					yield break;
 				}
 				foreach (var file in page) {
@@ -269,78 +253,32 @@ namespace DriveExplorer.MicrosoftApi {
 				request = page?.NextPageRequest;
 			} while (request != null);
 		}
-		private async Task<User> GetUserAsync(string userId) {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
+
+		private void RegisterUser(IAccount account) {
+			if (accountList.Contains(account)) {
+				logger.Log(new InvalidOperationException("The user has already signed in."));
+				return;
+			}
+			accountList.Add(account);
+		}
+		private async Task<string> GetAccessTokenSilently(IAccount account) {
 			try {
-				var user = await graphClient.Users[userId].Request().GetAsync(cts.Token).ConfigureAwait(false);
-				return user;
-			} catch (Exception ex) {
+				using var cts = new CancellationTokenSource(Timeouts.Silent);
+				// If there is an account, call AcquireTokenSilent
+				// By doing this, MSAL will refresh the token automatically if
+				// it is expired. Otherwise it returns the cached token.
+				var result = await msalClient.AcquireTokenSilent(scopes, account)
+											 .ExecuteAsync(cts.Token)
+											 .ConfigureAwait(false);
+
+				return result?.AccessToken;
+			} catch (MsalUiRequiredException ex) {
+				var (token, _) = await GetAccessTokenInteractively(account, ex.Claims).ConfigureAwait(false);
+				return token;
+			} catch (TaskCanceledException ex) {
 				logger.Log(ex);
 				return null;
 			}
-		}
-		private async Task<DriveItem> GetDriveRootAsync(string userId) {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			try {
-				return await graphClient.Users[userId].Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
-			} catch (Exception ex) {
-				logger.Log(ex);
-				return null;
-			}
-		}
-		private async IAsyncEnumerable<DriveItem> GetChildrenAsync(string parentId, string userId) {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			var request = graphClient.Users[userId].Drive.Items[parentId].Children.Request();
-			do {
-				IDriveItemChildrenCollectionPage page;
-				try {
-					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
-				} catch (Exception ex) {
-					logger.Log(ex);
-					yield break;
-				}
-				foreach (var file in page) {
-					yield return file;
-				}
-				request = page?.NextPageRequest;
-			} while (request != null);
-		}
-		private async Task<User> GetUserAsync() {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			try {
-				var user = await graphClient.Me.Request().GetAsync(cts.Token).ConfigureAwait(false);
-				return user;
-			} catch (Exception ex) {
-				logger.Log(ex);
-				return null;
-			}
-		}
-		private async Task<DriveItem> GetDriveRootAsync() {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			try {
-				return await graphClient.Me.Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
-			} catch (Exception ex) {
-				logger.Log(ex);
-				return null;
-			}
-		}
-		private async IAsyncEnumerable<DriveItem> GetChildrenAsync(string parentId) {
-			using var cts = new CancellationTokenSource(Timeouts.Silent);
-			var requestBuilder = graphClient.Me;
-			var request = requestBuilder.Drive.Items[parentId].Children.Request();
-			do {
-				IDriveItemChildrenCollectionPage page;
-				try {
-					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
-				} catch (Exception ex) {
-					logger.Log(ex);
-					yield break;
-				}
-				foreach (var file in page) {
-					yield return file;
-				}
-				request = page?.NextPageRequest;
-			} while (request != null);
 		}
 		private static string GetUserId(string url) {
 			var paths = url.Split('/').ToList();
@@ -364,6 +302,79 @@ namespace DriveExplorer.MicrosoftApi {
 				throw new InvalidOperationException("Cannot get account");
 			}
 			return account;
+		}
+		private async Task<User> GetUserAsync(string userId) {
+			using var cts = new CancellationTokenSource(Timeouts.Silent);
+			try {
+				var user = await graphClient.Users[userId].Request().GetAsync(cts.Token).ConfigureAwait(false);
+				return user;
+			} catch (TaskCanceledException ex) {
+				logger.Log(ex);
+				return null;
+			}
+		}
+		private async Task<DriveItem> GetDriveRootAsync(string userId) {
+			using var cts = new CancellationTokenSource(Timeouts.Silent);
+			try {
+				return await graphClient.Users[userId].Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
+			} catch (TaskCanceledException ex) {
+				logger.Log(ex);
+				return null;
+			}
+		}
+		private async IAsyncEnumerable<DriveItem> GetChildrenAsync(string parentId, string userId) {
+			using var cts = new CancellationTokenSource(Timeouts.Silent);
+			var request = graphClient.Users[userId].Drive.Items[parentId].Children.Request();
+			do {
+				IDriveItemChildrenCollectionPage page;
+				try {
+					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
+				} catch (TaskCanceledException ex) {
+					logger.Log(ex);
+					yield break;
+				}
+				foreach (var file in page) {
+					yield return file;
+				}
+				request = page?.NextPageRequest;
+			} while (request != null);
+		}
+		private async Task<User> GetUserAsync() {
+			using var cts = new CancellationTokenSource(Timeouts.Silent);
+			try {
+				var user = await graphClient.Me.Request().GetAsync(cts.Token).ConfigureAwait(false);
+				return user;
+			} catch (TaskCanceledException ex) {
+				logger.Log(ex);
+				return null;
+			}
+		}
+		private async Task<DriveItem> GetDriveRootAsync() {
+			using var cts = new CancellationTokenSource(Timeouts.Silent);
+			try {
+				return await graphClient.Me.Drive.Root.Request().GetAsync(cts.Token).ConfigureAwait(false);
+			} catch (TaskCanceledException ex) {
+				logger.Log(ex);
+				return null;
+			}
+		}
+		private async IAsyncEnumerable<DriveItem> GetChildrenAsync(string parentId) {
+			using var cts = new CancellationTokenSource(Timeouts.Silent);
+			var requestBuilder = graphClient.Me;
+			var request = requestBuilder.Drive.Items[parentId].Children.Request();
+			do {
+				IDriveItemChildrenCollectionPage page;
+				try {
+					page = await request.GetAsync(cts.Token).ConfigureAwait(false);
+				} catch (TaskCanceledException ex) {
+					logger.Log(ex);
+					yield break;
+				}
+				foreach (var file in page) {
+					yield return file;
+				}
+				request = page?.NextPageRequest;
+			} while (request != null);
 		}
 	}
 
