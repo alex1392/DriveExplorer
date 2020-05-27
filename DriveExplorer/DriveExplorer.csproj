@@ -185,6 +185,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\onedrive.png" />
     <Resource Include="Resources\zip.png" />
     <Resource Include="Resources\xls.png" />
     <Resource Include="Resources\txt.png" />
@@ -193,7 +194,6 @@
       <Link>.editorconfig</Link>
     </None>
     <None Include="packages.config" />
-    <None Include="Resources\onedrive.svg" />
     <Resource Include="Resources\img.png" />
     <Resource Include="Resources\folder.png" />
     <Resource Include="Resources\file.png" />

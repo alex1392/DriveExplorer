@@ -5,7 +5,7 @@ namespace DriveExplorer.Models {
 	public enum ItemTypes {
 		Unknown = 0,
 		Folder = 1,
-		LocaDrive = 1 << 1,
+		LocalDrive = 1 << 1,
 		OneDrive = 1 << 2,
 		File = 1 << 3,
 		IMG = 1 << 4,
@@ -14,7 +14,7 @@ namespace DriveExplorer.Models {
 		XLS = 1 << 7,
 		PPT = 1 << 8,
 		ZIP = 1 << 9,
-		Folders = OneDrive | LocaDrive | Folder,
+		Folders = OneDrive | LocalDrive | Folder,
 		Files = File | IMG | TXT | DOC | XLS | PPT | ZIP,
 	}
 

@@ -15,7 +15,7 @@ namespace DriveExplorer.Models {
 		public LocalItem(string fullPath) {
 			FullPath = fullPath;
 			var isRoot = IsRoot(fullPath);
-			Type = isRoot ? ItemTypes.LocaDrive :
+			Type = isRoot ? ItemTypes.LocalDrive :
 							IsFolder(fullPath) ? ItemTypes.Folder :
 												 ItemFactoryHelper.GetFileType(fullPath);
 			if (isRoot) {
@@ -27,9 +27,11 @@ namespace DriveExplorer.Models {
 				Name = Path.GetFileName(fullPath);
 			}
 		}
-		private static bool IsRoot(string fullPath) {
-			var n = fullPath.Length;
-			return fullPath[n - 1] == '\\' && fullPath[n - 2] == ':';
+		private static bool IsRoot(string path) {
+			while (path.Last() == Path.DirectorySeparatorChar) {
+				path = path.Remove(path.Length - 1);
+			}
+			return path.Last() == ':';
 		}
 
 		private static bool IsFolder(string fullPath) {
