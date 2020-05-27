@@ -16,7 +16,7 @@ namespace DriveExplorer.MicrosoftApi {
 		public string FullPath { get; private set; }
 		public string Id { get; private set; }
 		public string UserId { get; private set; }
-		public IAccount UserAccount { get; }
+		public IAccount UserAccount { get; private set; }
 
 		/// <summary>
 		/// Constructor of root item
@@ -30,29 +30,31 @@ namespace DriveExplorer.MicrosoftApi {
 			UserId = user.Id;
 			UserAccount = userAccount;
 		}
-
-		/// <summary>
-		/// Constructor of child item
-		/// </summary>
-		public OneDriveItem(DriveItem driveItem, OneDriveItem parent) {
-			graphManager = parent.graphManager;
-			Id = driveItem.Id;
-			Name = driveItem.Name;
-			Type = IsFolder(driveItem) ? ItemTypes.Folder : ItemFactoryHelper.GetFileType(driveItem.Name);
-			FullPath = Path.Combine(parent.FullPath, driveItem.Name);
-			UserId = parent.UserId;
-			UserAccount = parent.UserAccount;
+		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
+			await foreach (var item in graphManager.GetChildrenAsync(Id, UserId).ConfigureAwait(false)) {
+				yield return GetChild(item, this);
+			}
 		}
+
+		private OneDriveItem(GraphManager graphManager) {
+			this.graphManager = graphManager;
+		}
+		private OneDriveItem GetChild(DriveItem driveItem, OneDriveItem parent) {
+			return new OneDriveItem(parent.graphManager)
+			{
+				Id = driveItem.Id,
+				Name = driveItem.Name,
+				Type = IsFolder(driveItem) ? ItemTypes.Folder : ItemFactoryHelper.GetFileType(driveItem.Name),
+				FullPath = Path.Combine(parent.FullPath, driveItem.Name),
+				UserId = parent.UserId,
+				UserAccount = parent.UserAccount
+			};
+		}	
 
 		private static bool IsFolder(DriveItem driveItem) {
 			return driveItem.Folder != null;
 		}
 
 
-		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
-			await foreach (var item in graphManager.GetChildrenAsync(Id, UserId).ConfigureAwait(false)) {
-				yield return new OneDriveItem(item, this);
-			}
-		}
 	}
 }

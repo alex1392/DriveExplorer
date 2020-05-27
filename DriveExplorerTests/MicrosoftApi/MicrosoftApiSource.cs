@@ -1,24 +1,24 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Graph;
+using Microsoft.Identity.Client;
 using System.Collections;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
 	public class MicrosoftApiSource : IEnumerable {
-		private static readonly AuthProvider authProvider;
 		private static readonly GraphManager graphManager;
+		private static readonly IAccount account;
+		private static readonly User user;
 
 		static MicrosoftApiSource() {
 			var services = new ServiceCollection();
 			services.AddSingleton<ILogger, DebugLogger>();
-			services.AddSingleton(sp => new AuthProvider(sp.GetService<ILogger>(), AuthProvider.Authority.Organizations));
-			services.AddSingleton<GraphManager>();
+			services.AddSingleton(sp => new GraphManager(sp.GetService<ILogger>(), GraphManager.Authority.Organizations));
 			var serviceProvider = services.BuildServiceProvider();
-			authProvider = serviceProvider.GetService<AuthProvider>();
 			graphManager = serviceProvider.GetService<GraphManager>();
-			authProvider.GetAccessTokenWithUsernamePassword().Wait();
+			(_, account, user) = graphManager.GetAccessTokenWithUsernamePassword().Result;
 		}
 		public IEnumerator GetEnumerator() {
-			yield return new object[] { authProvider, graphManager };
+			yield return new object[] { graphManager, account, user };
 		}
 	}
 }

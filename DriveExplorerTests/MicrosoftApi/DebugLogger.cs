@@ -3,9 +3,7 @@ using System.Text;
 
 
 namespace DriveExplorer.MicrosoftApi.Tests {
-	/// <summary>
-	/// TODO: move this to test project
-	/// </summary>
+
 	public class DebugLogger : ILogger {
 		public void Log(Exception ex) {
 			var stringBuilder = new StringBuilder();
