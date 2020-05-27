@@ -1,6 +1,7 @@
 ﻿using DriveExplorer.MicrosoftApi;
 using DriveExplorer.Models;
-
+using Microsoft.Graph;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -15,7 +16,6 @@ using Directory = System.IO.Directory;
 
 namespace DriveExplorer.ViewModels {
 	public class MainWindowVM : INotifyPropertyChanged {
-		private readonly AuthProvider authProvider;
 		private readonly GraphManager graphManager;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
 
@@ -34,8 +34,7 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
-		public MainWindowVM(AuthProvider authProvider, GraphManager graphManager) {
-			this.authProvider = authProvider;
+		public MainWindowVM(GraphManager graphManager) {
 			this.graphManager = graphManager;
 		}
 		/// <summary>
@@ -56,16 +55,14 @@ namespace DriveExplorer.ViewModels {
 		}
 		public async Task LoginOneDrive() {
 			SpinnerVisibility = Visibility.Visible;
-			var token = await authProvider.GetAccessTokenInteractively().ConfigureAwait(true);
-			if (token != null) {
-				await CreateOneDriveAsync().ConfigureAwait(false);
-			}
+			var (_, account, user) = await graphManager.GetAccessTokenInteractively().ConfigureAwait(true);
+			await CreateOneDriveAsync(account, user).ConfigureAwait(false);
 			SpinnerVisibility = Visibility.Collapsed;
 		}
 		public async Task AutoLoginOneDrive() {
 			SpinnerVisibility = Visibility.Visible;
-			await foreach (var _ in authProvider.GetAllAccessTokenSilently().ConfigureAwait(true)) {
-				await CreateOneDriveAsync().ConfigureAwait(true);
+			await foreach (var (_, account, user) in graphManager.GetAllAccessTokenSilently().ConfigureAwait(true)) {
+				await CreateOneDriveAsync(account, user).ConfigureAwait(true);
 			}
 			SpinnerVisibility = Visibility.Collapsed;
 		}
@@ -74,33 +71,25 @@ namespace DriveExplorer.ViewModels {
 			// TODO: logout specific user
 			var treeVM = TreeItemVMs.First(vm => vm.Item.Type == ItemTypes.OneDrive);
 			var item = treeVM.Item as OneDriveItem;
-			if (await authProvider.LogoutAsync(item.UserAccount).ConfigureAwait(true)) {
+			if (await graphManager.LogoutAsync(item.UserId).ConfigureAwait(true)) {
 				TreeItemVMs.Remove(treeVM);
 				CurrentItemVMs.Remove(CurrentItemVMs.FirstOrDefault(vm => vm == treeVM));
-				graphManager.UserIdAccountRegistry.Remove(item.UserId);
 			}
 			SpinnerVisibility = Visibility.Collapsed;
 		}
-		private async Task CreateOneDriveAsync() {
-			var userAccount = authProvider.CurrentUserAccount;
-			if (TreeItemVMs.Any(vm => vm.Item.Name == userAccount.Username)) {
+		private async Task CreateOneDriveAsync(IAccount account, User user) {
+			if (account is null) {
+				throw new ArgumentNullException(nameof(account));
+			}
+			if (TreeItemVMs.Any(vm => vm.Item.Name == account.Username)) {
 				MessageBox.Show("User has already signed in.");
 				return;
 			}
-			var user = await graphManager.GetCurrentUserAsync().ConfigureAwait(true);
-			if (user == null) {
-				return;
-			}
-			if (graphManager.UserIdAccountRegistry.ContainsKey(user.Id)) {
-				MessageBox.Show("User has already signed in.");
-				return;
-			}
-			var root = await graphManager.GetDriveRootAsync().ConfigureAwait(true);
+			var root = await graphManager.GetDriveRootAsync(user.Id).ConfigureAwait(true);
 			if (root == null) {
 				return;
 			}
-
-			var item = new OneDriveItem(graphManager, root, user, userAccount);
+			var item = new OneDriveItem(graphManager, root, user, account);
 			TreeItemVMs.Add(new ItemVM(this, item));
 			CurrentItemVMs.Add(new ItemVM(this, item));
 		}

@@ -170,7 +170,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MicrosoftApi\AuthProvider.cs" />
     <Compile Include="MicrosoftApi\GraphManager.cs" />
     <Compile Include="MicrosoftApi\TokenCacheHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

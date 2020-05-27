@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graph;
+using Microsoft.Identity.Client;
 using NUnit.Framework;
 
 using System;
@@ -7,31 +8,31 @@ using System.Threading.Tasks;
 namespace DriveExplorer.MicrosoftApi.Tests {
 	[TestFixtureSource(typeof(MicrosoftApiSource))]
 	public class OneDriveItemTests {
-		private User user;
 		private DriveItem root;
 
-		public AuthProvider AuthProvider { get; }
 		public GraphManager GraphManager { get; }
+		public IAccount Account { get; }
+		public User User { get; }
 
-		public OneDriveItemTests(AuthProvider authProvider, GraphManager graphManager) {
-			AuthProvider = authProvider;
+		public OneDriveItemTests(GraphManager graphManager, IAccount account, User user) {
 			GraphManager = graphManager;
+			Account = account;
+			User = user;
 		}
 		[OneTimeSetUp]
 		public async Task OneTimeSetupAsync() {
-			user = await GraphManager.GetCurrentUserAsync().ConfigureAwait(false);
-			root = await GraphManager.GetDriveRootAsync().ConfigureAwait(false);
+			root = await GraphManager.GetDriveRootAsync(User.Id).ConfigureAwait(false);
 		}
 
 		[Test()]
 		public void OneDriveItemTest() {
-			var item = new OneDriveItem(GraphManager, root, user, AuthProvider.CurrentUserAccount);
+			var item = new OneDriveItem(GraphManager, root, User, Account);
 			Assert.NotNull(item);
 		}
 
 		[Test()]
 		public async Task GetChildrenAsyncTestAsync() {
-			var item = new OneDriveItem(GraphManager, root, user, AuthProvider.CurrentUserAccount);
+			var item = new OneDriveItem(GraphManager, root, User, Account);
 			await foreach (var child in item.GetChildrenAsync().ConfigureAwait(false)) {
 				Console.WriteLine(child.Name);
 				Assert.NotNull(child);

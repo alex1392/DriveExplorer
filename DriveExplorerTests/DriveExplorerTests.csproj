@@ -109,7 +109,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="MicrosoftApi\AuthProviderTests.cs" />
     <Compile Include="MicrosoftApi\DebugLogger.cs" />
     <Compile Include="MicrosoftApi\GraphManagerTests.cs" />
     <Compile Include="MicrosoftApi\MicrosoftApiSource.cs" />
