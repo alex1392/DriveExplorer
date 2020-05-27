@@ -13,12 +13,10 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 	public class GraphManagerTests {
 		private GraphManager graphManager;
 		private readonly IAccount account;
-		private readonly User user;
 
-		public GraphManagerTests(GraphManager graphManager, IAccount account, User user) {
+		public GraphManagerTests(GraphManager graphManager, IAccount account) {
 			this.graphManager = graphManager;
 			this.account = account;
-			this.user = user;
 		}
 
 		[Test()]
@@ -28,20 +26,20 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 
 		[Test()]
 		public async Task GetMeTestAsync() {
-			var u = await graphManager.GetUserAsync(user.Id).ConfigureAwait(false);
+			var u = await graphManager.GetUserAsync(account).ConfigureAwait(false);
 			Assert.NotNull(u);
 		}
 
 		[Test()]
 		public async Task GetDriveRootTestAsync() {
-			var root = await graphManager.GetDriveRootAsync(user.Id).ConfigureAwait(false);
+			var root = await graphManager.GetDriveRootAsync(account).ConfigureAwait(false);
 			Assert.NotNull(root);
 		}
 
 		[Test()]
 		public async Task GetChildrenTestAsync() {
-			var root = await graphManager.GetDriveRootAsync(user.Id).ConfigureAwait(false);
-			var asyncEnumerable = graphManager.GetChildrenAsync(root.Id, user.Id);
+			var root = await graphManager.GetDriveRootAsync(account).ConfigureAwait(false);
+			var asyncEnumerable = graphManager.GetChildrenAsync(root.Id, account);
 			await foreach (var child in asyncEnumerable) {
 				Console.WriteLine(child.Name);
 			}

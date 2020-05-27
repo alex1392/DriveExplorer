@@ -44,8 +44,10 @@ namespace DriveExplorer.ViewModels {
 				}
 			}
 		}
-
-		private readonly MainWindowVM mainWindowVM;
+		/// <summary>
+		/// Optional property Injection
+		/// </summary>
+		public MainWindowVM MainWindowVM { get; set; }
 		public IItem Item { get; private set; }
 
 		public ObservableCollection<ItemVM> Children { get; set; } = new ObservableCollection<ItemVM>
@@ -57,12 +59,9 @@ namespace DriveExplorer.ViewModels {
 		public event EventHandler Expanded;
 		public event EventHandler Selected;
 
-		public ItemVM() {
-
-		}
-		public ItemVM(MainWindowVM mainWindowVM, IItem model = null) {
-			this.mainWindowVM = mainWindowVM;
+		public ItemVM(IItem model, MainWindowVM mainWindowVM = null) {
 			Item = model;
+			MainWindowVM = mainWindowVM;
 		}
 
 		/// <summary>
@@ -94,14 +93,28 @@ namespace DriveExplorer.ViewModels {
 			if (haveExpanded) {
 				return;
 			}
-			mainWindowVM.SpinnerVisibility = Visibility.Visible;
+			ShowSpinner();
 			haveExpanded = true;
 			Children.Clear(); // clear dummy item
 			await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
-				Children.Add(new ItemVM(mainWindowVM, item));
+				Children.Add(new ItemVM(item)
+				{
+					MainWindowVM = MainWindowVM
+				});
 			}
 			Expanded?.Invoke(this, null); // invoke event
-			mainWindowVM.SpinnerVisibility = Visibility.Collapsed;
+			HideSpinner();
+		}
+
+		private void ShowSpinner() {
+			if (MainWindowVM != null) {
+				MainWindowVM.SpinnerVisibility = Visibility.Visible;
+			}
+		}
+		private void HideSpinner() {
+			if (MainWindowVM != null) {
+				MainWindowVM.SpinnerVisibility = Visibility.Collapsed;
+			}
 		}
 
 		private async Task SelectAsync() {
@@ -109,6 +122,7 @@ namespace DriveExplorer.ViewModels {
 
 			Selected?.Invoke(this, null); // invoke event
 		}
+		#region Overrides
 
 		public override string ToString() {
 			return $"{Item.Name}, Items: {Children.Count}";
@@ -142,5 +156,6 @@ namespace DriveExplorer.ViewModels {
 		public static bool operator !=(ItemVM left, ItemVM right) {
 			return !(left == right);
 		}
+		#endregion
 	}
 }

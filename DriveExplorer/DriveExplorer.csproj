@@ -152,6 +152,7 @@
     </Compile>
     <Compile Include="MicrosoftApi\ILogger.cs" />
     <Compile Include="MicrosoftApi\MessageBoxLogger.cs" />
+    <Compile Include="MicrosoftApi\UserIdConverter.cs" />
     <Compile Include="Models\Constants.cs" />
     <Compile Include="Views\Converters\DebugConverter.cs" />
     <Compile Include="Models\IItem.cs" />

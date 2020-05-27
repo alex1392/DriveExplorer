@@ -7,7 +7,6 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 	public class MicrosoftApiSource : IEnumerable {
 		private static readonly GraphManager graphManager;
 		private static readonly IAccount account;
-		private static readonly User user;
 
 		static MicrosoftApiSource() {
 			var services = new ServiceCollection();
@@ -15,10 +14,10 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 			services.AddSingleton(sp => new GraphManager(sp.GetService<ILogger>(), GraphManager.Authority.Organizations));
 			var serviceProvider = services.BuildServiceProvider();
 			graphManager = serviceProvider.GetService<GraphManager>();
-			(_, account, user) = graphManager.GetAccessTokenWithUsernamePassword().Result;
+			(_, account) = graphManager.GetAccessTokenWithUsernamePassword().Result;
 		}
 		public IEnumerator GetEnumerator() {
-			yield return new object[] { graphManager, account, user };
+			yield return new object[] { graphManager, account };
 		}
 	}
 }

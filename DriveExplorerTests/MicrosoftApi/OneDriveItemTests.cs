@@ -12,27 +12,25 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 
 		public GraphManager GraphManager { get; }
 		public IAccount Account { get; }
-		public User User { get; }
 
-		public OneDriveItemTests(GraphManager graphManager, IAccount account, User user) {
+		public OneDriveItemTests(GraphManager graphManager, IAccount account) {
 			GraphManager = graphManager;
 			Account = account;
-			User = user;
 		}
 		[OneTimeSetUp]
 		public async Task OneTimeSetupAsync() {
-			root = await GraphManager.GetDriveRootAsync(User.Id).ConfigureAwait(false);
+			root = await GraphManager.GetDriveRootAsync(Account).ConfigureAwait(false);
 		}
 
 		[Test()]
 		public void OneDriveItemTest() {
-			var item = new OneDriveItem(GraphManager, root, User, Account);
+			var item = new OneDriveItem(GraphManager, root, Account);
 			Assert.NotNull(item);
 		}
 
 		[Test()]
 		public async Task GetChildrenAsyncTestAsync() {
-			var item = new OneDriveItem(GraphManager, root, User, Account);
+			var item = new OneDriveItem(GraphManager, root, Account);
 			await foreach (var child in item.GetChildrenAsync().ConfigureAwait(false)) {
 				Console.WriteLine(child.Name);
 				Assert.NotNull(child);
