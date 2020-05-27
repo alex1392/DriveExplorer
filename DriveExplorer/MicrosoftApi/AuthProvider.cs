@@ -111,11 +111,8 @@ namespace DriveExplorer.MicrosoftApi {
 			}
 		}
 
-		public async Task<string> GetAccessTokenSilently(IAccount userAccount = null) {
-			CurrentUserAccount = userAccount ??
-				CurrentUserAccount ??
-				(await msalClient.GetAccountsAsync().ConfigureAwait(false)).FirstOrDefault();
-
+		public async Task<string> GetAccessTokenSilently() {
+			
 			if (CurrentUserAccount == null) {
 				return null;
 			}

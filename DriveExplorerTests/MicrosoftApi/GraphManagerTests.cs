@@ -24,7 +24,7 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 
 		[Test()]
 		public async Task GetMeTestAsync() {
-			var user = await graphManager.GetMeAsync().ConfigureAwait(false);
+			var user = await graphManager.GetCurrentUserAsync().ConfigureAwait(false);
 			Assert.NotNull(user);
 		}
 

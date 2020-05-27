@@ -87,7 +87,7 @@ namespace DriveExplorer.ViewModels {
 				MessageBox.Show("User has already signed in.");
 				return;
 			}
-			var user = await graphManager.GetMeAsync().ConfigureAwait(true);
+			var user = await graphManager.GetCurrentUserAsync().ConfigureAwait(true);
 			if (user == null) {
 				return;
 			}
@@ -100,7 +100,6 @@ namespace DriveExplorer.ViewModels {
 				return;
 			}
 
-			graphManager.UserIdAccountRegistry.Add(user.Id, userAccount);
 			var item = new OneDriveItem(graphManager, root, user, userAccount);
 			TreeItemVMs.Add(new ItemVM(this, item));
 			CurrentItemVMs.Add(new ItemVM(this, item));

@@ -53,14 +53,28 @@ namespace DriveExplorer.MicrosoftApi {
 			this.logger = logger;
 		}
 
-		public async Task<User> GetMeAsync(string userId = null) {
+		public async Task<User> GetUserAsync(string userId) {
+			if (!UserIdAccountRegistry.ContainsKey(userId)) {
+				logger.Log(new InvalidOperationException("User not registered yet"));
+				return null;
+			}
 			using var cts = new CancellationTokenSource(Timeouts.Silent);
 			try {
-				var requestBuilder = userId == null ? client.Me : client.Users[userId];
-				if (userId != null) {
-					authProvider.CurrentUserAccount = UserIdAccountRegistry[userId];
-				}
-				var user = await requestBuilder.Request().GetAsync(cts.Token).ConfigureAwait(false);
+				authProvider.CurrentUserAccount = UserIdAccountRegistry[userId];
+				var user = await client.Users[userId].Request().GetAsync(cts.Token).ConfigureAwait(false);
+				return user;
+			} catch (Exception ex) {
+				logger.Log(ex);
+				return null;
+			}
+		}
+
+		public async Task<User> GetCurrentUserAsync() {
+			using var cts = new CancellationTokenSource(Timeouts.Silent);
+			try {
+				var user = await client.Me.Request().GetAsync(cts.Token).ConfigureAwait(false);
+				// register user for authentication 
+				UserIdAccountRegistry.Add(user.Id, authProvider.CurrentUserAccount);
 				return user;
 			} catch (Exception ex) {
 				logger.Log(ex);
