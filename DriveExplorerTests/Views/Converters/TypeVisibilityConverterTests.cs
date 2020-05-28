@@ -1,11 +1,8 @@
-﻿using NUnit.Framework;
-using DriveExplorer.Views;
+﻿using DriveExplorer.Models;
+
+using NUnit.Framework;
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DriveExplorer.Models;
 using System.Windows;
 
 namespace DriveExplorer.Views.Tests {

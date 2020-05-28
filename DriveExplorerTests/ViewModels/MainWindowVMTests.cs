@@ -1,11 +1,7 @@
-﻿using DriveExplorer.MicrosoftApi;
-using DriveExplorer.MicrosoftApi.Tests;
-using Microsoft.Graph;
-using Microsoft.Identity.Client;
+﻿using DriveExplorer.Tests;
+
 using NUnit.Framework;
 
-using DriveExplorer.Tests;
-using System;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.ViewModels.Tests {
@@ -14,7 +10,7 @@ namespace DriveExplorer.ViewModels.Tests {
 		private readonly MainWindowVM mainWindowVM;
 
 		public MainWindowVMTests(object[] param) {
-			mainWindowVM = (MainWindowVM)param[2];
+			mainWindowVM = (MainWindowVM)param[3];
 		}
 
 		[TearDown]

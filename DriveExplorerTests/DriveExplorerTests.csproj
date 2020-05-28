@@ -151,21 +151,17 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="GoogleApi\GoogleManagerTests.cs" />
-    <Compile Include="DebugLogger.cs" />
-    <Compile Include="MicrosoftApi\MicrosoftManagerTests.cs" />
-    <Compile Include="TestSource.cs" />
-    <Compile Include="MicrosoftApi\OneDriveItemTests.cs" />
+    <Compile Include="Models\OneDriveItemTests.cs" />
     <Compile Include="Models\LocalItemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\ItemVMTests.cs" />
     <Compile Include="ViewModels\MainWindowVMTests.cs" />
+    <Compile Include="TestSource.cs" />
     <Compile Include="Views\Converters\TypeImageConverterTests.cs" />
     <Compile Include="Views\Converters\TypeVisibilityConverterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="GoogleApi\client_secret.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -1,13 +1,13 @@
 ﻿using Cyc.MicrosoftApi;
-using DriveExplorer.MicrosoftApi;
-using DriveExplorer.MicrosoftApi.Tests;
+
 using DriveExplorer.Models;
+using DriveExplorer.Tests;
+
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
+
 using NUnit.Framework;
 
-using DriveExplorer.Tests;
-using System;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.ViewModels.Tests {

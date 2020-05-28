@@ -1,9 +1,7 @@
 ﻿using Cyc.GoogleApi;
 using Cyc.MicrosoftApi;
 using Cyc.Standard;
-
 using DriveExplorer.ViewModels;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 
@@ -14,8 +12,8 @@ using System.IO;
 namespace DriveExplorer.Tests {
 	public class TestSource : IEnumerable {
 		private static readonly MicrosoftManager microsoftManager;
-		private static readonly MainWindowVM mainWindowVM;
 		private static readonly GoogleManager googleManager;
+		private static readonly MainWindowVM mainWindowVM;
 		private static readonly IAccount account;
 
 		static TestSource() {
@@ -29,12 +27,12 @@ namespace DriveExplorer.Tests {
 
 			var serviceProvider = services.BuildServiceProvider();
 			microsoftManager = serviceProvider.GetService<MicrosoftManager>();
-			mainWindowVM = serviceProvider.GetService<MainWindowVM>();
 			googleManager = serviceProvider.GetService<GoogleManager>();
+			mainWindowVM = serviceProvider.GetService<MainWindowVM>();
 			(_, account) = microsoftManager.GetAccessTokenWithUsernamePassword().Result;
 		}
 		public IEnumerator GetEnumerator() {
-			yield return new object[] { new object[] { microsoftManager, account, mainWindowVM, googleManager } };
+			yield return new object[] { new object[] { microsoftManager, account, googleManager, mainWindowVM } };
 		}
 	}
 }
