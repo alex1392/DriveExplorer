@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DriveExplorer.MicrosoftApi {
 	public class OneDriveItem : IItem {
-		private readonly MicrosoftManager graphManager;
+		private readonly MicrosoftManager microsoftManager;
 
 		public ItemTypes Type { get; private set; }
 		public string Name { get; private set; }
@@ -20,8 +20,8 @@ namespace DriveExplorer.MicrosoftApi {
 		/// <summary>
 		/// Constructor of root item
 		/// </summary>
-		public OneDriveItem(MicrosoftManager graphManager, DriveItem driveItem, IAccount account) {
-			this.graphManager = graphManager;
+		public OneDriveItem(MicrosoftManager microsoftManager, DriveItem driveItem, IAccount account) {
+			this.microsoftManager = microsoftManager;
 			Id = driveItem.Id;
 			Name = account.Username;
 			Type = ItemTypes.OneDrive;
@@ -29,16 +29,16 @@ namespace DriveExplorer.MicrosoftApi {
 			UserAccount = account;
 		}
 		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
-			await foreach (var item in graphManager.GetChildrenAsync(Id, UserAccount).ConfigureAwait(false)) {
+			await foreach (var item in microsoftManager.GetChildrenAsync(Id, UserAccount).ConfigureAwait(false)) {
 				yield return GetChild(item, this);
 			}
 		}
 
-		private OneDriveItem(MicrosoftManager graphManager) {
-			this.graphManager = graphManager;
+		private OneDriveItem(MicrosoftManager microsoftManager) {
+			this.microsoftManager = microsoftManager;
 		}
 		private OneDriveItem GetChild(DriveItem driveItem, OneDriveItem parent) {
-			return new OneDriveItem(parent.graphManager)
+			return new OneDriveItem(parent.microsoftManager)
 			{
 				Id = driveItem.Id,
 				Name = driveItem.Name,

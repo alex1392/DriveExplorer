@@ -14,7 +14,8 @@ namespace DriveExplorer.Models {
 		XLS = 1 << 7,
 		PPT = 1 << 8,
 		ZIP = 1 << 9,
-		Folders = OneDrive | LocalDrive | Folder,
+		GoogleDrive = 1 << 10,
+		Folders = OneDrive | LocalDrive | Folder | GoogleDrive,
 		Files = File | IMG | TXT | DOC | XLS | PPT | ZIP,
 	}
 

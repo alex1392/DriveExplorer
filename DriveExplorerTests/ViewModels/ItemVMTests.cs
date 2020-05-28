@@ -11,24 +11,24 @@ using System.Threading.Tasks;
 namespace DriveExplorer.ViewModels.Tests {
 	[TestFixtureSource(typeof(MicrosoftApiSource))]
 	public class ItemVMTests {
-		private readonly MicrosoftManager graphManager;
+		private readonly MicrosoftManager microsoftManager;
 		private readonly IAccount account;
 		private DriveItem root;
 		private ItemVM localItem;
 		private ItemVM onedriveItem;
 
 		public ItemVMTests(object[] param) {
-			graphManager = (MicrosoftManager)param[0];
+			microsoftManager = (MicrosoftManager)param[0];
 			account = (IAccount)param[1];
 		}
 		[SetUp]
 		public void Setup() {
 			localItem = new ItemVM(new LocalItem(@"C:\\"));
-			onedriveItem = new ItemVM(new OneDriveItem(graphManager, root, account));
+			onedriveItem = new ItemVM(new OneDriveItem(microsoftManager, root, account));
 		}
 		[OneTimeSetUp]
 		public async Task OneTimeSetupAsync() {
-			root = await graphManager.GetDriveRootAsync(account).ConfigureAwait(false);
+			root = await microsoftManager.GetDriveRootAsync(account).ConfigureAwait(false);
 		}
 		[Test()]
 		public void LocalItemVMTest() {

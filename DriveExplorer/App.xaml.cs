@@ -1,4 +1,5 @@
-﻿using DriveExplorer.MicrosoftApi;
+﻿using DriveExplorer.GoogleApi;
+using DriveExplorer.MicrosoftApi;
 using DriveExplorer.ViewModels;
 using DriveExplorer.Views;
 
@@ -24,10 +25,11 @@ namespace DriveExplorer {
 		}
 
 		private void ConfigureServices(ServiceCollection services) {
-			services.AddSingleton<MicrosoftManager>();
+			services.AddSingleton<ILogger, MessageBoxLogger>();
+			services.AddSingleton<GoogleManager>();
+			services.AddSingleton<MicrosoftManager>(_ => null);
 			services.AddSingleton<MainWindowVM>();
 			services.AddSingleton<MainWindow>();
-			services.AddSingleton<ILogger, MessageBoxLogger>();
 		}
 	}
 }

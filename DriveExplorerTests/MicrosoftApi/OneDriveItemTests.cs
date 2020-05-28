@@ -10,27 +10,27 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 	public class OneDriveItemTests {
 		private DriveItem root;
 
-		public MicrosoftManager GraphManager { get; }
+		public MicrosoftManager microsoftManager { get; }
 		public IAccount Account { get; }
 
 		public OneDriveItemTests(object[] param) {
-			GraphManager = (MicrosoftManager)param[0];
+			microsoftManager = (MicrosoftManager)param[0];
 			Account = (IAccount)param[1];
 		}
 		[OneTimeSetUp]
 		public async Task OneTimeSetupAsync() {
-			root = await GraphManager.GetDriveRootAsync(Account).ConfigureAwait(false);
+			root = await microsoftManager.GetDriveRootAsync(Account).ConfigureAwait(false);
 		}
 
 		[Test()]
 		public void OneDriveItemTest() {
-			var item = new OneDriveItem(GraphManager, root, Account);
+			var item = new OneDriveItem(microsoftManager, root, Account);
 			Assert.NotNull(item);
 		}
 
 		[Test()]
 		public async Task GetChildrenAsyncTestAsync() {
-			var item = new OneDriveItem(GraphManager, root, Account);
+			var item = new OneDriveItem(microsoftManager, root, Account);
 			await foreach (var child in item.GetChildrenAsync().ConfigureAwait(false)) {
 				Console.WriteLine(child.Name);
 				Assert.NotNull(child);

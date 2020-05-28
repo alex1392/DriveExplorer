@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
 	public class MicrosoftApiSource : IEnumerable {
-		private static readonly MicrosoftManager graphManager;
+		private static readonly MicrosoftManager microsoftManager;
 		private static readonly MainWindowVM mainWindowVM;
 		private static readonly IAccount account;
 
@@ -17,12 +17,12 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 			services.AddSingleton<MainWindowVM>();
 
 			var serviceProvider = services.BuildServiceProvider();
-			graphManager = serviceProvider.GetService<MicrosoftManager>();
+			microsoftManager = serviceProvider.GetService<MicrosoftManager>();
 			mainWindowVM = serviceProvider.GetService<MainWindowVM>();
-			(_, account) = graphManager.GetAccessTokenWithUsernamePassword().Result;		
+			(_, account) = microsoftManager.GetAccessTokenWithUsernamePassword().Result;		
 		}
 		public IEnumerator GetEnumerator() {
-			yield return new object[] { new object[] { graphManager, account, mainWindowVM } };
+			yield return new object[] { new object[] { microsoftManager, account, mainWindowVM } };
 		}
 	}
 }
