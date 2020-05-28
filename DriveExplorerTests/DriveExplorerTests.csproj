@@ -151,6 +151,8 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="GoogleApi\GoogleManagerTests.cs" />
+    <Compile Include="MicrosoftApi\MicrosoftManagerTests.cs" />
     <Compile Include="Models\OneDriveItemTests.cs" />
     <Compile Include="Models\LocalItemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -162,6 +164,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <Content Include="GoogleApi\client_secret.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

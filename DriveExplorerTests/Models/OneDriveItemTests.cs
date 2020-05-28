@@ -15,27 +15,27 @@ namespace DriveExplorer.Models.Tests {
 	public class OneDriveItemTests {
 		private DriveItem root;
 
-		public MicrosoftManager microsoftManager { get; }
-		public IAccount Account { get; }
+		private readonly MicrosoftManager microsoftManager;
+		private readonly IAccount account;
 
 		public OneDriveItemTests(object[] param) {
 			microsoftManager = (MicrosoftManager)param[0];
-			Account = (IAccount)param[1];
+			account = (IAccount)param[1];
 		}
 		[OneTimeSetUp]
 		public async Task OneTimeSetupAsync() {
-			root = await microsoftManager.GetDriveRootAsync(Account).ConfigureAwait(false);
+			root = await microsoftManager.GetDriveRootAsync(account).ConfigureAwait(false);
 		}
 
 		[Test()]
 		public void OneDriveItemTest() {
-			var item = new OneDriveItem(microsoftManager, root, Account);
+			var item = new OneDriveItem(microsoftManager, root, account);
 			Assert.NotNull(item);
 		}
 
 		[Test()]
 		public async Task GetChildrenAsyncTestAsync() {
-			var item = new OneDriveItem(microsoftManager, root, Account);
+			var item = new OneDriveItem(microsoftManager, root, account);
 			await foreach (var child in item.GetChildrenAsync().ConfigureAwait(false)) {
 				Console.WriteLine(child.Name);
 				Assert.NotNull(child);
