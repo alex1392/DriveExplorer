@@ -11,12 +11,12 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 
 	[TestFixtureSource(typeof(MicrosoftApiSource))]
 	public class GraphManagerTests {
-		private GraphManager graphManager;
+		private readonly GraphManager graphManager;
 		private readonly IAccount account;
 
-		public GraphManagerTests(GraphManager graphManager, IAccount account) {
-			this.graphManager = graphManager;
-			this.account = account;
+		public GraphManagerTests(object[] param) {
+			graphManager = (GraphManager)param[0];
+			account = (IAccount)param[1];
 		}
 
 		[Test()]

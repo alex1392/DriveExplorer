@@ -13,5 +13,9 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 			} while (ex != null);
 			Console.WriteLine(stringBuilder.ToString());
 		}
+
+		public void Log(string message) {
+			Console.WriteLine(message);
+		}
 	}
 }

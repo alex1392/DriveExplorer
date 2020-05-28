@@ -13,9 +13,9 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 		public GraphManager GraphManager { get; }
 		public IAccount Account { get; }
 
-		public OneDriveItemTests(GraphManager graphManager, IAccount account) {
-			GraphManager = graphManager;
-			Account = account;
+		public OneDriveItemTests(object[] param) {
+			GraphManager = (GraphManager)param[0];
+			Account = (IAccount)param[1];
 		}
 		[OneTimeSetUp]
 		public async Task OneTimeSetupAsync() {

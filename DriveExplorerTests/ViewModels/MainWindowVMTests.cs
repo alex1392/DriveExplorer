@@ -10,14 +10,10 @@ using System.Threading.Tasks;
 namespace DriveExplorer.ViewModels.Tests {
 	[TestFixtureSource(typeof(MicrosoftApiSource))]
 	public class MainWindowVMTests {
-		private readonly GraphManager graphManager;
-		private readonly IAccount account;
 		private readonly MainWindowVM mainWindowVM;
 
-		public MainWindowVMTests(GraphManager graphManager, IAccount account) {
-			this.graphManager = graphManager;
-			this.account = account;
-			mainWindowVM = new MainWindowVM(graphManager);
+		public MainWindowVMTests(object[] param) {
+			mainWindowVM = (MainWindowVM)param[2];
 		}
 
 		[TearDown]

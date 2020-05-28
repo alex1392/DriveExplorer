@@ -16,6 +16,7 @@ using Directory = System.IO.Directory;
 
 namespace DriveExplorer.ViewModels {
 	public class MainWindowVM : INotifyPropertyChanged {
+		private readonly ILogger logger;
 		private readonly GraphManager graphManager;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
 
@@ -34,7 +35,8 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
-		public MainWindowVM(GraphManager graphManager) {
+		public MainWindowVM(ILogger logger, GraphManager graphManager) {
+			this.logger = logger;
 			this.graphManager = graphManager;
 		}
 		/// <summary>
@@ -45,7 +47,7 @@ namespace DriveExplorer.ViewModels {
 			try {
 				drivePaths = Directory.GetLogicalDrives();
 			} catch (UnauthorizedAccessException ex) {
-				MessageBox.Show(ex.Message);
+				logger.Log(ex);
 			}
 			foreach (var drivePath in drivePaths) {
 				var item = new LocalItem(drivePath);
@@ -71,7 +73,7 @@ namespace DriveExplorer.ViewModels {
 			// TODO: logout specific user
 			var treeVM = TreeItemVMs.FirstOrDefault(vm => vm.Item.Type == ItemTypes.OneDrive);
 			if (treeVM == null) {
-				MessageBox.Show("User has been logged out");
+				logger.Log("User has been logged out");
 			} else {
 				var item = treeVM.Item as OneDriveItem;
 				if (await graphManager.LogoutAsync(item.UserAccount).ConfigureAwait(true)) {
@@ -86,8 +88,7 @@ namespace DriveExplorer.ViewModels {
 				return;
 			}
 			if (TreeItemVMs.Any(vm => vm.Item.Name == account.Username)) {
-				// TODO: change it to a logger
-				MessageBox.Show("User has already signed in.");
+				logger.Log("User has already signed in.");
 				return;
 			}
 			var root = await graphManager.GetDriveRootAsync(account).ConfigureAwait(true);

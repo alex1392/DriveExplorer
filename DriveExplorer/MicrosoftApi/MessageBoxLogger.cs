@@ -13,5 +13,9 @@ namespace DriveExplorer.MicrosoftApi {
 			} while (ex != null);
 			MessageBox.Show(stringBuilder.ToString());
 		}
+
+		public void Log(string message) {
+			MessageBox.Show(message);
+		}
 	}
 }

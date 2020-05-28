@@ -17,9 +17,9 @@ namespace DriveExplorer.ViewModels.Tests {
 		private ItemVM localItem;
 		private ItemVM onedriveItem;
 
-		public ItemVMTests(GraphManager graphManager, IAccount account) {
-			this.graphManager = graphManager;
-			this.account = account;
+		public ItemVMTests(object[] param) {
+			graphManager = (GraphManager)param[0];
+			account = (IAccount)param[1];
 		}
 		[SetUp]
 		public void Setup() {

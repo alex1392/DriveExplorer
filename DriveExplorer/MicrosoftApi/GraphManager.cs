@@ -248,7 +248,7 @@ namespace DriveExplorer.MicrosoftApi {
 
 		private void RegisterUser(IAccount account) {
 			if (accountList.Contains(account)) {
-				logger.Log(new InvalidOperationException("The user has already signed in."));
+				logger.Log("The user has already signed in.");
 				return;
 			}
 			accountList.Add(account);
