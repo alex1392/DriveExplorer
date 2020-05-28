@@ -19,7 +19,7 @@ namespace DriveExplorer.MicrosoftApi {
 	/// <summary>
 	/// Handles all graph api calling, includes error handling. If there's any error occurs in the api call, returns null
 	/// </summary>
-	public class GraphManager : IAuthenticationProvider {
+	public class MicrosoftManager : IAuthenticationProvider {
 		#region Constants
 		public const string ApiEndpoint = "https://graph.microsoft.com/v1.0/";
 		public static class Selects {
@@ -61,7 +61,7 @@ namespace DriveExplorer.MicrosoftApi {
 				public const string ReadWriteAll = "Files.ReadWrite.All";
 			}
 		}
-		public static class Timeouts {
+		private static class Timeouts {
 			public static readonly TimeSpan Silent = TimeSpan.FromSeconds(10);
 		}
 		#endregion
@@ -77,7 +77,7 @@ namespace DriveExplorer.MicrosoftApi {
 		private readonly List<IAccount> accountList = new List<IAccount>();
 		#endregion
 
-		public GraphManager(ILogger logger = null, string authority = Authority.Common) {
+		public MicrosoftManager(ILogger logger = null, string authority = Authority.Common) {
 			graphClient = new GraphServiceClient(this);
 			this.logger = logger;
 
@@ -173,7 +173,7 @@ namespace DriveExplorer.MicrosoftApi {
 			return (result?.AccessToken, result?.Account);
 		}
 		/// <summary>
-		/// Implementation of <see cref="IAuthenticationProvider"/>. This method is called everytime when <see cref="GraphManager"/> make a request.
+		/// Implementation of <see cref="IAuthenticationProvider"/>. This method is called everytime when <see cref="MicrosoftManager"/> make a request.
 		/// </summary>
 		public async Task AuthenticateRequestAsync(HttpRequestMessage request) {
 			var url = request.RequestUri.ToString().ToLower();

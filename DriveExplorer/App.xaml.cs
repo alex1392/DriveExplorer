@@ -24,7 +24,7 @@ namespace DriveExplorer {
 		}
 
 		private void ConfigureServices(ServiceCollection services) {
-			services.AddSingleton<GraphManager>();
+			services.AddSingleton<MicrosoftManager>();
 			services.AddSingleton<MainWindowVM>();
 			services.AddSingleton<MainWindow>();
 			services.AddSingleton<ILogger, MessageBoxLogger>();

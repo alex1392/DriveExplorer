@@ -6,18 +6,18 @@ using System.Collections;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
 	public class MicrosoftApiSource : IEnumerable {
-		private static readonly GraphManager graphManager;
+		private static readonly MicrosoftManager graphManager;
 		private static readonly MainWindowVM mainWindowVM;
 		private static readonly IAccount account;
 
 		static MicrosoftApiSource() {
 			var services = new ServiceCollection();
 			services.AddSingleton<ILogger, DebugLogger>();
-			services.AddSingleton(sp => new GraphManager(sp.GetService<ILogger>(), GraphManager.Authority.Organizations));
+			services.AddSingleton(sp => new MicrosoftManager(sp.GetService<ILogger>(), MicrosoftManager.Authority.Organizations));
 			services.AddSingleton<MainWindowVM>();
 
 			var serviceProvider = services.BuildServiceProvider();
-			graphManager = serviceProvider.GetService<GraphManager>();
+			graphManager = serviceProvider.GetService<MicrosoftManager>();
 			mainWindowVM = serviceProvider.GetService<MainWindowVM>();
 			(_, account) = graphManager.GetAccessTokenWithUsernamePassword().Result;		
 		}

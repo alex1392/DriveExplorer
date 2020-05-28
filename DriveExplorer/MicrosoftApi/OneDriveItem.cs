@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DriveExplorer.MicrosoftApi {
 	public class OneDriveItem : IItem {
-		private readonly GraphManager graphManager;
+		private readonly MicrosoftManager graphManager;
 
 		public ItemTypes Type { get; private set; }
 		public string Name { get; private set; }
@@ -20,7 +20,7 @@ namespace DriveExplorer.MicrosoftApi {
 		/// <summary>
 		/// Constructor of root item
 		/// </summary>
-		public OneDriveItem(GraphManager graphManager, DriveItem driveItem, IAccount account) {
+		public OneDriveItem(MicrosoftManager graphManager, DriveItem driveItem, IAccount account) {
 			this.graphManager = graphManager;
 			Id = driveItem.Id;
 			Name = account.Username;
@@ -34,7 +34,7 @@ namespace DriveExplorer.MicrosoftApi {
 			}
 		}
 
-		private OneDriveItem(GraphManager graphManager) {
+		private OneDriveItem(MicrosoftManager graphManager) {
 			this.graphManager = graphManager;
 		}
 		private OneDriveItem GetChild(DriveItem driveItem, OneDriveItem parent) {

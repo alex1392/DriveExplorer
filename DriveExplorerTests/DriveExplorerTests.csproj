@@ -112,8 +112,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="GoogleApi\GoogleManagerTests.cs" />
     <Compile Include="MicrosoftApi\DebugLogger.cs" />
-    <Compile Include="MicrosoftApi\GraphManagerTests.cs" />
+    <Compile Include="MicrosoftApi\MicrosoftManagerTests.cs" />
     <Compile Include="MicrosoftApi\MicrosoftApiSource.cs" />
     <Compile Include="MicrosoftApi\OneDriveItemTests.cs" />
     <Compile Include="Models\LocalItemTests.cs" />
@@ -125,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="GoogleApi\client_secret.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

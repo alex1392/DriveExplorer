@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 namespace DriveExplorer.MicrosoftApi.Tests {
 
 	[TestFixtureSource(typeof(MicrosoftApiSource))]
-	public class GraphManagerTests {
-		private readonly GraphManager graphManager;
+	public class MicrosoftManagerTests {
+		private readonly MicrosoftManager graphManager;
 		private readonly IAccount account;
 
-		public GraphManagerTests(object[] param) {
-			graphManager = (GraphManager)param[0];
+		public MicrosoftManagerTests(object[] param) {
+			graphManager = (MicrosoftManager)param[0];
 			account = (IAccount)param[1];
 		}
 

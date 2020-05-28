@@ -163,14 +163,14 @@
     <Compile Include="MicrosoftApi\OneDriveItem.cs" />
     <Compile Include="Views\Converters\TypeImageConverter.cs" />
     <Compile Include="Views\Converters\TypeVisibilityConverter.cs" />
-    <Compile Include="GoogleApi\UserCredentialProvider.cs" />
+    <Compile Include="GoogleApi\GoogleManager.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MicrosoftApi\GraphManager.cs" />
+    <Compile Include="MicrosoftApi\MicrosoftManager.cs" />
     <Compile Include="MicrosoftApi\TokenCacheHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

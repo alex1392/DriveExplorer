@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 namespace DriveExplorer.ViewModels.Tests {
 	[TestFixtureSource(typeof(MicrosoftApiSource))]
 	public class ItemVMTests {
-		private readonly GraphManager graphManager;
+		private readonly MicrosoftManager graphManager;
 		private readonly IAccount account;
 		private DriveItem root;
 		private ItemVM localItem;
 		private ItemVM onedriveItem;
 
 		public ItemVMTests(object[] param) {
-			graphManager = (GraphManager)param[0];
+			graphManager = (MicrosoftManager)param[0];
 			account = (IAccount)param[1];
 		}
 		[SetUp]

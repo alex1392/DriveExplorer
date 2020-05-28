@@ -17,7 +17,7 @@ using Directory = System.IO.Directory;
 namespace DriveExplorer.ViewModels {
 	public class MainWindowVM : INotifyPropertyChanged {
 		private readonly ILogger logger;
-		private readonly GraphManager graphManager;
+		private readonly MicrosoftManager graphManager;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -35,7 +35,7 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
-		public MainWindowVM(ILogger logger, GraphManager graphManager) {
+		public MainWindowVM(ILogger logger, MicrosoftManager graphManager) {
 			this.logger = logger;
 			this.graphManager = graphManager;
 		}

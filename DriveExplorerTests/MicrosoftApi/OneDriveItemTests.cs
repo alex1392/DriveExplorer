@@ -10,11 +10,11 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 	public class OneDriveItemTests {
 		private DriveItem root;
 
-		public GraphManager GraphManager { get; }
+		public MicrosoftManager GraphManager { get; }
 		public IAccount Account { get; }
 
 		public OneDriveItemTests(object[] param) {
-			GraphManager = (GraphManager)param[0];
+			GraphManager = (MicrosoftManager)param[0];
 			Account = (IAccount)param[1];
 		}
 		[OneTimeSetUp]
