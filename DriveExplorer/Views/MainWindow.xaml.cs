@@ -23,7 +23,7 @@ namespace DriveExplorer.Views {
 
 		private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
 			vm.GetLocalDrives();
-			await vm.AutoLoginOneDrive().ConfigureAwait(false);
+			await vm.AutoLoginOneDriveAsync().ConfigureAwait(false);
 		}
 
 		private async void TreeViewItem_Selected(object sender, RoutedEventArgs e) {
@@ -34,12 +34,16 @@ namespace DriveExplorer.Views {
 			await vm.CurrentItem_SelectedAsync(sender, e).ConfigureAwait(false);
 		}
 
-		private async void LoginOneDriveButton_Click(object sender, RoutedEventArgs e) {
-			await vm.LoginOneDrive().ConfigureAwait(false);
-		}
-
 		private async void LogoutOneDriveButton_Click(object sender, RoutedEventArgs e) {
 			await vm.LogoutOneDriveAsync().ConfigureAwait(false);
+		}
+
+		private async void LoginGoogleDriveButton_Click(object sender, RoutedEventArgs e) {
+			await vm.LoginGoogleDriveAsync().ConfigureAwait(false);
+		}
+
+		private async void LoginOneDriveButton_Click(object sender, RoutedEventArgs e) {
+			await vm.LoginOneDriveAsync().ConfigureAwait(false);
 		}
 	}
 }

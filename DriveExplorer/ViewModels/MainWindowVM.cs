@@ -111,7 +111,7 @@ namespace DriveExplorer.ViewModels {
 
 		#region MicrosoftApi
 
-		public async Task LoginOneDrive() {
+		public async Task LoginOneDriveAsync() {
 			if (microsoftManager == null) {
 				Console.WriteLine("microsoftManager is not attached to mainwindowVM");
 				return;
@@ -125,7 +125,7 @@ namespace DriveExplorer.ViewModels {
 		/// TODO: not auto login at launch, just retrieve account cache, and login when user want to access the drive
 		/// </summary>
 		/// <returns></returns>
-		public async Task AutoLoginOneDrive() {
+		public async Task AutoLoginOneDriveAsync() {
 			if (microsoftManager == null) {
 				Console.WriteLine("microsoftManager is not attached to mainwindowVM");
 				return;
@@ -180,10 +180,11 @@ namespace DriveExplorer.ViewModels {
 
 		#region GoogleApi
 		public async Task LoginGoogleDriveAsync() {
-			var user = await googleManager.GetUserAsync().ConfigureAwait(false);
-			var root = await googleManager.GetDriveRootAsync().ConfigureAwait(false);
-			var item = new GoogleDriveItem(root, user);
-
+			var about = await googleManager.GetAboutAsync().ConfigureAwait(true);
+			var root = await googleManager.GetDriveRootAsync().ConfigureAwait(true);
+			var item = new GoogleDriveItem(googleManager, about, root);
+			TreeItemVMs.Add(new ItemVM(item));
+			CurrentItemVMs.Add(new ItemVM(item));
 		}
 		#endregion
 	}

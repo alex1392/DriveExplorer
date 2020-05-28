@@ -4,7 +4,7 @@ using Path = System.IO.Path;
 
 namespace DriveExplorer.Models {
 	public static class ItemFactoryHelper {
-		private static readonly Dictionary<string, ItemTypes> TypesMap = new Dictionary<string, ItemTypes>
+		private static readonly Dictionary<string, ItemTypes> FileTypesMap = new Dictionary<string, ItemTypes>
 		{
 			{".jpg" , ItemTypes.IMG},
 			{".jpeg", ItemTypes.IMG},
@@ -22,10 +22,10 @@ namespace DriveExplorer.Models {
 			{".zip" , ItemTypes.ZIP},
 		};
 
-		public static ItemTypes GetFileType(string fullPath) {
-			var ext = Path.GetExtension(fullPath).ToLower();
-			if (TypesMap.ContainsKey(ext)) {
-				return TypesMap[ext];
+		public static ItemTypes GetFileType(string path) {
+			var ext = Path.GetExtension(path).ToLower();
+			if (FileTypesMap.ContainsKey(ext)) {
+				return FileTypesMap[ext];
 			}
 			return ItemTypes.File;
 		}

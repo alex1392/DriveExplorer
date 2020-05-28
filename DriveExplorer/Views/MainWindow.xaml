@@ -70,9 +70,13 @@
 					Click="LogoutOneDriveButton_Click"
 					Grid.Column="1"
 					Margin="10.333,374,461.333,9.667" />
+			<Button Content="Login GoogleDrive"
+					Click="LoginGoogleDriveButton_Click"
+					Grid.Column="1"
+					Margin="462.333,315,10.333,67.667" />
 		</Grid>
 		<Border Background="#4C000000"
-				Visibility="{Binding SpinnerVisibility}">
+				Visibility="{Binding SpinnerVisibility, FallbackValue=Collapsed}">
 			<fa:ImageAwesome Icon="Spinner"
 							 Spin="True"
 							 Height="48"

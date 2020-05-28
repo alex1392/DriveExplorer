@@ -16,7 +16,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyc.MicrosoftApi", "Cyc\Cyc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyc.GoogleApi", "Cyc\Cyc.GoogleApi\Cyc.GoogleApi.csproj", "{40DCA5C6-9BD9-40F5-AE71-8DB12F77A3A2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyc.Standard", "Cyc\Cyc\Cyc.Standard.csproj", "{85077D3F-281A-4FF5-A40D-C601F0F0939B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyc.Standard", "Cyc\Cyc.Standard\Cyc.Standard.csproj", "{1415E977-CDF6-4507-AE7A-41780DCB1A77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,10 +40,10 @@ Global
 		{40DCA5C6-9BD9-40F5-AE71-8DB12F77A3A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40DCA5C6-9BD9-40F5-AE71-8DB12F77A3A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40DCA5C6-9BD9-40F5-AE71-8DB12F77A3A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{85077D3F-281A-4FF5-A40D-C601F0F0939B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{85077D3F-281A-4FF5-A40D-C601F0F0939B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{85077D3F-281A-4FF5-A40D-C601F0F0939B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{85077D3F-281A-4FF5-A40D-C601F0F0939B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1415E977-CDF6-4507-AE7A-41780DCB1A77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1415E977-CDF6-4507-AE7A-41780DCB1A77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1415E977-CDF6-4507-AE7A-41780DCB1A77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1415E977-CDF6-4507-AE7A-41780DCB1A77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
