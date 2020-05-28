@@ -21,9 +21,8 @@ namespace DriveExplorer.GoogleApi {
 		private readonly string[] scopes = new[] { DriveService.Scope.Drive };
 		private readonly UserCredential credential;
 		private readonly DriveService service;
-		private readonly ILogger logger;
 
-		public GoogleManager(ILogger logger) {
+		public GoogleManager() {
 			credential = FromFileAsync(
 				ClientSecretsPath,
 				scopes).Result;
@@ -33,13 +32,13 @@ namespace DriveExplorer.GoogleApi {
 					HttpClientInitializer = credential,
 					ApplicationName = nameof(DriveExplorer),
 				});
-			this.logger = logger;
 		}
 
-		public async Task<About> GetAboutAsync() {
+		public async Task<User> GetUserAsync() {
 			var request = service.About.Get();
-			request.Fields = "*";
-			return await request.ExecuteAsync().ConfigureAwait(false);
+			request.Fields = "user";
+			var about = await request.ExecuteAsync().ConfigureAwait(false);
+			return about.User;
 		}
 
 		public async Task<File> GetDriveRootAsync() {

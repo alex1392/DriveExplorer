@@ -1,10 +1,10 @@
 ﻿using DriveExplorer.GoogleApi;
 using DriveExplorer.MicrosoftApi;
 using DriveExplorer.Models;
-using Microsoft.Graph;
+
 using Microsoft.Identity.Client;
+
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -13,10 +13,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Google.Apis.Drive.v3.Data;
 
 using Directory = System.IO.Directory;
-using File = Google.Apis.Drive.v3.Data.File;
 
 namespace DriveExplorer.ViewModels {
 	public class MainWindowVM : INotifyPropertyChanged {
@@ -109,7 +107,7 @@ namespace DriveExplorer.ViewModels {
 			CurrentItemVMs.Clear();
 			spinnerVisibility = Visibility.Collapsed;
 		}
-	
+
 		#region MicrosoftApi
 
 		public async Task LoginOneDrive() {
@@ -181,31 +179,11 @@ namespace DriveExplorer.ViewModels {
 
 		#region GoogleApi
 		public async Task LoginGoogleDriveAsync() {
+			var user = await googleManager.GetUserAsync().ConfigureAwait(false);
 			var root = await googleManager.GetDriveRootAsync().ConfigureAwait(false);
-			var item = new GoogleDriveItem(root);
-			
+			var item = new GoogleDriveItem(root, user);
+
 		}
 		#endregion
-	}
-
-	public class GoogleDriveItem : IItem {
-		public ItemTypes Type { get; private set; }
-
-		public string Name { get; private set; }
-
-		public string FullPath { get; private set; }
-
-		/// <summary>
-		/// Root constructor
-		/// </summary>
-		public GoogleDriveItem(File root) {
-			Type = ItemTypes.GoogleDrive;
-
-		}
-
-
-		public IAsyncEnumerable<IItem> GetChildrenAsync() {
-			throw new NotImplementedException();
-		}
 	}
 }

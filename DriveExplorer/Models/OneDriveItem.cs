@@ -1,4 +1,4 @@
-﻿using DriveExplorer.Models;
+﻿using DriveExplorer.MicrosoftApi;
 
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace DriveExplorer.MicrosoftApi {
+namespace DriveExplorer.Models {
 	public class OneDriveItem : IItem {
 		private readonly MicrosoftManager microsoftManager;
 

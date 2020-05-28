@@ -153,6 +153,7 @@
     <Compile Include="MicrosoftApi\ILogger.cs" />
     <Compile Include="MicrosoftApi\MessageBoxLogger.cs" />
     <Compile Include="Models\Constants.cs" />
+    <Compile Include="GoogleApi\GoogleDriveItem.cs" />
     <Compile Include="Views\Converters\DebugConverter.cs" />
     <Compile Include="Models\IItem.cs" />
     <Compile Include="Models\ItemFactoryHelper.cs" />
@@ -160,7 +161,7 @@
     <Compile Include="ViewModels\ItemVM.cs" />
     <Compile Include="Models\LocalItem.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
-    <Compile Include="MicrosoftApi\OneDriveItem.cs" />
+    <Compile Include="Models\OneDriveItem.cs" />
     <Compile Include="Views\Converters\TypeImageConverter.cs" />
     <Compile Include="Views\Converters\TypeVisibilityConverter.cs" />
     <Compile Include="GoogleApi\GoogleManager.cs" />
@@ -214,6 +215,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
