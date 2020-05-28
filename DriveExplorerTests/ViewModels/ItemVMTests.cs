@@ -1,15 +1,17 @@
-﻿using DriveExplorer.MicrosoftApi;
+﻿using Cyc.MicrosoftApi;
+using DriveExplorer.MicrosoftApi;
 using DriveExplorer.MicrosoftApi.Tests;
 using DriveExplorer.Models;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using NUnit.Framework;
 
+using DriveExplorer.Tests;
 using System;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.ViewModels.Tests {
-	[TestFixtureSource(typeof(MicrosoftApiSource))]
+	[TestFixtureSource(typeof(TestSource))]
 	public class ItemVMTests {
 		private readonly MicrosoftManager microsoftManager;
 		private readonly IAccount account;

@@ -1,4 +1,7 @@
-﻿using Microsoft.Graph;
+﻿using Cyc.MicrosoftApi;
+using DriveExplorer.Models;
+using DriveExplorer.Tests;
+using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using NUnit.Framework;
 
@@ -6,7 +9,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
-	[TestFixtureSource(typeof(MicrosoftApiSource))]
+	[TestFixtureSource(typeof(TestSource))]
 	public class OneDriveItemTests {
 		private DriveItem root;
 

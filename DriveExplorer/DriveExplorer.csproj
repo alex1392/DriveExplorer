@@ -55,8 +55,8 @@
     <Reference Include="Google.Apis.Core, Version=1.45.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.Core.1.45.0\lib\net45\Google.Apis.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Apis.Drive.v3, Version=1.45.0.1959, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Drive.v3.1.45.0.1959\lib\net45\Google.Apis.Drive.v3.dll</HintPath>
+    <Reference Include="Google.Apis.Drive.v3, Version=1.45.0.1964, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Drive.v3.1.45.0.1964\lib\net45\Google.Apis.Drive.v3.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis.PlatformServices, Version=1.45.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.1.45.0\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
@@ -150,10 +150,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MicrosoftApi\ILogger.cs" />
-    <Compile Include="MicrosoftApi\MessageBoxLogger.cs" />
+    <Compile Include="Models\GoogleDriveItem.cs" />
+    <Compile Include="Views\MessageBoxLogger.cs" />
     <Compile Include="Models\Constants.cs" />
-    <Compile Include="GoogleApi\GoogleDriveItem.cs" />
     <Compile Include="Views\Converters\DebugConverter.cs" />
     <Compile Include="Models\IItem.cs" />
     <Compile Include="Models\ItemFactoryHelper.cs" />
@@ -164,15 +163,12 @@
     <Compile Include="Models\OneDriveItem.cs" />
     <Compile Include="Views\Converters\TypeImageConverter.cs" />
     <Compile Include="Views\Converters\TypeVisibilityConverter.cs" />
-    <Compile Include="GoogleApi\GoogleManager.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MicrosoftApi\MicrosoftManager.cs" />
-    <Compile Include="MicrosoftApi\TokenCacheHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -218,6 +214,20 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cyc\Cyc.GoogleApi\Cyc.GoogleApi.csproj">
+      <Project>{40DCA5C6-9BD9-40F5-AE71-8DB12F77A3A2}</Project>
+      <Name>Cyc.GoogleApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cyc\Cyc.MicrosoftApi\Cyc.MicrosoftApi.csproj">
+      <Project>{BD671F7E-9628-466F-8E8E-82A83AF19CA9}</Project>
+      <Name>Cyc.MicrosoftApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cyc\Cyc\Cyc.Standard.csproj">
+      <Project>{85077D3F-281A-4FF5-A40D-C601F0F0939B}</Project>
+      <Name>Cyc.Standard</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

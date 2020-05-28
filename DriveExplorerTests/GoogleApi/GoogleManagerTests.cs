@@ -1,18 +1,21 @@
-﻿using NUnit.Framework;
-using DriveExplorer.GoogleApi;
+﻿using Cyc.GoogleApi;
+using DriveExplorer.MicrosoftApi.Tests;
+using DriveExplorer.Tests;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.GoogleApi.Tests {
-	[TestFixture()]
+	[TestFixtureSource(typeof(TestSource))]
 	public class GoogleManagerTests {
 		private GoogleManager googleManager;
 
-		public GoogleManagerTests() {
-			googleManager = new GoogleManager();
+		public GoogleManagerTests(object[] param) {
+			googleManager = (GoogleManager)param[3];
 		}
 
 		[Test()]

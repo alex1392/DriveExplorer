@@ -4,11 +4,12 @@ using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using NUnit.Framework;
 
+using DriveExplorer.Tests;
 using System;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.ViewModels.Tests {
-	[TestFixtureSource(typeof(MicrosoftApiSource))]
+	[TestFixtureSource(typeof(TestSource))]
 	public class MainWindowVMTests {
 		private readonly MainWindowVM mainWindowVM;
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.Graph;
+﻿using Cyc.MicrosoftApi;
+using DriveExplorer.Tests;
+using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using NUnit.Framework;
 
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
 
-	[TestFixtureSource(typeof(MicrosoftApiSource))]
+	[TestFixtureSource(typeof(TestSource))]
 	public class MicrosoftManagerTests {
 		private readonly MicrosoftManager microsoftManager;
 		private readonly IAccount account;

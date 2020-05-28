@@ -1,9 +1,9 @@
-﻿using DriveExplorer.Models;
+﻿
 using System;
 using System.Collections.Generic;
 using Google.Apis.Drive.v3.Data;
 
-namespace DriveExplorer.GoogleApi {
+namespace DriveExplorer.Models {
 	public class GoogleDriveItem : IItem {
 		public ItemTypes Type { get; private set; }
 
