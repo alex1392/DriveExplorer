@@ -69,11 +69,15 @@ namespace DriveExplorer.ViewModels {
 		public async Task LogoutOneDriveAsync() {
 			SpinnerVisibility = Visibility.Visible;
 			// TODO: logout specific user
-			var treeVM = TreeItemVMs.First(vm => vm.Item.Type == ItemTypes.OneDrive);
-			var item = treeVM.Item as OneDriveItem;
-			if (await graphManager.LogoutAsync(item.UserAccount).ConfigureAwait(true)) {
-				TreeItemVMs.Remove(treeVM);
-				CurrentItemVMs.Remove(CurrentItemVMs.FirstOrDefault(vm => vm == treeVM));
+			var treeVM = TreeItemVMs.FirstOrDefault(vm => vm.Item.Type == ItemTypes.OneDrive);
+			if (treeVM == null) {
+				MessageBox.Show("User has been logged out");
+			} else {
+				var item = treeVM.Item as OneDriveItem;
+				if (await graphManager.LogoutAsync(item.UserAccount).ConfigureAwait(true)) {
+					TreeItemVMs.Remove(treeVM);
+					CurrentItemVMs.Remove(CurrentItemVMs.FirstOrDefault(vm => vm == treeVM));
+				}
 			}
 			SpinnerVisibility = Visibility.Collapsed;
 		}

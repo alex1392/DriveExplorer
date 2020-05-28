@@ -67,13 +67,13 @@ namespace DriveExplorer.MicrosoftApi {
 		#endregion
 
 		#region Fields
-		private readonly string[] scopes;
+		private string[] scopes;
+		private string appId;
+		private string username;
+		private string password;
 		private readonly GraphServiceClient graphClient;
 		private readonly IPublicClientApplication msalClient;
 		private readonly ILogger logger;
-		private readonly string appId;
-		private readonly string username;
-		private readonly string password;
 		private readonly List<IAccount> accountList = new List<IAccount>();
 		#endregion
 
@@ -81,16 +81,7 @@ namespace DriveExplorer.MicrosoftApi {
 			graphClient = new GraphServiceClient(this);
 			this.logger = logger;
 
-			var appConfig = ConfigurationManager.AppSettings;
-			if (!ContainsKey(appConfig, nameof(appId))) {
-				throw new ArgumentException($"Given {nameof(appConfig)} has no  configuration key named {nameof(appId)}");
-			}
-			appId = appConfig[nameof(appId)];
-			if (ContainsKey(appConfig, nameof(scopes))) {
-				scopes = appConfig[nameof(scopes)].Split(';');
-			}
-			username = appConfig[nameof(username)];
-			password = appConfig[nameof(password)];
+			AppConfig();
 
 			msalClient = PublicClientApplicationBuilder
 				.Create(appId)
@@ -99,6 +90,21 @@ namespace DriveExplorer.MicrosoftApi {
 				.WithDefaultRedirectUri()
 				.Build();
 			TokenCacheHelper.EnableSerialization(msalClient.UserTokenCache);
+
+		}
+
+		private void AppConfig() {
+			var appConfig = ConfigurationManager.AppSettings;
+			if (!ContainsKey(appConfig, nameof(appId))) {
+				throw new ArgumentException($"Given {nameof(appConfig)} has no  configuration key named {nameof(appId)}");
+			}
+			if (!ContainsKey(appConfig, nameof(scopes))) {
+				throw new ArgumentException($"Given {nameof(appConfig)} has no  configuration key named {nameof(scopes)}");
+			}
+			appId = appConfig[nameof(appId)];
+			scopes = appConfig[nameof(scopes)].Split(';');
+			username = appConfig[nameof(username)]; // optional
+			password = appConfig[nameof(password)]; // optional
 
 			bool ContainsKey(NameValueCollection appConfig, string key) {
 				return appConfig.AllKeys.Any(item => item == key);

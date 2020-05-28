@@ -341,7 +341,7 @@ healthchecksdb
 coverage.json
 lcov.info
 dotcover*
-coverlet.cmd
+*.cmd
 client_secret.json
 DriveExplorer.Core/
 DriveExplorerTests.Core/
