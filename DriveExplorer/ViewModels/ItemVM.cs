@@ -50,7 +50,7 @@ namespace DriveExplorer.ViewModels {
 		public MainWindowVM MainWindowVM { get; set; }
 		public IItem Item { get; private set; }
 
-		public ObservableCollection<ItemVM> Children { get; set; } = new ObservableCollection<ItemVM>
+		public ObservableCollection<ItemVM> Children { get; } = new ObservableCollection<ItemVM>
 		{
 			null // add dummyItem for the expansion indicator
         };
@@ -110,7 +110,7 @@ namespace DriveExplorer.ViewModels {
 			if (MainWindowVM == null) {
 				return;
 			}
-			MainWindowVM.SpinnerVisibility = 
+			MainWindowVM.SpinnerVisibility =
 				MainWindowVM.SpinnerVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 		}
 

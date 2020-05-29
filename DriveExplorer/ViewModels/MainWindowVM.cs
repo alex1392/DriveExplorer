@@ -65,7 +65,7 @@ namespace DriveExplorer.ViewModels {
 				CurrentItemVMs.Add(new ItemVM(item));
 			}
 		}
-		public async Task TreeItem_SelectedAsync(object sender, RoutedEventArgs e = null) {
+		public async Task TreeItemSelectedAsync(object sender, RoutedEventArgs e = null) {
 			var vm = (sender as ItemVM) ??
 				(sender as TreeViewItem).DataContext as ItemVM ??
 				throw new ArgumentException("invalid sender");
@@ -81,7 +81,7 @@ namespace DriveExplorer.ViewModels {
 			}
 			SwitchSpinner();
 		}
-		public async Task CurrentItem_SelectedAsync(object sender, MouseButtonEventArgs e = null) {
+		public async Task CurrentItemSelectedAsync(object sender, MouseButtonEventArgs e = null) {
 			var vm = (sender as ItemVM) ??
 				(sender as ListBoxItem).DataContext as ItemVM ??
 				throw new ArgumentException("invalid sender");
@@ -214,11 +214,17 @@ namespace DriveExplorer.ViewModels {
 			TreeItemVMs.Add(new ItemVM(item, this));
 			CurrentItemVMs.Add(new ItemVM(item, this));
 		}
-		public void LogoutGoogleDrive(ItemVM itemVM) {
+		public async Task LogoutGoogleDriveAsync(ItemVM treeVM) {
 			if (googleManager == null) {
 				return;
 			}
-			googleManager.UserLogout();
+			if (!(treeVM.Item is GoogleDriveItem googleDriveItem)) {
+				return;
+			}
+			if (await googleManager.UserLogoutAsync(googleDriveItem.UserId).ConfigureAwait(true)) {
+				TreeItemVMs.Remove(treeVM);
+				CurrentItemVMs.Remove(CurrentItemVMs.FirstOrDefault(vm => vm == treeVM));
+			}
 		}
 		#endregion
 	}

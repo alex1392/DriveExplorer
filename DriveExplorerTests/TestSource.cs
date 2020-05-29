@@ -1,20 +1,24 @@
 ﻿using Cyc.GoogleApi;
 using Cyc.MicrosoftApi;
 using Cyc.Standard;
+
 using DriveExplorer.ViewModels;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 
 using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 
 namespace DriveExplorer.Tests {
 	public class TestSource : IEnumerable {
 		private static readonly MicrosoftManager microsoftManager;
 		private static readonly GoogleManager googleManager;
 		private static readonly MainWindowVM mainWindowVM;
-		private static readonly IAccount account;
+		private static readonly string googleDriveUserId;
+		private static readonly IAccount oneDriveAccount;
 
 		static TestSource() {
 			var services = new ServiceCollection();
@@ -30,12 +34,13 @@ namespace DriveExplorer.Tests {
 			googleManager = serviceProvider.GetService<GoogleManager>();
 			mainWindowVM = serviceProvider.GetService<MainWindowVM>();
 			var result = microsoftManager.LoginWithUsernamePassword().Result;
-			account = result.Account;
+			oneDriveAccount = result.Account;
 
-			// TODO: login google accounts
+			googleDriveUserId = googleManager.LoadAllUserId().First();
+			googleManager.UserLoginAsync(googleDriveUserId).Wait();
 		}
 		public IEnumerator GetEnumerator() {
-			yield return new object[] { new object[] { microsoftManager, account, googleManager, mainWindowVM } };
+			yield return new object[] { new object[] { microsoftManager, oneDriveAccount, googleManager, mainWindowVM, googleDriveUserId } };
 		}
 	}
 }

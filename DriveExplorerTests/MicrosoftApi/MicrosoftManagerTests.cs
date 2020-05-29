@@ -1,12 +1,12 @@
 ﻿using Cyc.MicrosoftApi;
+
 using DriveExplorer.Tests;
-using Microsoft.Graph;
+
 using Microsoft.Identity.Client;
+
 using NUnit.Framework;
 
 using System;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.MicrosoftApi.Tests {
@@ -41,11 +41,10 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 		[Test()]
 		public async Task GetChildrenTestAsync() {
 			var root = await microsoftManager.GetDriveRootAsync(account).ConfigureAwait(false);
-			var asyncEnumerable = microsoftManager.GetChildrenAsync(root.Id, account);
-			await foreach (var child in asyncEnumerable) {
+			await foreach (var child in microsoftManager.GetChildrenAsync(root.Id, account).ConfigureAwait(false)) {
 				Console.WriteLine(child.Name);
+				Assert.NotNull(child);
 			}
-			Assert.NotNull(asyncEnumerable);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿
 using Cyc.MicrosoftApi;
+
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 
@@ -46,7 +47,7 @@ namespace DriveExplorer.Models {
 				FullPath = Path.Combine(parent.FullPath, driveItem.Name),
 				UserAccount = parent.UserAccount
 			};
-		}	
+		}
 
 		private static bool IsFolder(DriveItem driveItem) {
 			return driveItem.Folder != null;

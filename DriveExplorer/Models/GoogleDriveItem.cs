@@ -1,10 +1,11 @@
-﻿
-using System;
+﻿using Cyc.GoogleApi;
+
+using Google.Apis.Drive.v3.Data;
+
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Cyc.GoogleApi;
-using Google.Apis.Drive.v3.Data;
+
 using File = Google.Apis.Drive.v3.Data.File;
 
 namespace DriveExplorer.Models {
@@ -36,8 +37,8 @@ namespace DriveExplorer.Models {
 		/// </summary>
 		private GoogleDriveItem(GoogleDriveItem parent, File child) {
 			googleManager = parent.googleManager;
-			Type = IsFolder(child) ? 
-				ItemTypes.Folder : 
+			Type = IsFolder(child) ?
+				ItemTypes.Folder :
 				ItemFactoryHelper.GetFileType(child.Name);
 			Name = child.Name;
 			FullPath = Path.Combine(parent.FullPath, child.Name);

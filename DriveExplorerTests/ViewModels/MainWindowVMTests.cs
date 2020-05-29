@@ -1,5 +1,4 @@
-﻿using DriveExplorer.ViewModels;
-using DriveExplorer.Tests;
+﻿using DriveExplorer.Tests;
 
 using NUnit.Framework;
 
@@ -43,7 +42,7 @@ namespace DriveExplorer.ViewModels.Tests {
 		public async Task LogoutOneDriveAsyncTestAsync() {
 			await mainWindowVM.AutoLoginOneDriveAsync().ConfigureAwait(false);
 			var originalCount = mainWindowVM.TreeItemVMs.Count;
-			await mainWindowVM.LogoutOneDriveAsync().ConfigureAwait(false);
+			await mainWindowVM.LogoutOneDriveAsync(mainWindowVM.TreeItemVMs[0]).ConfigureAwait(false);
 			var nowCount = mainWindowVM.TreeItemVMs.Count;
 			Assert.That(nowCount < originalCount);
 		}
@@ -52,7 +51,7 @@ namespace DriveExplorer.ViewModels.Tests {
 		public async Task TreeItem_SelectedAsyncTestAsync() {
 			mainWindowVM.GetLocalDrives();
 			var itemVM = mainWindowVM.TreeItemVMs[0];
-			await mainWindowVM.TreeItem_SelectedAsync(itemVM).ConfigureAwait(false);
+			await mainWindowVM.TreeItemSelectedAsync(itemVM).ConfigureAwait(false);
 			Assert.That(mainWindowVM.TreeItemVMs[0].Children[0] != null);
 		}
 
@@ -60,7 +59,7 @@ namespace DriveExplorer.ViewModels.Tests {
 		public async Task CurrentItem_SelectedAsyncTestAsync() {
 			mainWindowVM.GetLocalDrives();
 			var itemVM = mainWindowVM.CurrentItemVMs[0];
-			await mainWindowVM.CurrentItem_SelectedAsync(itemVM).ConfigureAwait(false);
+			await mainWindowVM.CurrentItemSelectedAsync(itemVM).ConfigureAwait(false);
 			Assert.That(mainWindowVM.TreeItemVMs[0].Children[0] != null);
 		}
 

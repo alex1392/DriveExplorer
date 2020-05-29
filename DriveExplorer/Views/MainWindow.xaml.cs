@@ -1,5 +1,6 @@
 ﻿
 using DriveExplorer.ViewModels;
+
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,11 +30,11 @@ namespace DriveExplorer.Views {
 		}
 
 		private async void TreeViewItem_Selected(object sender, RoutedEventArgs e) {
-			await vm.TreeItem_SelectedAsync(sender, e).ConfigureAwait(false);
+			await vm.TreeItemSelectedAsync(sender, e).ConfigureAwait(false);
 		}
 
 		private async void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
-			await vm.CurrentItem_SelectedAsync(sender, e).ConfigureAwait(false);
+			await vm.CurrentItemSelectedAsync(sender, e).ConfigureAwait(false);
 		}
 
 		private async void LoginGoogleDriveButton_Click(object sender, RoutedEventArgs e) {
@@ -55,7 +56,7 @@ namespace DriveExplorer.Views {
 						await vm.LogoutOneDriveAsync(itemVM).ConfigureAwait(false);
 						break;
 					case Models.ItemTypes.GoogleDrive:
-						vm.LogoutGoogleDrive(itemVM);
+						vm.LogoutGoogleDriveAsync(itemVM);
 						break;
 				}
 			}
