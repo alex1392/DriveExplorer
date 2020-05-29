@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.GoogleApi.Tests {
+	[TestFixture()]
 	[TestFixtureSource(typeof(TestSource))]
 	public class GoogleManagerTests {
 		private readonly GoogleManager googleManager;
@@ -41,5 +42,19 @@ namespace DriveExplorer.GoogleApi.Tests {
 			}
 		}
 
+		[Test()]
+		public void UserLogoutAsyncTest() {
+			throw new NotImplementedException();
+		}
+
+		[Test()]
+		public void UserLoginAsyncTest() {
+			throw new NotImplementedException();
+		}
+
+		[Test()]
+		public void LoadAllUserIdTest() {
+			throw new NotImplementedException();
+		}
 	}
 }
