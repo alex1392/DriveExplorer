@@ -43,18 +43,25 @@ namespace DriveExplorer.GoogleApi.Tests {
 		}
 
 		[Test()]
-		public void UserLogoutAsyncTest() {
-			throw new NotImplementedException();
+		public async Task UserLoginAsyncTestAsync() {
+			var newUserId = await googleManager.UserLoginAsync(userId).ConfigureAwait(false);
+			Assert.AreEqual(userId, newUserId);
 		}
 
 		[Test()]
-		public void UserLoginAsyncTest() {
-			throw new NotImplementedException();
+		public async Task UserLogoutAsyncTestAsync() {
+			await googleManager.UserLogoutAsync(userId).ConfigureAwait(false);
+			Assert.IsFalse(googleManager.HasUser(userId));
 		}
+
 
 		[Test()]
 		public void LoadAllUserIdTest() {
-			throw new NotImplementedException();
+			var userIds = googleManager.LoadAllUserId();
+			foreach (var id in userIds) {
+				Console.WriteLine(id);
+				Assert.NotNull(id);
+			}
 		}
 	}
 }
