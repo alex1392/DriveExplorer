@@ -1,6 +1,7 @@
 ﻿using Cyc.GoogleApi;
 using Cyc.MicrosoftApi;
 using Cyc.Standard;
+
 using DriveExplorer.Models;
 
 using Microsoft.Identity.Client;
@@ -16,19 +17,15 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 using Directory = System.IO.Directory;
-
 namespace DriveExplorer.ViewModels {
 	public class MainWindowVM : INotifyPropertyChanged {
 		private readonly ILogger logger;
 		private readonly MicrosoftManager microsoftManager;
 		private readonly GoogleManager googleManager;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
-
 		public event PropertyChangedEventHandler PropertyChanged;
 		public ObservableCollection<ItemVM> TreeItemVMs { get; } = new ObservableCollection<ItemVM>();
-
 		public ObservableCollection<ItemVM> CurrentItemVMs { get; } = new ObservableCollection<ItemVM>();
-
 		public Visibility SpinnerVisibility {
 			get => spinnerVisibility;
 			set {
@@ -38,11 +35,19 @@ namespace DriveExplorer.ViewModels {
 				}
 			}
 		}
-
-		public MainWindowVM(ILogger logger, MicrosoftManager microsoftManager, GoogleManager googleManager) {
+		public MainWindowVM(ILogger logger = null, MicrosoftManager microsoftManager = null, GoogleManager googleManager = null) {
 			this.logger = logger;
 			this.microsoftManager = microsoftManager;
 			this.googleManager = googleManager;
+			if (this.logger == null) {
+				Console.WriteLine($"{typeof(ILogger)} is not attached to {GetType()}.");
+			}
+			if (this.microsoftManager == null) {
+				Console.WriteLine($"{typeof(MicrosoftManager)} is not attached to {GetType()}.");
+			}
+			if (this.googleManager == null) {
+				Console.WriteLine($"{typeof(GoogleManager)} is not attached to {GetType()}.");
+			}
 		}
 		/// <summary>
 		/// Attach all local drives to <see cref="TreeItemVMs"/>. This method should be called at the startup of application.
@@ -52,7 +57,7 @@ namespace DriveExplorer.ViewModels {
 			try {
 				drivePaths = Directory.GetLogicalDrives();
 			} catch (UnauthorizedAccessException ex) {
-				logger.Log(ex);
+				logger?.Log(ex);
 			}
 			foreach (var drivePath in drivePaths) {
 				var item = new LocalItem(drivePath);
@@ -60,7 +65,6 @@ namespace DriveExplorer.ViewModels {
 				CurrentItemVMs.Add(new ItemVM(item));
 			}
 		}
-
 		public async Task TreeItem_SelectedAsync(object sender, RoutedEventArgs e = null) {
 			var vm = (sender as ItemVM) ??
 				(sender as TreeViewItem).DataContext as ItemVM ??
@@ -68,14 +72,14 @@ namespace DriveExplorer.ViewModels {
 			if (e != null) {
 				e.Handled = true; // avoid recursive calls of treeViewItem.select
 			}
-			SpinnerVisibility = Visibility.Visible;
+			SwitchSpinner();
 			// update list box items, in case there's no items as it hasn't been expanded 
 			await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
 			CurrentItemVMs.Clear();
 			foreach (var itemVM in vm.Children) {
 				CurrentItemVMs.Add(new ItemVM(itemVM.Item, this));
 			}
-			SpinnerVisibility = Visibility.Collapsed;
+			SwitchSpinner();
 		}
 		public async Task CurrentItem_SelectedAsync(object sender, MouseButtonEventArgs e = null) {
 			var vm = (sender as ItemVM) ??
@@ -84,8 +88,7 @@ namespace DriveExplorer.ViewModels {
 			if (!vm.Item.Type.Is(ItemTypes.Folders)) {
 				return;
 			}
-
-			SpinnerVisibility = Visibility.Visible;
+			SwitchSpinner();
 			// expand all treeViewItems
 			var directories = vm.Item.FullPath.Split(Path.DirectorySeparatorChar).Where(s => !string.IsNullOrEmpty(s));
 			var parent = TreeItemVMs;
@@ -97,29 +100,28 @@ namespace DriveExplorer.ViewModels {
 				lastChild = child;
 			}
 			await lastChild.SetIsSelectedAsync(true).ConfigureAwait(true);
-			SpinnerVisibility = Visibility.Collapsed;
+			SwitchSpinner();
 		}
-
 		/// <summary>
 		/// Reset <see cref="TreeItemVMs"/> and <see cref="CurrentItemVMs"/>.
 		/// </summary>
 		public void Reset() {
 			TreeItemVMs.Clear();
 			CurrentItemVMs.Clear();
-			spinnerVisibility = Visibility.Collapsed;
+			SwitchSpinner();
 		}
-
+		private void SwitchSpinner() {
+			SpinnerVisibility = SpinnerVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+		}
 		#region MicrosoftApi
-
 		public async Task LoginOneDriveAsync() {
 			if (microsoftManager == null) {
-				Console.WriteLine("microsoftManager is not attached to mainwindowVM");
 				return;
 			}
-			SpinnerVisibility = Visibility.Visible;
-			var (_, account) = await microsoftManager.GetAccessTokenInteractively().ConfigureAwait(true);
-			await CreateOneDriveAsync(account).ConfigureAwait(false);
-			SpinnerVisibility = Visibility.Collapsed;
+			SwitchSpinner();
+			var result = await microsoftManager.LoginInteractively().ConfigureAwait(true);
+			await CreateOneDriveAsync(result?.Account).ConfigureAwait(false);
+			SwitchSpinner();
 		}
 		/// <summary>
 		/// TODO: not auto login at launch, just retrieve account cache, and login when user want to access the drive
@@ -127,25 +129,24 @@ namespace DriveExplorer.ViewModels {
 		/// <returns></returns>
 		public async Task AutoLoginOneDriveAsync() {
 			if (microsoftManager == null) {
-				Console.WriteLine("microsoftManager is not attached to mainwindowVM");
 				return;
 			}
-			SpinnerVisibility = Visibility.Visible;
-			await foreach (var (_, account) in microsoftManager.GetAllAccessTokenSilently().ConfigureAwait(true)) {
-				await CreateOneDriveAsync(account).ConfigureAwait(true);
+			SwitchSpinner();
+			await foreach (var result in microsoftManager.LoginAllUserSilently().ConfigureAwait(true)) {
+				await CreateOneDriveAsync(result?.Account).ConfigureAwait(true);
 			}
-			SpinnerVisibility = Visibility.Collapsed;
+			SwitchSpinner();
 		}
-		public async Task LogoutOneDriveAsync() {
+		public async Task LogoutOneDriveAsync(ItemVM treeVM) {
+			if (treeVM.Item.Type != ItemTypes.OneDrive) {
+				throw new InvalidOperationException();
+			}
 			if (microsoftManager == null) {
-				Console.WriteLine("microsoftManager is not attached to mainwindowVM");
 				return;
 			}
-			SpinnerVisibility = Visibility.Visible;
-			// TODO: logout specific user
-			var treeVM = TreeItemVMs.FirstOrDefault(vm => vm.Item.Type == ItemTypes.OneDrive);
+			SwitchSpinner();
 			if (treeVM == null) {
-				logger.Log("User has been logged out");
+				logger?.Log("User has been logged out");
 			} else {
 				var item = treeVM.Item as OneDriveItem;
 				if (await microsoftManager.LogoutAsync(item.UserAccount).ConfigureAwait(true)) {
@@ -153,18 +154,17 @@ namespace DriveExplorer.ViewModels {
 					CurrentItemVMs.Remove(CurrentItemVMs.FirstOrDefault(vm => vm == treeVM));
 				}
 			}
-			SpinnerVisibility = Visibility.Collapsed;
+			SwitchSpinner();
 		}
 		private async Task CreateOneDriveAsync(IAccount account) {
 			if (microsoftManager == null) {
-				Console.WriteLine("microsoftManager is not attached to mainwindowVM");
 				return;
 			}
 			if (account is null) {
 				return;
 			}
 			if (TreeItemVMs.Any(vm => vm.Item.Name == account.Username)) {
-				logger.Log("User has already signed in.");
+				logger?.Log("User has already signed in.");
 				return;
 			}
 			var root = await microsoftManager.GetDriveRootAsync(account).ConfigureAwait(true);
@@ -175,16 +175,50 @@ namespace DriveExplorer.ViewModels {
 			TreeItemVMs.Add(new ItemVM(item, this));
 			CurrentItemVMs.Add(new ItemVM(item, this));
 		}
-
 		#endregion
-
 		#region GoogleApi
 		public async Task LoginGoogleDriveAsync() {
-			var about = await googleManager.GetAboutAsync().ConfigureAwait(true);
-			var root = await googleManager.GetDriveRootAsync().ConfigureAwait(true);
-			var item = new GoogleDriveItem(googleManager, about, root);
-			TreeItemVMs.Add(new ItemVM(item));
-			CurrentItemVMs.Add(new ItemVM(item));
+			if (googleManager == null) {
+				return;
+			}
+			SwitchSpinner();
+			var userId = await googleManager.UserLoginAsync().ConfigureAwait(true);
+			await CreateGoogleDrive(userId).ConfigureAwait(true);
+			SwitchSpinner();
+		}
+		public async Task AutoLoginGoogleDriveAsync() {
+			if (googleManager == null) {
+				return;
+			}
+			SwitchSpinner();
+			foreach (var userId in googleManager.LoadAllUserId()) {
+				await googleManager.UserLoginAsync(userId).ConfigureAwait(true);
+				await CreateGoogleDrive(userId).ConfigureAwait(true);
+			}
+			SwitchSpinner();
+		}
+		private async Task CreateGoogleDrive(string userId) {
+			var about = await googleManager.GetAboutAsync(userId).ConfigureAwait(true);
+			if (about == null) {
+				return;
+			}
+			if (TreeItemVMs.Any(vm => vm.Item.Name == about.User.EmailAddress)) {
+				logger?.Log("User has already logged in.");
+				return;
+			}
+			var root = await googleManager.GetDriveRootAsync(userId).ConfigureAwait(true);
+			if (root == null) {
+				return;
+			}
+			var item = new GoogleDriveItem(googleManager, about, root, userId);
+			TreeItemVMs.Add(new ItemVM(item, this));
+			CurrentItemVMs.Add(new ItemVM(item, this));
+		}
+		public void LogoutGoogleDrive(ItemVM itemVM) {
+			if (googleManager == null) {
+				return;
+			}
+			googleManager.UserLogout();
 		}
 		#endregion
 	}

@@ -93,7 +93,7 @@ namespace DriveExplorer.ViewModels {
 			if (haveExpanded) {
 				return;
 			}
-			ShowSpinner();
+			SwitchSpinner();
 			haveExpanded = true;
 			Children.Clear(); // clear dummy item
 			await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
@@ -103,18 +103,15 @@ namespace DriveExplorer.ViewModels {
 				});
 			}
 			Expanded?.Invoke(this, null); // invoke event
-			HideSpinner();
+			SwitchSpinner();
 		}
 
-		private void ShowSpinner() {
-			if (MainWindowVM != null) {
-				MainWindowVM.SpinnerVisibility = Visibility.Visible;
+		private void SwitchSpinner() {
+			if (MainWindowVM == null) {
+				return;
 			}
-		}
-		private void HideSpinner() {
-			if (MainWindowVM != null) {
-				MainWindowVM.SpinnerVisibility = Visibility.Collapsed;
-			}
+			MainWindowVM.SpinnerVisibility = 
+				MainWindowVM.SpinnerVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 		}
 
 		private async Task SelectAsync() {

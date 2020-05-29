@@ -16,19 +16,19 @@ namespace DriveExplorer.Models {
 		public string Name { get; private set; }
 
 		public string FullPath { get; private set; }
-		public User User { get; private set; }
+		public string UserId { get; private set; }
 		public string Id { get; private set; }
 
 		/// <summary>
 		/// Root constructor
 		/// </summary>
-		public GoogleDriveItem(GoogleManager googleManager, About about, File file) {
+		public GoogleDriveItem(GoogleManager googleManager, About about, File file, string userId) {
 			this.googleManager = googleManager;
 			var user = about.User;
 			Type = ItemTypes.GoogleDrive;
-			Name = user.EmailAddress ?? user.DisplayName;
+			Name = user.EmailAddress;
 			FullPath = Name;
-			User = user;
+			UserId = userId;
 			Id = file.Id;
 		}
 		/// <summary>
@@ -41,7 +41,7 @@ namespace DriveExplorer.Models {
 				ItemFactoryHelper.GetFileType(child.Name);
 			Name = child.Name;
 			FullPath = Path.Combine(parent.FullPath, child.Name);
-			User = parent.User;
+			UserId = parent.UserId;
 			Id = child.Id;
 		}
 
@@ -51,7 +51,7 @@ namespace DriveExplorer.Models {
 		}
 
 		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
-			await foreach (var child in googleManager.GetChildrenAsync(Id).ConfigureAwait(false)) {
+			await foreach (var child in googleManager.GetChildrenAsync(UserId, Id).ConfigureAwait(false)) {
 				yield return new GoogleDriveItem(this, child);
 			}
 		}

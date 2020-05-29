@@ -1,6 +1,6 @@
 ﻿using Cyc.GoogleApi;
 using DriveExplorer.Tests;
-
+using Google.Apis.Drive.v3;
 using NUnit.Framework;
 
 using System;
@@ -36,6 +36,12 @@ namespace DriveExplorer.GoogleApi.Tests {
 				Console.WriteLine(child.Name);
 				Assert.NotNull(child);
 			}
+		}
+
+		[Test()]
+		public void OAuthTest() {
+
+
 		}
 	}
 }

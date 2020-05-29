@@ -23,13 +23,16 @@ namespace DriveExplorer.Tests {
 			services.AddSingleton<MainWindowVM>();
 
 			var fullPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, @"GoogleApi\client_secret.json");
-			services.AddSingleton(_ => new GoogleManager(fullPath));
+			services.AddSingleton(sp => new GoogleManager(sp.GetService<ILogger>(), fullPath));
 
 			var serviceProvider = services.BuildServiceProvider();
 			microsoftManager = serviceProvider.GetService<MicrosoftManager>();
 			googleManager = serviceProvider.GetService<GoogleManager>();
 			mainWindowVM = serviceProvider.GetService<MainWindowVM>();
-			(_, account) = microsoftManager.GetAccessTokenWithUsernamePassword().Result;
+			var result = microsoftManager.LoginWithUsernamePassword().Result;
+			account = result.Account;
+
+			// TODO: login google accounts
 		}
 		public IEnumerator GetEnumerator() {
 			yield return new object[] { new object[] { microsoftManager, account, googleManager, mainWindowVM } };

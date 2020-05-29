@@ -23,6 +23,8 @@
 					<Style TargetType="TreeViewItem">
 						<EventSetter Event="Selected"
 									 Handler="TreeViewItem_Selected" />
+						<EventSetter Event="MouseDown"
+									 Handler="TreeViewItem_MouseDown" />
 						<Setter Property="IsExpanded"
 								Value="{Binding IsExpanded, Mode=TwoWay}" />
 						<Setter Property="IsSelected"
@@ -66,10 +68,6 @@
 					Click="LoginOneDriveButton_Click"
 					Grid.Column="1"
 					Margin="462,373,10,10" />
-			<Button Content="Logout OneDrive"
-					Click="LogoutOneDriveButton_Click"
-					Grid.Column="1"
-					Margin="10.333,374,461.333,9.667" />
 			<Button Content="Login GoogleDrive"
 					Click="LoginGoogleDriveButton_Click"
 					Grid.Column="1"
