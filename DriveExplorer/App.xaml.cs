@@ -1,4 +1,5 @@
 ﻿using Cyc.GoogleApi;
+using Cyc.MicrosoftApi;
 using Cyc.Standard;
 
 using DriveExplorer.ViewModels;
@@ -28,7 +29,7 @@ namespace DriveExplorer {
 		private void ConfigureServices(ServiceCollection services) {
 			services.AddSingleton<ILogger, MessageBoxLogger>();
 			services.AddSingleton<GoogleManager>();
-			//services.AddSingleton<MicrosoftManager>();
+			services.AddSingleton<MicrosoftManager>();
 			services.AddSingleton<MainWindowVM>();
 			services.AddSingleton<MainWindow>();
 		}

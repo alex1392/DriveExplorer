@@ -29,24 +29,22 @@ namespace DriveExplorer.Models {
 			FullPath = account.Username;
 			UserAccount = account;
 		}
-		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
-			await foreach (var item in microsoftManager.GetChildrenAsync(Id, UserAccount).ConfigureAwait(false)) {
-				yield return GetChild(item, this);
-			}
+		/// <summary>
+		/// Constructor of child
+		/// </summary>
+		private OneDriveItem(DriveItem driveItem, OneDriveItem parent) {
+			microsoftManager = parent.microsoftManager;
+			Id = driveItem.Id;
+			Name = driveItem.Name;
+			Type = IsFolder(driveItem) ? ItemTypes.Folder : ItemFactoryHelper.GetFileType(driveItem.Name);
+			FullPath = Path.Combine(parent.FullPath, driveItem.Name);
+			UserAccount = parent.UserAccount;
 		}
 
-		private OneDriveItem(MicrosoftManager microsoftManager) {
-			this.microsoftManager = microsoftManager;
-		}
-		private OneDriveItem GetChild(DriveItem driveItem, OneDriveItem parent) {
-			return new OneDriveItem(parent.microsoftManager)
-			{
-				Id = driveItem.Id,
-				Name = driveItem.Name,
-				Type = IsFolder(driveItem) ? ItemTypes.Folder : ItemFactoryHelper.GetFileType(driveItem.Name),
-				FullPath = Path.Combine(parent.FullPath, driveItem.Name),
-				UserAccount = parent.UserAccount
-			};
+		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
+			await foreach (var item in microsoftManager.GetChildrenAsync(UserAccount, Id).ConfigureAwait(false)) {
+				yield return new OneDriveItem(item, this);
+			}
 		}
 
 		private static bool IsFolder(DriveItem driveItem) {

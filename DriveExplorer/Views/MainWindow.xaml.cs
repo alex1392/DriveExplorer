@@ -24,6 +24,7 @@ namespace DriveExplorer.Views {
 		}
 
 		private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
+			vm.SetupLocalRoot();
 			vm.GetLocalDrives();
 			await vm.AutoLoginOneDriveAsync().ConfigureAwait(false);
 			await vm.AutoLoginGoogleDriveAsync().ConfigureAwait(false);

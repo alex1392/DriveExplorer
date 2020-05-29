@@ -41,7 +41,7 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 		[Test()]
 		public async Task GetChildrenTestAsync() {
 			var root = await microsoftManager.GetDriveRootAsync(account).ConfigureAwait(false);
-			await foreach (var child in microsoftManager.GetChildrenAsync(root.Id, account).ConfigureAwait(false)) {
+			await foreach (var child in microsoftManager.GetChildrenAsync(account, root.Id).ConfigureAwait(false)) {
 				Console.WriteLine(child.Name);
 				Assert.NotNull(child);
 			}
