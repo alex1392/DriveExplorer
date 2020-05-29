@@ -71,7 +71,7 @@ namespace DriveExplorer.ViewModels.Tests {
 			Assert.That(mainWindowVM.CurrentItemVMs.Count == 0);
 		}
 
-		[Test()]
+		[Ignore("This requires user interaction")]
 		public async Task LoginGoogleDriveAsyncTestAsync() {
 			await mainWindowVM.LoginGoogleDriveAsync().ConfigureAwait(false);
 			Assert.True(mainWindowVM.TreeItemVMs.Count > 0);

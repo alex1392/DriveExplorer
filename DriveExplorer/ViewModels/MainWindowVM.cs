@@ -181,10 +181,10 @@ namespace DriveExplorer.ViewModels {
 			if (googleManager == null) {
 				return;
 			}
-			SwitchSpinner();
+			//SwitchSpinner(); // dot not show spinner, let the task expired automatically
 			var userId = await googleManager.UserLoginAsync().ConfigureAwait(true);
 			await CreateGoogleDrive(userId).ConfigureAwait(true);
-			SwitchSpinner();
+			//SwitchSpinner();
 		}
 		public async Task AutoLoginGoogleDriveAsync() {
 			if (googleManager == null) {

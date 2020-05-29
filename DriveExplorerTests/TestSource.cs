@@ -3,7 +3,9 @@ using Cyc.MicrosoftApi;
 using Cyc.Standard;
 
 using DriveExplorer.ViewModels;
+
 using Google.Apis.Auth.OAuth2;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 
@@ -27,9 +29,9 @@ namespace DriveExplorer.Tests {
 			services.AddSingleton<MainWindowVM>();
 
 			var fullPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, @"GoogleApi\client_secret.json");
-			services.AddSingleton(sp => 
-				new GoogleManager(sp.GetService<ILogger>(), 
-					fullPath, 
+			services.AddSingleton(sp =>
+				new GoogleManager(sp.GetService<ILogger>(),
+					fullPath,
 					dataStorePath: Path.Combine(GoogleWebAuthorizationBroker.Folder, "Test")));
 
 			var serviceProvider = services.BuildServiceProvider();

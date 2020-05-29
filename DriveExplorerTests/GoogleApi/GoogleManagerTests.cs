@@ -48,7 +48,7 @@ namespace DriveExplorer.GoogleApi.Tests {
 			Assert.AreEqual(userId, newUserId);
 		}
 
-		[Test()]
+		[Ignore("This will change the test cache")]
 		public async Task UserLogoutAsyncTestAsync() {
 			await googleManager.UserLogoutAsync(userId).ConfigureAwait(false);
 			Assert.IsFalse(googleManager.HasUser(userId));
