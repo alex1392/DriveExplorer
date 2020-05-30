@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -14,9 +15,9 @@ namespace DriveExplorer.ViewModels {
 		private bool isExpanded;
 		private bool haveExpanded = false;
 		private bool isSelected;
-		private readonly string localRootPath;
-		private readonly string localFullPath;
 
+		public string cacheRootPath { get; }
+		public string cacheFullPath { get; }
 		/// <summary>
 		/// Change the state of expansion and invoke <see cref="ExpandAsync"/> without await. To expand item programmically, call <see cref="SetIsExpandedAsync(bool)"/> instead.
 		/// </summary>
@@ -70,29 +71,31 @@ namespace DriveExplorer.ViewModels {
 		/// <summary>
 		/// Root Constructor
 		/// </summary>
-		public ItemVM(IItem item, string localRootPath) {
+		public ItemVM(IItem item, string localRootPath = null) {
 			if (!item.Type.Is(ItemTypes.Drives)) {
 				throw new TypeInitializationException(nameof(ItemVM), null);
 			}
 			Item = item;
-			this.localRootPath = localRootPath;
-			localFullPath = Path.Combine(localRootPath, Item.FullPath);
-
-			if (!Directory.Exists(localFullPath)) {
-				Directory.CreateDirectory(localFullPath);
-			}
+			this.cacheRootPath = localRootPath;
+			cacheFullPath = Path.Combine(localRootPath, Item.FullPath);
+			CacheFolder();
 		}
 		/// <summary>
 		/// Child constructor
 		/// </summary>
 		public ItemVM(IItem item, ItemVM parent) {
 			Item = item;
-			localRootPath = parent.localRootPath;
-			localFullPath = Path.Combine(localRootPath, Item.FullPath);
+			cacheRootPath = parent.cacheRootPath;
+			cacheFullPath = Path.Combine(cacheRootPath, Item.FullPath);
 			// inherit parent's events
 			BeforeExpand += parent.BeforeExpand;
 			Expanded += parent.Expanded;
+
+			if (Item.Type.Is(ItemTypes.Folders)) {
+				CacheFolder();
+			}
 		}
+
 
 		/// <summary>
 		/// Set <see cref="IsExpanded"/> asynchronizly.
@@ -121,6 +124,14 @@ namespace DriveExplorer.ViewModels {
 				Item = Item,
 			};
 		}
+		private void CacheFolder() {
+			if (cacheRootPath == null) {
+				return;
+			}
+			if (!Directory.Exists(cacheFullPath)) {
+				Directory.CreateDirectory(cacheFullPath);
+			}
+		}
 		private async Task ExpandAsync() {
 			if (!Item.Type.Is(ItemTypes.Folders)) {
 				return;
@@ -135,6 +146,10 @@ namespace DriveExplorer.ViewModels {
 			await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
 				Children.Add(new ItemVM(item, this));
 			}
+			Directory.GetDirectories(cacheFullPath)
+				.Where(path => !Children.Any(vm => vm.cacheFullPath == path))
+				.ToList()
+				.ForEach(path => Directory.Delete(path, recursive: true));
 			Expanded?.Invoke(this, null);
 		}
 
