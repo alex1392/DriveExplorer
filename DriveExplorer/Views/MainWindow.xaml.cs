@@ -1,4 +1,5 @@
 ﻿
+using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
 
 using System;
@@ -24,10 +25,7 @@ namespace DriveExplorer.Views {
 		}
 
 		private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
-			vm.SetupLocalRoot();
-			vm.GetLocalDrives();
-			await vm.AutoLoginOneDriveAsync().ConfigureAwait(false);
-			await vm.AutoLoginGoogleDriveAsync().ConfigureAwait(false);
+			await vm.InitializeAsync().ConfigureAwait(false);
 		}
 
 		private async void TreeViewItem_Selected(object sender, RoutedEventArgs e) {
@@ -53,11 +51,11 @@ namespace DriveExplorer.Views {
 			}
 			if (e.RightButton == MouseButtonState.Pressed) {
 				switch (itemVM.Item.Type) {
-					case Models.ItemTypes.OneDrive:
-						await vm.LogoutOneDriveAsync(itemVM).ConfigureAwait(false);
+					case ItemTypes.OneDrive:
+						await vm.LogoutOneDriveAsync(itemVM.Item).ConfigureAwait(false);
 						break;
-					case Models.ItemTypes.GoogleDrive:
-						vm.LogoutGoogleDriveAsync(itemVM);
+					case ItemTypes.GoogleDrive:
+						vm.LogoutGoogleDriveAsync(itemVM.Item);
 						break;
 				}
 			}

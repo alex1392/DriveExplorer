@@ -184,11 +184,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\DriveManager.cs" />
     <Compile Include="Models\GoogleDriveItem.cs" />
+    <Compile Include="Models\GoogleDriveManager.cs" />
+    <Compile Include="Models\LocalDriveManager.cs" />
+    <Compile Include="Models\OneDriveManager.cs" />
     <Compile Include="Views\MessageBoxLogger.cs" />
     <Compile Include="Views\Converters\DebugConverter.cs" />
     <Compile Include="Models\IItem.cs" />
-    <Compile Include="Models\ItemFactoryHelper.cs" />
+    <Compile Include="Models\ItemFactoryBase.cs" />
     <Compile Include="Models\ItemTypes.cs" />
     <Compile Include="ViewModels\ItemVM.cs" />
     <Compile Include="Models\LocalItem.cs" />

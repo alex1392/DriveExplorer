@@ -17,12 +17,19 @@ namespace DriveExplorer.ViewModels {
 		private bool haveExpanded = false;
 		private bool isSelected;
 
-		public string cacheRootPath { get; }
-		public string cacheFullPath { get; }
 		public bool IsCached {
 			get {
 				// check if cache file exist, and the last modified date and file size is matched
-				return Directory.Exists(cacheFullPath);
+				if (Item.Type.Is(ItemTypes.Folders)) {
+					return Directory.Exists(CacheFullPath);
+				} else if (Item.Type.Is(ItemTypes.Files)) {
+					var info = new FileInfo(CacheFullPath);
+					return info.Exists && 
+						info.Length == Item.Size && 
+						info.LastWriteTimeUtc == Item.LastModifiedTime;
+				} else {
+					throw new InvalidOperationException();
+				}
 			}
 		}
 
@@ -60,11 +67,16 @@ namespace DriveExplorer.ViewModels {
 		/// Optional property Injection
 		/// </summary>
 		public IItem Item { get; private set; }
-
+		public ItemVM Parent { get; }
 		public ObservableCollection<ItemVM> Children { get; private set; } = new ObservableCollection<ItemVM>
 		{
 			null // add dummyItem for the expansion indicator
         };
+
+		public string CacheFullPath { get; private set; }
+
+		public string CacheRootPath { get; private set; }
+		public ItemVM LinkedVM { get; private set; }
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		public event EventHandler BeforeExpand;
@@ -79,22 +91,25 @@ namespace DriveExplorer.ViewModels {
 		/// <summary>
 		/// Root Constructor
 		/// </summary>
-		public ItemVM(IItem item, string localRootPath = null) {
+		public ItemVM(IItem item, string localRootPath = null)
+		{
 			if (!item.Type.Is(ItemTypes.Drives)) {
 				throw new TypeInitializationException(nameof(ItemVM), null);
 			}
 			Item = item;
-			this.cacheRootPath = localRootPath;
-			cacheFullPath = Path.Combine(localRootPath, Item.FullPath);
+			CacheRootPath = localRootPath;
+			CacheFullPath = Path.Combine(CacheRootPath, Item.Type.ToString(), Item.FullPath);
 			CacheFolder();
 		}
 		/// <summary>
 		/// Child constructor
 		/// </summary>
-		public ItemVM(IItem item, ItemVM parent) {
+		public ItemVM(IItem item, ItemVM parent)
+		{
 			Item = item;
-			cacheRootPath = parent.cacheRootPath;
-			cacheFullPath = Path.Combine(cacheRootPath, Item.FullPath);
+			Parent = parent;
+			CacheRootPath = parent.CacheRootPath;
+			CacheFullPath = Path.Combine(parent.CacheFullPath, Item.Name);
 			// inherit parent's events
 			BeforeExpand += parent.BeforeExpand;
 			Expanded += parent.Expanded;
@@ -108,7 +123,8 @@ namespace DriveExplorer.ViewModels {
 		/// <summary>
 		/// Set <see cref="IsExpanded"/> asynchronizly.
 		/// </summary>
-		public async Task SetIsExpandedAsync(bool value) {
+		public async Task SetIsExpandedAsync(bool value)
+		{
 			if (value != isExpanded) {
 				isExpanded = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsExpanded)));
@@ -118,7 +134,8 @@ namespace DriveExplorer.ViewModels {
 		/// <summary>
 		/// Set <see cref="IsSelected"/> asynchronizly
 		/// </summary>
-		public async Task SetIsSelectedAsync(bool value) {
+		public async Task SetIsSelectedAsync(bool value)
+		{
 			if (value != isSelected) {
 				isSelected = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
@@ -126,21 +143,18 @@ namespace DriveExplorer.ViewModels {
 			await SelectAsync().ConfigureAwait(false);
 		}
 
-		public ItemVM Clone() {
+		public ItemVM Clone()
+		{
 			return new ItemVM
 			{
 				Item = Item,
+				CacheFullPath = CacheFullPath,
+				CacheRootPath = CacheRootPath,
+				LinkedVM = this,
 			};
 		}
-		private void CacheFolder() {
-			if (cacheRootPath == null) {
-				return;
-			}
-			if (!Directory.Exists(cacheFullPath)) {
-				Directory.CreateDirectory(cacheFullPath);
-			}
-		}
-		private async Task ExpandAsync() {
+		private async Task ExpandAsync()
+		{
 			if (!Item.Type.Is(ItemTypes.Folders)) {
 				return;
 			}
@@ -152,55 +166,65 @@ namespace DriveExplorer.ViewModels {
 			await DoExpand();
 			Expanded?.Invoke(this, null);
 
-			async Task DoExpand() {
+			async Task DoExpand()
+			{
 				haveExpanded = true;
 				Children.Clear(); // clear dummy item
 				await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
 					Children.Add(new ItemVM(item, this));
 				}
-				Directory.GetDirectories(cacheFullPath)
-					.Where(path => !Children.Any(vm => vm.cacheFullPath == path))
+				Directory.GetDirectories(CacheFullPath)
+					.Where(path => !Children.Any(vm => vm.CacheFullPath == path))
 					.ToList()
 					.ForEach(path => Directory.Delete(path, recursive: true));
 			}
 		}
 
-		private void Cache() {
-			throw new NotImplementedException();
-		}
-
-		private async Task SelectAsync() {
+		private async Task SelectAsync()
+		{
 			BeforeSelect?.Invoke(this, null);
 
-			// check if the file has been cached
-			if (!IsCached) {
-				// download the file to cache
-				Cache();
-			}
-			// open the cached file with default application
-			Process.Start(cacheFullPath);
 			
+
 			Selected?.Invoke(this, null);
+		}
+		private void CacheFolder()
+		{
+			if (CacheRootPath == null) {
+				return;
+			}
+			if (!IsCached) {
+				Directory.CreateDirectory(CacheFullPath);
+			}
+		}
+
+		public async Task CacheFileAsync()
+		{
+			await Item.DownloadAsync(CacheFullPath).ConfigureAwait(false);
 		}
 
 		#region Overrides, Implementations
 
-		public override string ToString() {
+		public override string ToString()
+		{
 			return $"{Item.Name}, Items: {Children.Count}";
 		}
 
-		public override bool Equals(object obj) {
+		public override bool Equals(object obj)
+		{
 			return Equals(obj as ItemVM);
 		}
 
-		public bool Equals(ItemVM other) {
+		public bool Equals(ItemVM other)
+		{
 			return other != null &&
 				Item.Name == other.Item.Name &&
 				Item.Type == other.Item.Type &&
 				Item.FullPath == other.Item.FullPath;
 		}
 
-		public override int GetHashCode() {
+		public override int GetHashCode()
+		{
 			var hashCode = 424228742;
 			hashCode = hashCode * -1521134295 + isExpanded.GetHashCode();
 			hashCode = hashCode * -1521134295 + haveExpanded.GetHashCode();
@@ -211,11 +235,13 @@ namespace DriveExplorer.ViewModels {
 		}
 
 
-		public static bool operator ==(ItemVM left, ItemVM right) {
+		public static bool operator ==(ItemVM left, ItemVM right)
+		{
 			return EqualityComparer<ItemVM>.Default.Equals(left, right);
 		}
 
-		public static bool operator !=(ItemVM left, ItemVM right) {
+		public static bool operator !=(ItemVM left, ItemVM right)
+		{
 			return !(left == right);
 		}
 		#endregion

@@ -3,7 +3,7 @@
 using Path = System.IO.Path;
 
 namespace DriveExplorer.Models {
-	public static class ItemFactoryHelper {
+	public abstract class ItemFactoryBase {
 		private static readonly Dictionary<string, ItemTypes> FileTypesMap = new Dictionary<string, ItemTypes>
 		{
 			{".jpg" , ItemTypes.IMG},
@@ -30,5 +30,8 @@ namespace DriveExplorer.Models {
 			return ItemTypes.File;
 		}
 
+		public abstract IItem CreateRoot(params object[] parameters);
+		public abstract IItem CreateFolder(params object[] parameters);
+		public abstract IItem CreateFile(params object[] parameters);
 	}
 }

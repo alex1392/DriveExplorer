@@ -1,64 +1,88 @@
 ﻿using Cyc.GoogleApi;
-
+using Google.Apis.Download;
 using Google.Apis.Drive.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
 using File = Google.Apis.Drive.v3.Data.File;
-
 namespace DriveExplorer.Models {
 	public class GoogleDriveItem : IItem {
-		private readonly GoogleManager googleManager;
-
+		public class Factory : ItemFactoryBase {
+			public override IItem CreateRoot(params object[] parameters) {
+				var googleApiManager = (GoogleApiManager)parameters[0];
+				var about = (About)parameters[1];
+				var driveItem = (File)parameters[2];
+				var userId = (string)parameters[3];
+				var user = about.User;
+				var item = new GoogleDriveItem(googleApiManager, this, driveItem)
+				{
+					Type = ItemTypes.GoogleDrive,
+					Name = user.EmailAddress,
+					FullPath = user.EmailAddress,
+					UserId = userId,
+				};
+				return item;
+			}
+			public override IItem CreateFile(params object[] parameters) {
+				var parent = (GoogleDriveItem)parameters[0];
+				var driveItem = (File)parameters[1];
+				var item = new GoogleDriveItem(parent.googleApiManager, this, driveItem)
+				{
+					Type = GetFileType(driveItem.Name),
+					Name = driveItem.Name,
+					FullPath = Path.Combine(parent.FullPath, driveItem.Name),
+					UserId = parent.UserId,
+				};
+				return item;
+			}
+			public override IItem CreateFolder(params object[] parameters) {
+				var parent = (GoogleDriveItem)parameters[0];
+				var driveItem = (File)parameters[1];
+				var item = new GoogleDriveItem(parent.googleApiManager, this, driveItem)
+				{
+					Type = ItemTypes.Folder,
+					Name = driveItem.Name,
+					FullPath = Path.Combine(parent.FullPath, driveItem.Name),
+					UserId = parent.UserId,
+				};
+				return item;
+			}
+		}
+		private readonly GoogleApiManager googleApiManager;
+		private readonly Factory factory;
 		public ItemTypes Type { get; private set; }
-
 		public string Name { get; private set; }
-
 		public string FullPath { get; private set; }
 		public string UserId { get; private set; }
 		public string Id { get; private set; }
-
-		public long Size { get; private set; }
-
-		public DateTime LastModifiedDate { get; private set; }
-
-		/// <summary>
-		/// Root constructor
-		/// </summary>
-		public GoogleDriveItem(GoogleManager googleManager, About about, File file, string userId) {
-			this.googleManager = googleManager;
-			var user = about.User;
-			Type = ItemTypes.GoogleDrive;
-			Name = user.EmailAddress;
-			FullPath = Name;
-			UserId = userId;
-			Id = file.Id;
+		public long? Size { get; private set; }
+		public DateTimeOffset? LastModifiedTime { get; private set; }
+		public GoogleDriveItem(GoogleApiManager googleApiManager, Factory factory, File driveItem) {
+			this.googleApiManager = googleApiManager;
+			this.factory = factory;
+			Id = driveItem.Id;
+			Size = driveItem.Size;
+			LastModifiedTime = driveItem.ModifiedTime;
 		}
-		/// <summary>
-		/// Child constructor
-		/// </summary>
-		private GoogleDriveItem(GoogleDriveItem parent, File child) {
-			googleManager = parent.googleManager;
-			Type = IsFolder(child) ?
-				ItemTypes.Folder :
-				ItemFactoryHelper.GetFileType(child.Name);
-			Name = child.Name;
-			FullPath = Path.Combine(parent.FullPath, child.Name);
-			UserId = parent.UserId;
-			Id = child.Id;
-		}
-
+		
 		private bool IsFolder(File child) {
 			// application/vnd.google-apps.folder
 			return child.MimeType.Contains("folder");
 		}
-
 		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
-			await foreach (var child in googleManager.GetChildrenAsync(UserId, Id).ConfigureAwait(false)) {
-				yield return new GoogleDriveItem(this, child);
+			await foreach (var child in googleApiManager.GetChildrenAsync(UserId, Id).ConfigureAwait(false)) {
+				if (IsFolder(child)) {
+					yield return factory.CreateFolder(this, child);
+				} else {
+					yield return factory.CreateFile(this, child);
+				}
 			}
+		}
+
+		public async Task DownloadAsync(string localPath)
+		{
+			await googleApiManager.DownloadAsync(UserId, Id, localPath).ConfigureAwait(false);
 		}
 	}
 }
