@@ -1,7 +1,7 @@
 ﻿using Cyc.GoogleApi;
 
 using Google.Apis.Drive.v3.Data;
-
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -19,6 +19,10 @@ namespace DriveExplorer.Models {
 		public string FullPath { get; private set; }
 		public string UserId { get; private set; }
 		public string Id { get; private set; }
+
+		public long Size { get; private set; }
+
+		public DateTime LastModifiedDate { get; private set; }
 
 		/// <summary>
 		/// Root constructor

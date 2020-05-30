@@ -3,7 +3,7 @@ using Cyc.MicrosoftApi;
 
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
-
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -18,9 +18,11 @@ namespace DriveExplorer.Models {
 		public string Id { get; private set; }
 		public IAccount UserAccount { get; private set; }
 
-		/// <summary>
-		/// Constructor of root item
-		/// </summary>
+		public long Size { get; private set; }
+
+		public DateTime LastModifiedDate { get; private set; }
+
+		
 		public OneDriveItem(MicrosoftManager microsoftManager, DriveItem driveItem, IAccount account) {
 			this.microsoftManager = microsoftManager;
 			Id = driveItem.Id;
@@ -29,9 +31,7 @@ namespace DriveExplorer.Models {
 			FullPath = account.Username;
 			UserAccount = account;
 		}
-		/// <summary>
-		/// Constructor of child
-		/// </summary>
+		
 		private OneDriveItem(DriveItem driveItem, OneDriveItem parent) {
 			microsoftManager = parent.microsoftManager;
 			Id = driveItem.Id;
@@ -40,6 +40,8 @@ namespace DriveExplorer.Models {
 			FullPath = Path.Combine(parent.FullPath, driveItem.Name);
 			UserAccount = parent.UserAccount;
 		}
+
+		
 
 		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
 			await foreach (var item in microsoftManager.GetChildrenAsync(UserAccount, Id).ConfigureAwait(false)) {

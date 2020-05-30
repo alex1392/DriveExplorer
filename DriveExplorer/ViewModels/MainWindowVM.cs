@@ -9,6 +9,7 @@ using Microsoft.Identity.Client;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +49,7 @@ namespace DriveExplorer.ViewModels {
 			if (this.microsoftManager == null) {
 				Console.WriteLine($"{typeof(MicrosoftManager)} is not attached to {this.GetType()}.");
 			} else {
-				this.microsoftManager.BeforeTaskExecute += (_,_) => ShowSpinner();
+				this.microsoftManager.BeforeTaskExecute += (_, _) => ShowSpinner();
 				this.microsoftManager.TaskExecuted += (_, _) => HideSpinner();
 			}
 			if (this.googleManager == null) {
@@ -70,18 +71,6 @@ namespace DriveExplorer.ViewModels {
 		/// <summary>
 		/// Attach all local drives to <see cref="TreeItemVMs"/>. This method should be called at the startup of application.
 		/// </summary>
-		public void GetLocalDrives() {
-			string[] drivePaths = null;
-			try {
-				drivePaths = Directory.GetLogicalDrives();
-			} catch (UnauthorizedAccessException ex) {
-				logger?.Log(ex);
-			}
-			foreach (var drivePath in drivePaths) {
-				var item = new LocalItem(drivePath);
-				AddTreeItemVM(item);
-			}
-		}
 		public async Task TreeItemSelectedAsync(object sender, RoutedEventArgs e = null) {
 			var itemVM = (sender as ItemVM) ??
 				(sender as TreeViewItem).DataContext as ItemVM ??
@@ -101,11 +90,11 @@ namespace DriveExplorer.ViewModels {
 				(sender as ListBoxItem).DataContext as ItemVM ??
 				throw new ArgumentException("invalid sender");
 			if (vm.Item.Type.Is(ItemTypes.Folders)) {
-				await CurrentItemFolderSelectedAsync(vm);
+				await CurrentItemFolderSelectedAsync(vm).ConfigureAwait(false);
 			} else if (vm.Item.Type.Is(ItemTypes.Files)) {
-
+				CurrentItemFileSelected(vm);
 			} else {
-				
+				throw new InvalidOperationException();
 			}
 		}
 
@@ -117,21 +106,20 @@ namespace DriveExplorer.ViewModels {
 			CurrentItemVMs.Clear();
 		}
 		private void CurrentItemFileSelected(ItemVM vm) {
-			// check if the file has been cached
-
-			// if true, open the cached file with default application
-
-			// if false, download the file to cache
-
+			
 		}
 
 		private async Task CurrentItemFolderSelectedAsync(ItemVM vm) {
 			// expand all treeViewItems
-			var directories = vm.Item.FullPath.Split(Path.DirectorySeparatorChar).Where(s => !string.IsNullOrEmpty(s));
+			var directories = vm.Item.FullPath
+				.Split(Path.DirectorySeparatorChar)
+				.Where(s => !string.IsNullOrEmpty(s));
 			var parent = TreeItemVMs;
 			ItemVM lastChild = null;
 			foreach (var dir in directories) {
-				var child = parent.FirstOrDefault(vm => vm.Item.Name == Uri.UnescapeDataString(dir)) ?? throw new Exception("Cannot find folder to expand");
+				var child = parent
+					.FirstOrDefault(vm => vm.Item.Name == Uri.UnescapeDataString(dir)) 
+					?? throw new Exception("Cannot find folder to expand");
 				await child.SetIsExpandedAsync(true).ConfigureAwait(true);
 				parent = child.Children;
 				lastChild = child;
@@ -152,6 +140,19 @@ namespace DriveExplorer.ViewModels {
 			itemVM.BeforeExpand += (_, _) => ShowSpinner();
 			itemVM.Expanded += (_, _) => HideSpinner();
 			TreeItemVMs.Add(itemVM);
+		}
+
+		public void GetLocalDrives() {
+			string[] drivePaths = null;
+			try {
+				drivePaths = Directory.GetLogicalDrives();
+			} catch (UnauthorizedAccessException ex) {
+				logger?.Log(ex);
+			}
+			foreach (var drivePath in drivePaths) {
+				var item = LocalItem.CreateRoot(drivePath);
+				AddTreeItemVM(item);
+			}
 		}
 
 		#region MicrosoftApi
@@ -209,7 +210,6 @@ namespace DriveExplorer.ViewModels {
 			AddTreeItemVM(item);
 		}
 
-		
 		#endregion
 
 		#region GoogleApi
@@ -231,6 +231,17 @@ namespace DriveExplorer.ViewModels {
 				await CreateGoogleDrive(userId).ConfigureAwait(true);
 			}
 		}
+		public async Task LogoutGoogleDriveAsync(ItemVM treeVM) {
+			if (googleManager == null) {
+				return;
+			}
+			if (!(treeVM.Item is GoogleDriveItem googleDriveItem)) {
+				return;
+			}
+			if (await googleManager.UserLogoutAsync(googleDriveItem.UserId).ConfigureAwait(true)) {
+				TreeItemVMs.Remove(treeVM);
+			}
+		}
 		private async Task CreateGoogleDrive(string userId) {
 			var about = await googleManager.GetAboutAsync(userId).ConfigureAwait(true);
 			if (about == null) {
@@ -246,17 +257,6 @@ namespace DriveExplorer.ViewModels {
 			}
 			var item = new GoogleDriveItem(googleManager, about, root, userId);
 			AddTreeItemVM(item);
-		}
-		public async Task LogoutGoogleDriveAsync(ItemVM treeVM) {
-			if (googleManager == null) {
-				return;
-			}
-			if (!(treeVM.Item is GoogleDriveItem googleDriveItem)) {
-				return;
-			}
-			if (await googleManager.UserLogoutAsync(googleDriveItem.UserId).ConfigureAwait(true)) {
-				TreeItemVMs.Remove(treeVM);
-			}
 		}
 		#endregion
 	}

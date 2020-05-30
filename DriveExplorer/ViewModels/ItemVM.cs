@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,13 @@ namespace DriveExplorer.ViewModels {
 
 		public string cacheRootPath { get; }
 		public string cacheFullPath { get; }
+		public bool IsCached {
+			get {
+				// check if cache file exist, and the last modified date and file size is matched
+				return Directory.Exists(cacheFullPath);
+			}
+		}
+
 		/// <summary>
 		/// Change the state of expansion and invoke <see cref="ExpandAsync"/> without await. To expand item programmically, call <see cref="SetIsExpandedAsync(bool)"/> instead.
 		/// </summary>
@@ -141,21 +149,37 @@ namespace DriveExplorer.ViewModels {
 				return;
 			}
 			BeforeExpand?.Invoke(this, null);
-			haveExpanded = true;
-			Children.Clear(); // clear dummy item
-			await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
-				Children.Add(new ItemVM(item, this));
-			}
-			Directory.GetDirectories(cacheFullPath)
-				.Where(path => !Children.Any(vm => vm.cacheFullPath == path))
-				.ToList()
-				.ForEach(path => Directory.Delete(path, recursive: true));
+			await DoExpand();
 			Expanded?.Invoke(this, null);
+
+			async Task DoExpand() {
+				haveExpanded = true;
+				Children.Clear(); // clear dummy item
+				await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
+					Children.Add(new ItemVM(item, this));
+				}
+				Directory.GetDirectories(cacheFullPath)
+					.Where(path => !Children.Any(vm => vm.cacheFullPath == path))
+					.ToList()
+					.ForEach(path => Directory.Delete(path, recursive: true));
+			}
+		}
+
+		private void Cache() {
+			throw new NotImplementedException();
 		}
 
 		private async Task SelectAsync() {
 			BeforeSelect?.Invoke(this, null);
 
+			// check if the file has been cached
+			if (!IsCached) {
+				// download the file to cache
+				Cache();
+			}
+			// open the cached file with default application
+			Process.Start(cacheFullPath);
+			
 			Selected?.Invoke(this, null);
 		}
 
