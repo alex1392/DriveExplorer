@@ -161,7 +161,17 @@ namespace DriveExplorer.ViewModels {
 					await vm.CacheFileAsync().ConfigureAwait(false);
 				}
 				// open the cached file with default application
-				Process.Start(vm.CacheFullPath);
+				try {
+					new Process
+					{
+						StartInfo = new ProcessStartInfo(vm.CacheFullPath)
+						{
+							UseShellExecute = true,
+						}
+					}.Start();
+				} catch (Win32Exception ex) {
+					logger.Log(ex);
+				}
 			}
 		}
 
@@ -173,9 +183,10 @@ namespace DriveExplorer.ViewModels {
 				.Where(s => !string.IsNullOrEmpty(s));
 			var treeVM = vm.LinkedVM;
 			while (treeVM != null) {
-				await treeVM.SetIsSelectedAsync(true).ConfigureAwait(true);
+				await treeVM.SetIsExpandedAsync(true).ConfigureAwait(true);
 				treeVM = treeVM.Parent;
 			}
+			await vm.LinkedVM.SetIsSelectedAsync(true).ConfigureAwait(true);
 		}
 
 		private void ShowSpinner()

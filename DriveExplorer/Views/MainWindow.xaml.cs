@@ -55,7 +55,7 @@ namespace DriveExplorer.Views {
 						await vm.LogoutOneDriveAsync(itemVM.Item).ConfigureAwait(false);
 						break;
 					case ItemTypes.GoogleDrive:
-						vm.LogoutGoogleDriveAsync(itemVM.Item);
+						await vm.LogoutGoogleDriveAsync(itemVM.Item).ConfigureAwait(false);
 						break;
 				}
 			}

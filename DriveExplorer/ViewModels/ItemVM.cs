@@ -201,6 +201,8 @@ namespace DriveExplorer.ViewModels {
 		public async Task CacheFileAsync()
 		{
 			await Item.DownloadAsync(CacheFullPath).ConfigureAwait(false);
+			// set file info
+			File.SetLastWriteTimeUtc(CacheFullPath, Item.LastModifiedTime.Value.LocalDateTime);
 		}
 
 		#region Overrides, Implementations
