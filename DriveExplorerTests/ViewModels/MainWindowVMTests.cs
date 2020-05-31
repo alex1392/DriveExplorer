@@ -13,7 +13,7 @@ namespace DriveExplorer.ViewModels.Tests {
 	[TestFixtureSource(typeof(TestSource))]
 	public class MainWindowVMTests {
 		private readonly MainWindowVM mainWindowVM;
-		private ObservableCollection<ItemVM> treeItemVMs;
+		private ObservableCollection<ItemVM> treeItemVMs = new ObservableCollection<ItemVM>();
 
 		public MainWindowVMTests(object[] param)
 		{
@@ -23,7 +23,9 @@ namespace DriveExplorer.ViewModels.Tests {
 		public async Task OneTimeSetupAsync()
 		{
 			await mainWindowVM.InitializeAsync().ConfigureAwait(false);
-			treeItemVMs = mainWindowVM.TreeItemVMs;
+			foreach (var vm in mainWindowVM.TreeItemVMs) {
+				treeItemVMs.Add(vm);
+			}
 			mainWindowVM.TreeItemVMs.Clear(); // avoid duplicate in setup
 		}
 
@@ -59,7 +61,7 @@ namespace DriveExplorer.ViewModels.Tests {
 		[Test()]
 		public async Task CurrentItem_SelectedAsyncTestAsync()
 		{
-			await mainWindowVM.TreeItemVMs[0].SetIsSelectedAsync(true).ConfigureAwait(false); // fill current items
+			await mainWindowVM.TreeItemSelectedAsync(mainWindowVM.TreeItemVMs[0]).ConfigureAwait(false);// fill current items
 			var itemVM = mainWindowVM.CurrentItemVMs[0];
 			await mainWindowVM.CurrentItemSelectedAsync(itemVM).ConfigureAwait(false);
 			Assert.That(mainWindowVM.TreeItemVMs[0].Children[0].Children[0] != null);
@@ -81,10 +83,12 @@ namespace DriveExplorer.ViewModels.Tests {
 			Assert.That(mainWindowVM.TreeItemVMs.Count == 3);
 		}
 
-		[Test()]
-		public void LoginOneDriveAsyncTest()
+		[Ignore("This method requires user interaction.")]
+		public async Task LoginOneDriveAsyncTestAsync()
 		{
-			throw new NotImplementedException();
+			var originalCount = mainWindowVM.TreeItemVMs.Count;
+			await mainWindowVM.LoginOneDriveAsync().ConfigureAwait(false);
+			Assert.That(mainWindowVM.TreeItemVMs.Count > originalCount);
 		}
 
 		[Test()]
@@ -104,7 +108,7 @@ namespace DriveExplorer.ViewModels.Tests {
 			Assert.True(mainWindowVM.CurrentItemVMs.Count > 0);
 		}
 
-		[Test()]
+		[Ignore("This method would change the cache.")]
 		public async Task LogoutGoogleDriveAsyncTestAsync()
 		{
 			var originalCount = mainWindowVM.TreeItemVMs.Count;

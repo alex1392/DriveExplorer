@@ -4,7 +4,7 @@ using Cyc.Standard;
 using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
 using Google.Apis.Auth.OAuth2;
-
+using Google.Apis.Util.Store;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 
@@ -23,7 +23,8 @@ namespace DriveExplorer.Tests {
 		private static readonly string googleDriveUserId;
 		private static readonly IAccount oneDriveAccount;
 
-		static TestSource() {
+		static TestSource()
+		{
 			var services = new ServiceCollection();
 			services.AddSingleton<IDispatcher, MockDispatcher>();
 			services.AddSingleton<ILogger, DebugLogger>();
@@ -47,10 +48,23 @@ namespace DriveExplorer.Tests {
 			var result = microsoftManager.LoginWithUsernamePassword().Result;
 			oneDriveAccount = result.Account;
 
-			googleDriveUserId = googleManager.LoadAllUserId().First();
+			googleDriveUserId = googleManager.LoadAllUserId().FirstOrDefault();
+			if (googleDriveUserId == null) {
+				var store = new FileDataStore(googleManager.DataStorePath);
+				var fixturePath = Path.Combine(store.FolderPath, "TokenFixtures");
+				var filePaths = Directory.GetFiles(fixturePath);
+				foreach (var filePath in filePaths) {
+					File.Copy(filePath, Path.Combine(store.FolderPath, Path.GetFileName(filePath)));
+				}
+				googleDriveUserId = googleManager.LoadAllUserId().FirstOrDefault();
+				if (googleDriveUserId == null) {
+					throw new InvalidOperationException("No google account is cached.");
+				}
+			}
 			googleManager.UserLoginAsync(googleDriveUserId).Wait();
 		}
-		public IEnumerator GetEnumerator() {
+		public IEnumerator GetEnumerator()
+		{
 			yield return new object[] { new object[] { microsoftManager, oneDriveAccount, googleManager, mainWindowVM, googleDriveUserId } };
 		}
 	}
