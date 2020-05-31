@@ -132,7 +132,7 @@ namespace DriveExplorer.ViewModels {
 				throw new ArgumentException("invalid sender");
 			if (vm.Item.Type.Is(ItemTypes.Folders)) {
 				await CurrentItemFolderSelectedAsync(vm).ConfigureAwait(false);
-			} else if (vm.Item.Type.Is(ItemTypes.Files)) {
+			} else if (vm.Item.Type == ItemTypes.File) {
 				await CurrentItemFileSelectedAsync(vm).ConfigureAwait(false);
 			} else {
 				throw new InvalidOperationException();
@@ -167,7 +167,7 @@ namespace DriveExplorer.ViewModels {
 
 		private async Task CurrentItemFileSelectedAsync(ItemVM vm)
 		{
-			if (vm.Item.Type.Is(ItemTypes.Files)) {
+			if (vm.Item.Type == ItemTypes.File) {
 				// check if the file has been cached
 				if (!vm.IsCached) {
 					// download the file to cache

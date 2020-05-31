@@ -195,13 +195,12 @@
     <Compile Include="Views\MessageBoxLogger.cs" />
     <Compile Include="Views\Converters\DebugConverter.cs" />
     <Compile Include="Models\IItem.cs" />
-    <Compile Include="Models\ItemFactoryBase.cs" />
     <Compile Include="Models\ItemTypes.cs" />
     <Compile Include="ViewModels\ItemVM.cs" />
     <Compile Include="Models\LocalItem.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
     <Compile Include="Models\OneDriveItem.cs" />
-    <Compile Include="Views\Converters\TypeImageConverter.cs" />
+    <Compile Include="Views\Converters\FileImageConverter.cs" />
     <Compile Include="Views\Converters\TypeVisibilityConverter.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -261,7 +260,7 @@
       <Name>Cyc.GoogleApi</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cyc\Cyc.MicrosoftApi\Cyc.MicrosoftApi.csproj">
-      <Project>{BD671F7E-9628-466F-8E8E-82A83AF19CA9}</Project>
+      <Project>{376baee4-d75b-404c-b93f-37a4aa085dbc}</Project>
       <Name>Cyc.MicrosoftApi</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cyc\Cyc.Standard\Cyc.Standard.csproj">

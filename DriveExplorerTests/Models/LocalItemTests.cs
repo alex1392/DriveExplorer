@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace DriveExplorer.Models.Tests {
 	[TestFixture()]
 	public class LocalItemTests {
-		[TestCase(@"C:\\", ItemTypes.LocalDrive, "C:")]
+		[TestCase(@"C:\", ItemTypes.LocalDrive, @"C:\")]
 		public void LocalItemRootTest(string fullPath, ItemTypes expectedType, string expectedName) {
 			var item = new LocalItem(fullPath);
 			Assert.NotNull(item);

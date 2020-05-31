@@ -1,5 +1,5 @@
 ﻿using Cyc.GoogleApi;
-using Cyc.MicrosoftApi;
+//using Cyc.MicrosoftApi;
 using Cyc.Standard;
 using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
@@ -36,42 +36,52 @@ namespace DriveExplorer.Tests {
 	//	}
 	//}
 	public class TestSource : IEnumerable {
-		private static readonly MicrosoftApiManager microsoftManager;
+		//private static readonly MicrosoftApiManager microsoftManager;
 		private static readonly GoogleApiManager googleManager;
 		private static readonly MainWindowVM mainWindowVM;
 		private static readonly string googleDriveUserId;
 		private static readonly IAccount oneDriveAccount;
 
-		static TestSource() {
+		static TestSource()
+		{
 			//var app = new Application(); // ensure main thread
 			//DispatcherUtil.DoEvents();
 			var services = new ServiceCollection();
 			services.AddSingleton<ILogger, DebugLogger>();
-			services.AddSingleton(sp => new MicrosoftApiManager(sp.GetService<ILogger>(), MicrosoftApiManager.Authority.Organizations));
-			services.AddSingleton<MainWindowVM>();
-			services.AddSingleton<GoogleDriveManager>();
-			services.AddSingleton<OneDriveManager>();
-			services.AddSingleton<LocalDriveManager>();
-
+			//services.AddSingleton(sp => new MicrosoftApiManager(sp.GetService<ILogger>(), MicrosoftApiManager.Authority.Organizations));
 			var fullPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, @"GoogleApi\client_secret.json");
 			services.AddSingleton(sp =>
 				new GoogleApiManager(sp.GetService<ILogger>(),
 					fullPath,
 					dataStorePath: Path.Combine(GoogleWebAuthorizationBroker.Folder, "Test")));
 
+			services.AddSingleton<GoogleDriveManager>();
+			services.AddSingleton<OneDriveManager>();
+			services.AddSingleton<LocalDriveManager>();
+			services.AddSingleton<MainWindowVM>();
+
+
 			var serviceProvider = services.BuildServiceProvider();
-			microsoftManager = serviceProvider.GetService<MicrosoftApiManager>();
+			//microsoftManager = serviceProvider.GetService<MicrosoftApiManager>();
 			googleManager = serviceProvider.GetService<GoogleApiManager>();
 			mainWindowVM = serviceProvider.GetService<MainWindowVM>();
 			mainWindowVM.SetCacheRootPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(DriveExplorer)));
-			var result = microsoftManager.LoginWithUsernamePassword().Result;
-			oneDriveAccount = result.Account;
+			//var result = microsoftManager.LoginWithUsernamePassword().Result;
+			//oneDriveAccount = result.Account;
 
 			googleDriveUserId = googleManager.LoadAllUserId().First();
 			googleManager.UserLoginAsync(googleDriveUserId).Wait();
 		}
-		public IEnumerator GetEnumerator() {
-			yield return new object[] { new object[] { microsoftManager, oneDriveAccount, googleManager, mainWindowVM, googleDriveUserId } };
+		public IEnumerator GetEnumerator()
+		{
+			yield return new object[] { new object[] {/* microsoftManager, */oneDriveAccount, googleManager, mainWindowVM, googleDriveUserId } };
+		}
+	}
+
+	public class source : IEnumerable {
+		public IEnumerator GetEnumerator()
+		{
+			yield return new object[] { 1 };
 		}
 	}
 }

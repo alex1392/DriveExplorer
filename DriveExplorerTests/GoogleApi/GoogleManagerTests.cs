@@ -8,7 +8,6 @@ using System;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.GoogleApi.Tests {
-	[TestFixture()]
 	[TestFixtureSource(typeof(TestSource))]
 	public class GoogleManagerTests {
 		private readonly GoogleApiManager googleManager;

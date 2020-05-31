@@ -10,7 +10,7 @@ namespace DriveExplorer.Views.Tests {
 	public class TypeVisibilityConverterTests {
 		private TypeVisibilityConverter converter;
 
-		[TestCase(ItemTypes.DOC, Visibility.Collapsed)]
+		[TestCase(ItemTypes.File, Visibility.Collapsed)]
 		[TestCase(ItemTypes.OneDrive, Visibility.Visible)]
 		public void ConvertTest(ItemTypes type, Visibility expected) {
 			converter = new TypeVisibilityConverter();
