@@ -1,7 +1,7 @@
 ﻿using Cyc.Standard;
 
 using DriveExplorer.Models;
-
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -94,9 +94,15 @@ namespace DriveExplorer.ViewModels {
 			if (!Directory.Exists(CacheRootPath)) {
 				Directory.CreateDirectory(CacheRootPath);
 			}
-			await localDriveManager.AutoLoginAsync().ConfigureAwait(true);
-			await oneDriveManager.AutoLoginAsync().ConfigureAwait(true);
-			await googleDriveManager.AutoLoginAsync().ConfigureAwait(true);
+			if (localDriveManager != null) {
+				await localDriveManager.AutoLoginAsync().ConfigureAwait(true);
+			}
+			if (oneDriveManager != null) {
+				await oneDriveManager.AutoLoginAsync().ConfigureAwait(true);
+			}
+			if (googleDriveManager != null) {
+				await googleDriveManager.AutoLoginAsync().ConfigureAwait(true);
+			}
 		}
 		public async Task TreeItemSelectedAsync(object sender, RoutedEventArgs e = null)
 		{
@@ -176,11 +182,17 @@ namespace DriveExplorer.ViewModels {
 		}
 		public async Task LoginOneDriveAsync()
 		{
+			if (oneDriveManager == null) {
+				return;
+			}
 			await oneDriveManager.LoginAsync().ConfigureAwait(false);
 		}
 
 		public async Task LogoutOneDriveAsync(IItem item)
 		{
+			if (oneDriveManager == null) {
+				return;
+			}
 			await oneDriveManager.LogoutAsync(item).ConfigureAwait(false);
 		}
 		public void CancelCurrentTask()
@@ -189,11 +201,17 @@ namespace DriveExplorer.ViewModels {
 		}
 		public async Task LoginGoogleDriveAsync()
 		{
+			if (googleDriveManager == null) {
+				return;
+			}
 			currentCancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
 			await googleDriveManager.LoginAsync(currentCancellationTokenSource.Token).ConfigureAwait(false);
 		}
 		public async Task LogoutGoogleDriveAsync(IItem item)
 		{
+			if (googleDriveManager == null) {
+				return;
+			}
 			await googleDriveManager.LogoutAsync(item).ConfigureAwait(false);
 		}
 
