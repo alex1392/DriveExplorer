@@ -20,12 +20,12 @@ using System.Windows.Threading;
 using Directory = System.IO.Directory;
 namespace DriveExplorer.ViewModels {
 	public class MainWindowVM : INotifyPropertyChanged {
-		private readonly string localRootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), nameof(DriveExplorer));
+		private string CacheRootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), nameof(DriveExplorer));
 
 		private readonly ILogger logger;
-		private readonly LocalDriveManager localDriveManager;
-		private readonly OneDriveManager oneDriveManager;
-		private readonly GoogleDriveManager googleDriveManager;
+		private readonly IDriveManager localDriveManager;
+		private readonly IDriveManager oneDriveManager;
+		private readonly IDriveManager googleDriveManager;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -43,6 +43,7 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
+		public Dispatcher Dispatcher { get; private set; }
 
 		public MainWindowVM(ILogger logger = null,
 			LocalDriveManager localDriveManager = null,
@@ -54,6 +55,7 @@ namespace DriveExplorer.ViewModels {
 			this.oneDriveManager = oneDriveManager;
 			this.googleDriveManager = googleDriveManager;
 			SetupDriveManagers();
+			SetUpDispatcher();
 
 			void SetupDriveManagers()
 			{
@@ -85,13 +87,24 @@ namespace DriveExplorer.ViewModels {
 					googleDriveManager.TaskExecuted += (_, _) => HideSpinner();
 				}
 			}
+			void SetUpDispatcher()
+			{
+				if (Application.Current != null) {
+					Dispatcher = Application.Current.Dispatcher;
+				} else {
+					Dispatcher = Dispatcher.CurrentDispatcher; // for testing
+				}
+			}
 		}
-
+		public void SetCacheRootPath(string path)
+		{
+			CacheRootPath = path;
+		}
 		public async Task InitializeAsync()
 		{
 			// check local cache
-			if (!Directory.Exists(localRootPath)) {
-				Directory.CreateDirectory(localRootPath);
+			if (!Directory.Exists(CacheRootPath)) {
+				Directory.CreateDirectory(CacheRootPath);
 			}
 			await localDriveManager.AutoLoginAsync().ConfigureAwait(true);
 			await oneDriveManager.AutoLoginAsync().ConfigureAwait(true);
@@ -191,31 +204,31 @@ namespace DriveExplorer.ViewModels {
 
 		private void ShowSpinner()
 		{
-			Application.Current.Dispatcher.Invoke(() => {
+			Dispatcher.Invoke(() => {
 				SpinnerVisibility = Visibility.Visible;
 			});
 		}
 
 		private void HideSpinner()
 		{
-			Application.Current.Dispatcher.Invoke(() => {
+			Dispatcher.Invoke(() => {
 				SpinnerVisibility = Visibility.Collapsed;
 			});
 		}
 
 		private void AddTreeItemVM(IItem item)
 		{
-			var itemVM = new ItemVM(item, localRootPath);
+			var itemVM = new ItemVM(item, CacheRootPath);
 			itemVM.BeforeExpand += (_, _) => ShowSpinner();
 			itemVM.Expanded += (_, _) => HideSpinner();
-			Application.Current.Dispatcher.Invoke(() => {
+			Dispatcher.Invoke(() => {
 				TreeItemVMs.Add(itemVM);
 			});
 		}
 		private void RemoveTreeItemVM(IItem item)
 		{
 			var vm = TreeItemVMs.FirstOrDefault(vm => vm.Item.Name == item.Name) ?? throw new InvalidOperationException();
-			Application.Current.Dispatcher.Invoke(() => {
+			Dispatcher.Invoke(() => {
 				TreeItemVMs.Remove(vm);
 			});
 		}

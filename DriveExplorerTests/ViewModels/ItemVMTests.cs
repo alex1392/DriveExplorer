@@ -7,26 +7,28 @@ using Microsoft.Graph;
 using Microsoft.Identity.Client;
 
 using NUnit.Framework;
-
+using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.ViewModels.Tests {
 	[TestFixtureSource(typeof(TestSource))]
 	public class ItemVMTests {
-		private readonly MicrosoftManager microsoftManager;
+		private readonly MicrosoftApiManager microsoftManager;
 		private readonly IAccount account;
 		private DriveItem root;
 		private ItemVM localItem;
 		private ItemVM onedriveItem;
 
 		public ItemVMTests(object[] param) {
-			microsoftManager = (MicrosoftManager)param[0];
+			microsoftManager = (MicrosoftApiManager)param[0];
 			account = (IAccount)param[1];
 		}
 		[SetUp]
 		public void Setup() {
-			localItem = new ItemVM(new LocalItem(@"C:\\"));
-			onedriveItem = new ItemVM(new OneDriveItem(microsoftManager, root, account));
+			var localRootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(DriveExplorer));
+			localItem = new ItemVM(new LocalItem(@"C:\\"), localRootPath);
+			onedriveItem = new ItemVM(new OneDriveItem(microsoftManager, root, account), localRootPath);
 		}
 		[OneTimeSetUp]
 		public async Task OneTimeSetupAsync() {

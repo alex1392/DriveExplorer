@@ -30,14 +30,11 @@ namespace DriveExplorer {
 			services.AddSingleton<ILogger, MessageBoxLogger>();
 			
 			services.AddSingleton<GoogleApiManager>();
-			services.AddSingleton<GoogleDriveItem.Factory>();
 			services.AddSingleton<GoogleDriveManager>();
 			
 			services.AddSingleton<MicrosoftApiManager>();
-			services.AddSingleton<OneDriveItem.Factory>();
 			services.AddSingleton<OneDriveManager>();
 			
-			services.AddSingleton<LocalItem.Factory>();
 			services.AddSingleton<LocalDriveManager>();
 			
 			services.AddSingleton<MainWindowVM>();

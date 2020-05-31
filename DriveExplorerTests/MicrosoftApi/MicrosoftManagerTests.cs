@@ -13,11 +13,11 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 
 	[TestFixtureSource(typeof(TestSource))]
 	public class MicrosoftManagerTests {
-		private readonly MicrosoftManager microsoftManager;
+		private readonly MicrosoftApiManager microsoftManager;
 		private readonly IAccount account;
 
 		public MicrosoftManagerTests(object[] param) {
-			microsoftManager = (MicrosoftManager)param[0];
+			microsoftManager = (MicrosoftApiManager)param[0];
 			account = (IAccount)param[1];
 		}
 

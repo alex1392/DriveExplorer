@@ -345,3 +345,5 @@ dotcover*
 client_secret.json
 DriveExplorer.Core/
 DriveExplorerTests.Core/
+/.scannerwork
+/DriveExplorer/.scannerwork

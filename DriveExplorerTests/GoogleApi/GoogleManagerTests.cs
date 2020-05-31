@@ -11,11 +11,11 @@ namespace DriveExplorer.GoogleApi.Tests {
 	[TestFixture()]
 	[TestFixtureSource(typeof(TestSource))]
 	public class GoogleManagerTests {
-		private readonly GoogleManager googleManager;
+		private readonly GoogleApiManager googleManager;
 		private readonly string userId;
 
 		public GoogleManagerTests(object[] param) {
-			googleManager = (GoogleManager)param[2];
+			googleManager = (GoogleApiManager)param[2];
 			userId = (string)param[4];
 		}
 

@@ -10,53 +10,7 @@ using System.Threading.Tasks;
 
 namespace DriveExplorer.Models {
 	public class OneDriveItem : IItem {
-		public class Factory : ItemFactoryBase {
-			public override IItem CreateRoot(params object[] parameters)
-			{
-				var microsoftApiManager = (MicrosoftApiManager)parameters[0];
-				var driveItem = (DriveItem)parameters[1];
-				var account = (IAccount)parameters[2];
-				var item = new OneDriveItem(microsoftApiManager, this, driveItem)
-				{
-					Name = account.Username,
-					Type = ItemTypes.OneDrive,
-					FullPath = account.Username,
-					UserAccount = account,
-				};
-				return item;
-			}
-
-			public override IItem CreateFile(params object[] parameters)
-			{
-				var driveItem = (DriveItem)parameters[0];
-				var parent = (OneDriveItem)parameters[1];
-				var item = new OneDriveItem(parent.microsoftApiManager, this, driveItem)
-				{
-					Name = driveItem.Name,
-					Type = GetFileType(driveItem.Name),
-					FullPath = Path.Combine(parent.FullPath, driveItem.Name),
-					UserAccount = parent.UserAccount
-				};
-				return item;
-			}
-
-			public override IItem CreateFolder(params object[] parameters)
-			{
-				var driveItem = (DriveItem)parameters[0];
-				var parent = (OneDriveItem)parameters[1];
-				var item = new OneDriveItem(parent.microsoftApiManager, this, driveItem)
-				{
-					Name = driveItem.Name,
-					Type = ItemTypes.Folder,
-					FullPath = Path.Combine(parent.FullPath, driveItem.Name),
-					UserAccount = parent.UserAccount
-				};
-				return item;
-			}
-		}
-
 		private readonly MicrosoftApiManager microsoftApiManager;
-		private readonly Factory factory;
 
 		public ItemTypes Type { get; private set; }
 		public string Name { get; private set; }
@@ -67,11 +21,30 @@ namespace DriveExplorer.Models {
 		public long? Size { get; private set; }
 
 		public DateTimeOffset? LastModifiedTime { get; private set; }
-
-		public OneDriveItem(MicrosoftApiManager microsoftManager, Factory factory, DriveItem driveItem)
+		/// <summary>
+		/// Root constructor
+		/// </summary>
+		public OneDriveItem(MicrosoftApiManager microsoftApiManager, DriveItem driveItem, IAccount account)
 		{
-			this.microsoftApiManager = microsoftManager;
-			this.factory = factory;
+			this.microsoftApiManager = microsoftApiManager;
+			Name = account.Username;
+			Type = ItemTypes.OneDrive;
+			FullPath = account.Username;
+			UserAccount = account;
+			Id = driveItem.Id;
+			Size = 0;
+			LastModifiedTime = driveItem.LastModifiedDateTime;
+		}
+		/// <summary>
+		/// Child constructor
+		/// </summary>
+		public OneDriveItem(DriveItem driveItem, OneDriveItem parent)
+		{
+			microsoftApiManager = parent.microsoftApiManager;
+			Name = driveItem.Name;
+			Type = IsFolder(driveItem) ? ItemTypes.Folder : ItemTypes.File;
+			FullPath = Path.Combine(parent.FullPath, driveItem.Name);
+			UserAccount = parent.UserAccount;
 			Id = driveItem.Id;
 			Size = driveItem.Size ?? 0;
 			LastModifiedTime = driveItem.LastModifiedDateTime;
@@ -88,12 +61,7 @@ namespace DriveExplorer.Models {
 		public async IAsyncEnumerable<IItem> GetChildrenAsync()
 		{
 			await foreach (var item in microsoftApiManager.GetChildrenAsync(UserAccount, Id).ConfigureAwait(false)) {
-				if (IsFolder(item)) {
-					yield return factory.CreateFolder(item, this);
-
-				} else {
-					yield return factory.CreateFile(item, this);
-				}
+				yield return new OneDriveItem(item, this);
 			}
 		}
 

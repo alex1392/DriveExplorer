@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 namespace DriveExplorer.Models {
 	public class OneDriveManager : IDriveManager {
 		private readonly ILogger logger;
-		private readonly ItemFactoryBase factory;
 		private readonly MicrosoftApiManager microsoftManager;
 
 
@@ -25,10 +24,9 @@ namespace DriveExplorer.Models {
 			remove => microsoftManager.TaskExecuted -= value;
 		}
 
-		public OneDriveManager(ILogger logger, MicrosoftApiManager microsoftManager, OneDriveItem.Factory factory) {
+		public OneDriveManager(ILogger logger, MicrosoftApiManager microsoftManager) {
 			this.logger = logger;
 			this.microsoftManager = microsoftManager;
-			this.factory = factory;
 		}
 
 		public async Task LoginAsync() {
@@ -72,7 +70,7 @@ namespace DriveExplorer.Models {
 			if (root == null) {
 				return;
 			}
-			var item = factory.CreateRoot(microsoftManager, root, account);
+			var item = new OneDriveItem(microsoftManager, root, account);
 			LoginCompleted?.Invoke(this, item);
 		}
 

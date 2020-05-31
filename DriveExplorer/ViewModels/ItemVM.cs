@@ -91,7 +91,7 @@ namespace DriveExplorer.ViewModels {
 		/// <summary>
 		/// Root Constructor
 		/// </summary>
-		public ItemVM(IItem item, string localRootPath = null)
+		public ItemVM(IItem item, string localRootPath)
 		{
 			if (!item.Type.Is(ItemTypes.Drives)) {
 				throw new TypeInitializationException(nameof(ItemVM), null);

@@ -9,16 +9,14 @@ using System.Threading.Tasks;
 namespace DriveExplorer.Models {
 	public class LocalDriveManager : IDriveManager {
 		private readonly ILogger logger;
-		private readonly ItemFactoryBase factory;
 
 		public event EventHandler<IItem> LoginCompleted;
 		public event EventHandler<IItem> LogoutCompleted;
 		public event EventHandler BeforeTaskExecuted;
 		public event EventHandler TaskExecuted;
 
-		public LocalDriveManager(ILogger logger, LocalItem.Factory factory) {
+		public LocalDriveManager(ILogger logger) {
 			this.logger = logger;
-			this.factory = factory;
 		}
 		public Task AutoLoginAsync() {
 			string[] drivePaths = null;
@@ -28,7 +26,7 @@ namespace DriveExplorer.Models {
 				logger?.Log(ex);
 			}
 			foreach (var drivePath in drivePaths) {
-				var item = factory.CreateRoot(drivePath);
+				var item = new LocalItem(drivePath);
 				LoginCompleted?.Invoke(this, item);
 			}
 			return Task.CompletedTask;

@@ -10,7 +10,6 @@ namespace DriveExplorer.Models {
 	public class GoogleDriveManager : IDriveManager {
 		private readonly ILogger logger;
 		private readonly GoogleApiManager googleManager;
-		private readonly ItemFactoryBase factory;
 
 		public event EventHandler<IItem> LoginCompleted;
 		public event EventHandler<IItem> LogoutCompleted;
@@ -22,10 +21,9 @@ namespace DriveExplorer.Models {
 			add => googleManager.TaskExecuted += value;
 			remove => googleManager.TaskExecuted -= value;
 		}
-		public GoogleDriveManager(ILogger logger, GoogleApiManager googleManager, GoogleDriveItem.Factory factory) {
+		public GoogleDriveManager(ILogger logger, GoogleApiManager googleManager) {
 			this.logger = logger;
 			this.googleManager = googleManager;
-			this.factory = factory;
 		}
 
 
@@ -66,7 +64,7 @@ namespace DriveExplorer.Models {
 			if (root == null) {
 				return;
 			}
-			var item = factory.CreateRoot(googleManager, about, root, userId);
+			var item = new GoogleDriveItem(googleManager, about, root, userId);
 			LoginCompleted?.Invoke(this, item);
 		}
 	}
