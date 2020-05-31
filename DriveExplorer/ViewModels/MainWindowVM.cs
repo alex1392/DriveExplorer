@@ -144,6 +144,10 @@ namespace DriveExplorer.ViewModels {
 		{
 			await oneDriveManager.LogoutAsync(item).ConfigureAwait(false);
 		}
+		public void CancelCurrentTask()
+		{
+			currentCancellationTokenSource?.Cancel();
+		}
 		public async Task LoginGoogleDriveAsync()
 		{
 			currentCancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
