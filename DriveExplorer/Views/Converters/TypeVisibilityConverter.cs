@@ -10,8 +10,8 @@ namespace DriveExplorer.Views {
 		public static readonly TypeVisibilityConverter Instance = new TypeVisibilityConverter();
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
 			var type = (ItemTypes)value;
-			return type.Is(ItemTypes.Files) ?
-				Visibility.Collapsed : Visibility.Visible;
+			return type.Is(ItemTypes.Folders) ?
+				Visibility.Visible : Visibility.Collapsed;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {

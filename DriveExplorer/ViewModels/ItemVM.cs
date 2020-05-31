@@ -22,7 +22,7 @@ namespace DriveExplorer.ViewModels {
 				// check if cache file exist, and the last modified date and file size is matched
 				if (Item.Type.Is(ItemTypes.Folders)) {
 					return Directory.Exists(CacheFullPath);
-				} else if (Item.Type.Is(ItemTypes.Files)) {
+				} else if (Item.Type == ItemTypes.File) {
 					var info = new FileInfo(CacheFullPath);
 					return info.Exists &&
 						info.Length == Item.Size &&

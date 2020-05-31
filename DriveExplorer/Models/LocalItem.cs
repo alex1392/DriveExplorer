@@ -19,7 +19,6 @@ namespace DriveExplorer.Models {
 		/// </summary>
 		public LocalItem(string fullPath)
 		{
-			fullPath = FixFullPath(fullPath);
 			var info = new DirectoryInfo(fullPath);
 			FullPath = fullPath;
 			Type = ItemTypes.LocalDrive;

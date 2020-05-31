@@ -13,8 +13,8 @@ namespace DriveExplorer.Views.Tests {
 		public void ConvertTest() {
 			var app = Application.Current; // ensure pack uri scheme
 			var converter = new TypeImageConverter();
-			var actual = (BitmapImage)converter.Convert(ItemTypes.DOC, null, null, null);
-			var expected = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/doc.png"));
+			var actual = (BitmapImage)converter.Convert(ItemTypes.OneDrive, null, null, null);
+			var expected = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/onedrive.png"));
 			Assert.AreEqual(expected.BaseUri, actual.BaseUri);
 		}
 

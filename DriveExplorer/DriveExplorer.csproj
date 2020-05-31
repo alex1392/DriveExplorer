@@ -192,7 +192,6 @@
     <Compile Include="Views\MessageBoxLogger.cs" />
     <Compile Include="Views\Converters\DebugConverter.cs" />
     <Compile Include="Models\IItem.cs" />
-    <Compile Include="Models\ItemFactoryHelper.cs" />
     <Compile Include="Models\ItemTypes.cs" />
     <Compile Include="ViewModels\ItemVM.cs" />
     <Compile Include="Models\LocalItem.cs" />
