@@ -67,6 +67,9 @@ namespace DriveExplorer.Models {
 		}
 		private async Task CreateGoogleDrive(string userId)
 		{
+			if (userId == null) {
+				return;
+			}
 			var about = await googleManager.GetAboutAsync(userId).ConfigureAwait(true);
 			if (about == null) {
 				return;
