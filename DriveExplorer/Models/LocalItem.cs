@@ -1,63 +1,50 @@
-﻿using Microsoft.Graph;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-using Directory = System.IO.Directory;
-
 namespace DriveExplorer.Models {
 	public class LocalItem : IItem {
+
 		public ItemTypes Type { get; private set; }
 		public string Name { get; private set; }
 		public string FullPath { get; private set; }
-		public long Size { get; private set; }
-		public DateTime LastModifiedDate { get; private set; }
+		public long? Size { get; private set; }
+		public DateTimeOffset? LastModifiedTime { get; private set; }
 
-		public LocalItem(string fullPath) {
-			while (fullPath.Last() == Path.DirectorySeparatorChar) {
-				fullPath = fullPath.Remove(fullPath.Length - 1);
-			}
+		/// <summary>
+		/// Root constructor
+		/// </summary>
+		public LocalItem(string fullPath)
+		{
+			fullPath = FixFullPath(fullPath);
+			var info = new DirectoryInfo(fullPath);
 			FullPath = fullPath;
+			Type = ItemTypes.LocalDrive;
+			Name = fullPath;
+			Size = 0;
+			LastModifiedTime = info.LastWriteTimeUtc;
 		}
 
-		public static LocalItem CreateRoot(string fullPath) {
-			var info = new DirectoryInfo(fullPath);
-			var item = new LocalItem(fullPath)
-			{
-				Type = ItemTypes.LocalDrive,
-				Name = fullPath,
-				Size = 0,
-				LastModifiedDate = info.LastWriteTimeUtc
-			};
-			return item;
-		}
-		public static LocalItem CreateFolder(string fullPath) {
-			var info = new DirectoryInfo(fullPath);
-			var item = new LocalItem(fullPath)
-			{
-				Type = ItemTypes.Folder,
-				Name = Path.GetFileName(fullPath),
-				Size = 0,
-				LastModifiedDate = info.LastWriteTimeUtc
-			};
-			return item;
-		}
-		public static LocalItem CreateFile(string fullPath) {
-			var info = new FileInfo(fullPath);
-			var item = new LocalItem(fullPath)
-			{
-				Type = ItemFactoryHelper.GetFileType(fullPath),
-				Name = Path.GetFileName(fullPath),
-				Size = info.Length,
-				LastModifiedDate = info.LastWriteTimeUtc
-			};
-			return item;
+
+		/// <summary>
+		/// Child constructor
+		/// </summary>
+		public LocalItem(string fullPath, bool isFolder)
+		{
+			fullPath = FixFullPath(fullPath);
+			var info = isFolder ? new DirectoryInfo(fullPath) : new FileInfo(fullPath) as FileSystemInfo;
+			FullPath = fullPath;
+			Type = isFolder ? ItemTypes.Folder : ItemTypes.File;
+			Name = Path.GetFileName(fullPath);
+			Size = isFolder ? 0 : (info as FileInfo).Length;
+			LastModifiedTime = info.LastWriteTimeUtc;
 		}
 
-		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
+		public async IAsyncEnumerable<IItem> GetChildrenAsync()
+		{
 			IEnumerable<string> files;
 			IEnumerable<string> folders;
 			try {
@@ -71,12 +58,27 @@ namespace DriveExplorer.Models {
 				yield break;
 			}
 			foreach (var path in folders) {
-				yield return CreateFolder(path);
+				yield return new LocalItem(path, true);
 			}
 			foreach (var path in files) {
-				yield return CreateFile(path);
+				yield return new LocalItem(path, false);
 			}
 		}
+
+		private static string FixFullPath(string fullPath)
+		{
+			while (fullPath.Last() == Path.DirectorySeparatorChar) {
+				fullPath = fullPath.Remove(fullPath.Length - 1);
+			}
+
+			return fullPath;
+		}
+		public Task DownloadAsync(string localPath)
+		{
+			// this should never be executed
+			throw new InvalidOperationException();
+		}
 	}
+
 
 }

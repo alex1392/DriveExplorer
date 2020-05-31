@@ -6,8 +6,8 @@ namespace DriveExplorer.Models {
 		ItemTypes Type { get; }
 		string Name { get; }
 		string FullPath { get; }
-		long Size { get; }
-		DateTime LastModifiedDate { get; }
+		long? Size { get; }
+		DateTimeOffset? LastModifiedTime { get; }
 		IAsyncEnumerable<IItem> GetChildrenAsync();
 	}
 }

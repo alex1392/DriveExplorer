@@ -1,64 +1,66 @@
 ﻿using Cyc.GoogleApi;
-
+using Google.Apis.Download;
 using Google.Apis.Drive.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
 using File = Google.Apis.Drive.v3.Data.File;
-
 namespace DriveExplorer.Models {
 	public class GoogleDriveItem : IItem {
-		private readonly GoogleManager googleManager;
 
+		private readonly GoogleApiManager googleApiManager;
 		public ItemTypes Type { get; private set; }
-
 		public string Name { get; private set; }
-
 		public string FullPath { get; private set; }
 		public string UserId { get; private set; }
 		public string Id { get; private set; }
-
-		public long Size { get; private set; }
-
-		public DateTime LastModifiedDate { get; private set; }
-
+		public long? Size { get; private set; }
+		public DateTimeOffset? LastModifiedTime { get; private set; }
 		/// <summary>
 		/// Root constructor
 		/// </summary>
-		public GoogleDriveItem(GoogleManager googleManager, About about, File file, string userId) {
-			this.googleManager = googleManager;
+		public GoogleDriveItem(GoogleApiManager googleApiManager, About about, File driveItem, string userId)
+		{
 			var user = about.User;
+			this.googleApiManager = googleApiManager;
 			Type = ItemTypes.GoogleDrive;
 			Name = user.EmailAddress;
-			FullPath = Name;
+			FullPath = user.EmailAddress;
 			UserId = userId;
-			Id = file.Id;
+			Id = driveItem.Id;
+			Size = driveItem.Size;
+			LastModifiedTime = driveItem.ModifiedTime;
 		}
 		/// <summary>
 		/// Child constructor
 		/// </summary>
-		private GoogleDriveItem(GoogleDriveItem parent, File child) {
-			googleManager = parent.googleManager;
-			Type = IsFolder(child) ?
-				ItemTypes.Folder :
-				ItemFactoryHelper.GetFileType(child.Name);
-			Name = child.Name;
-			FullPath = Path.Combine(parent.FullPath, child.Name);
+		public GoogleDriveItem(GoogleDriveItem parent, File driveItem)
+		{
+			googleApiManager = parent.googleApiManager;
+			Type = IsFolder(driveItem) ? ItemTypes.Folder : ItemTypes.File;
+			Name = driveItem.Name;
+			FullPath = Path.Combine(parent.FullPath, driveItem.Name);
 			UserId = parent.UserId;
-			Id = child.Id;
+			Id = driveItem.Id;
+			Size = driveItem.Size;
+			LastModifiedTime = driveItem.ModifiedTime;
 		}
-
-		private bool IsFolder(File child) {
+		private bool IsFolder(File child)
+		{
 			// application/vnd.google-apps.folder
 			return child.MimeType.Contains("folder");
 		}
-
-		public async IAsyncEnumerable<IItem> GetChildrenAsync() {
-			await foreach (var child in googleManager.GetChildrenAsync(UserId, Id).ConfigureAwait(false)) {
+		public async IAsyncEnumerable<IItem> GetChildrenAsync()
+		{
+			await foreach (var child in googleApiManager.GetChildrenAsync(UserId, Id).ConfigureAwait(false)) {
 				yield return new GoogleDriveItem(this, child);
 			}
+		}
+
+		public async Task DownloadAsync(string localPath)
+		{
+			await googleApiManager.DownloadAsync(UserId, Id, localPath).ConfigureAwait(false);
 		}
 	}
 }
