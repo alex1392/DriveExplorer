@@ -1,12 +1,12 @@
 ﻿using Cyc.GoogleApi;
 using Cyc.MicrosoftApi;
 using Cyc.Standard;
-
+using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
 using DriveExplorer.Views;
 
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Windows;
 
 namespace DriveExplorer {
@@ -15,7 +15,8 @@ namespace DriveExplorer {
 	/// Interaction logic for App.xaml
 	/// </summary>
 	public partial class App : Application {
-		protected override void OnStartup(StartupEventArgs e) {
+		protected override void OnStartup(StartupEventArgs e)
+		{
 			base.OnStartup(e);
 
 			var services = new ServiceCollection();
@@ -26,10 +27,18 @@ namespace DriveExplorer {
 			MainWindow.Show();
 		}
 
-		private void ConfigureServices(ServiceCollection services) {
+		private void ConfigureServices(ServiceCollection services)
+		{
 			services.AddSingleton<ILogger, MessageBoxLogger>();
-			services.AddSingleton<GoogleManager>();
-			services.AddSingleton<MicrosoftManager>();
+
+			services.AddSingleton<GoogleApiManager>();
+			services.AddSingleton<GoogleDriveManager>();
+
+			services.AddSingleton<MicrosoftApiManager>();
+			services.AddSingleton<OneDriveManager>();
+
+			services.AddSingleton<LocalDriveManager>();
+
 			services.AddSingleton<MainWindowVM>();
 			services.AddSingleton<MainWindow>();
 		}
