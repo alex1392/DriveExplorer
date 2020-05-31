@@ -9,11 +9,41 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.ViewModels {
+
 	public class ItemVM : INotifyPropertyChanged, IEquatable<ItemVM> {
 
-		private bool isExpanded;
+		#region Private Fields
+
 		private bool haveExpanded = false;
+		private bool isExpanded;
 		private bool isSelected;
+
+		#endregion Private Fields
+
+		#region Public Events
+
+		public event EventHandler BeforeExpand;
+
+		public event EventHandler BeforeSelect;
+
+		public event EventHandler Expanded;
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		public event EventHandler Selected;
+
+		#endregion Public Events
+
+		#region Public Properties
+
+		public string CacheFullPath { get; private set; }
+
+		public string CacheRootPath { get; private set; }
+
+		public ObservableCollection<ItemVM> Children { get; private set; } = new ObservableCollection<ItemVM>
+		{
+			null // add dummyItem for the expansion indicator
+        };
 
 		public bool IsCached {
 			get {
@@ -46,6 +76,7 @@ namespace DriveExplorer.ViewModels {
 				}
 			}
 		}
+
 		/// <summary>
 		/// Change the state of selection and invoke <see cref="SelectAsync"/> without await. To select item programmically, call <see cref="SetIsSelectedAsync(bool)"/> instead.
 		/// </summary>
@@ -64,21 +95,10 @@ namespace DriveExplorer.ViewModels {
 
 		public IItem Item { get; private set; }
 		public ItemVM Parent { get; }
-		public ObservableCollection<ItemVM> Children { get; private set; } = new ObservableCollection<ItemVM>
-		{
-			null // add dummyItem for the expansion indicator
-        };
 
-		public string CacheFullPath { get; private set; }
+		#endregion Public Properties
 
-		public string CacheRootPath { get; private set; }
-
-		public event PropertyChangedEventHandler PropertyChanged;
-		public event EventHandler BeforeExpand;
-		public event EventHandler Expanded;
-
-		public event EventHandler BeforeSelect;
-		public event EventHandler Selected;
+		#region Public Constructors
 
 		/// <summary>
 		/// Root Constructor
@@ -93,6 +113,7 @@ namespace DriveExplorer.ViewModels {
 			CacheFullPath = Path.Combine(CacheRootPath, Item.Type.ToString(), Item.FullPath);
 			CacheFolder();
 		}
+
 		/// <summary>
 		/// Child constructor
 		/// </summary>
@@ -111,6 +132,50 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
+		#endregion Public Constructors
+
+		#region Public Methods
+
+		public static bool operator !=(ItemVM left, ItemVM right)
+		{
+			return !(left == right);
+		}
+
+		public static bool operator ==(ItemVM left, ItemVM right)
+		{
+			return EqualityComparer<ItemVM>.Default.Equals(left, right);
+		}
+
+		public async Task CacheFileAsync()
+		{
+			await Item.DownloadAsync(CacheFullPath).ConfigureAwait(false);
+			// set file info
+			File.SetLastWriteTimeUtc(CacheFullPath, Item.LastModifiedTime.Value.LocalDateTime);
+		}
+
+		public override bool Equals(object obj)
+		{
+			return Equals(obj as ItemVM);
+		}
+
+		public bool Equals(ItemVM other)
+		{
+			return other != null &&
+				Item.Name == other.Item.Name &&
+				Item.Type == other.Item.Type &&
+				Item.FullPath == other.Item.FullPath;
+		}
+
+		public override int GetHashCode()
+		{
+			var hashCode = 424228742;
+			hashCode = hashCode * -1521134295 + isExpanded.GetHashCode();
+			hashCode = hashCode * -1521134295 + haveExpanded.GetHashCode();
+			hashCode = hashCode * -1521134295 + isSelected.GetHashCode();
+			hashCode = hashCode * -1521134295 + EqualityComparer<IItem>.Default.GetHashCode(Item);
+			hashCode = hashCode * -1521134295 + EqualityComparer<ObservableCollection<ItemVM>>.Default.GetHashCode(Children);
+			return hashCode;
+		}
 
 		/// <summary>
 		/// Set <see cref="IsExpanded"/> asynchronizly.
@@ -123,6 +188,7 @@ namespace DriveExplorer.ViewModels {
 			}
 			await ExpandAsync().ConfigureAwait(false);
 		}
+
 		/// <summary>
 		/// Set <see cref="IsSelected"/> asynchronizly
 		/// </summary>
@@ -133,6 +199,25 @@ namespace DriveExplorer.ViewModels {
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
 			}
 			await SelectAsync().ConfigureAwait(false);
+		}
+
+		public override string ToString()
+		{
+			return $"{Item.Name}, Items: {Children.Count}";
+		}
+
+		#endregion Public Methods
+
+		#region Private Methods
+
+		private void CacheFolder()
+		{
+			if (CacheRootPath == null) {
+				return;
+			}
+			if (!IsCached) {
+				Directory.CreateDirectory(CacheFullPath);
+			}
 		}
 
 		private async Task ExpandAsync()
@@ -170,64 +255,7 @@ namespace DriveExplorer.ViewModels {
 
 			Selected?.Invoke(this, null);
 		}
-		private void CacheFolder()
-		{
-			if (CacheRootPath == null) {
-				return;
-			}
-			if (!IsCached) {
-				Directory.CreateDirectory(CacheFullPath);
-			}
-		}
 
-		public async Task CacheFileAsync()
-		{
-			await Item.DownloadAsync(CacheFullPath).ConfigureAwait(false);
-			// set file info
-			File.SetLastWriteTimeUtc(CacheFullPath, Item.LastModifiedTime.Value.LocalDateTime);
-		}
-
-		#region Overrides, Implementations
-
-		public override string ToString()
-		{
-			return $"{Item.Name}, Items: {Children.Count}";
-		}
-
-		public override bool Equals(object obj)
-		{
-			return Equals(obj as ItemVM);
-		}
-
-		public bool Equals(ItemVM other)
-		{
-			return other != null &&
-				Item.Name == other.Item.Name &&
-				Item.Type == other.Item.Type &&
-				Item.FullPath == other.Item.FullPath;
-		}
-
-		public override int GetHashCode()
-		{
-			var hashCode = 424228742;
-			hashCode = hashCode * -1521134295 + isExpanded.GetHashCode();
-			hashCode = hashCode * -1521134295 + haveExpanded.GetHashCode();
-			hashCode = hashCode * -1521134295 + isSelected.GetHashCode();
-			hashCode = hashCode * -1521134295 + EqualityComparer<IItem>.Default.GetHashCode(Item);
-			hashCode = hashCode * -1521134295 + EqualityComparer<ObservableCollection<ItemVM>>.Default.GetHashCode(Children);
-			return hashCode;
-		}
-
-
-		public static bool operator ==(ItemVM left, ItemVM right)
-		{
-			return EqualityComparer<ItemVM>.Default.Equals(left, right);
-		}
-
-		public static bool operator !=(ItemVM left, ItemVM right)
-		{
-			return !(left == right);
-		}
-		#endregion
+		#endregion Private Methods
 	}
 }

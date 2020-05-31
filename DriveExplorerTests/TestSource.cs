@@ -1,10 +1,13 @@
 ﻿using Cyc.GoogleApi;
 using Cyc.MicrosoftApi;
 using Cyc.Standard;
+
 using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
+
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Util.Store;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 
@@ -12,16 +15,22 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
-using System.Security.Permissions;
-using System.Windows.Threading;
 
 namespace DriveExplorer.Tests {
+
 	public class TestSource : IEnumerable {
-		private static readonly MicrosoftApiManager microsoftManager;
+
+		#region Private Fields
+
+		private static readonly string googleDriveUserId;
 		private static readonly GoogleApiManager googleManager;
 		private static readonly MainWindowVM mainWindowVM;
-		private static readonly string googleDriveUserId;
+		private static readonly MicrosoftApiManager microsoftManager;
 		private static readonly IAccount oneDriveAccount;
+
+		#endregion Private Fields
+
+		#region Public Constructors
 
 		static TestSource()
 		{
@@ -63,9 +72,16 @@ namespace DriveExplorer.Tests {
 			}
 			googleManager.UserLoginAsync(googleDriveUserId).Wait();
 		}
+
+		#endregion Public Constructors
+
+		#region Public Methods
+
 		public IEnumerator GetEnumerator()
 		{
 			yield return new object[] { new object[] { microsoftManager, oneDriveAccount, googleManager, mainWindowVM, googleDriveUserId } };
 		}
+
+		#endregion Public Methods
 	}
 }

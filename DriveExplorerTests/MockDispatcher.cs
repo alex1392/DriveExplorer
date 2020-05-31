@@ -1,16 +1,18 @@
 ﻿using DriveExplorer.ViewModels;
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DriveExplorer.Tests {
-	class MockDispatcher : IDispatcher {
+
+	internal class MockDispatcher : IDispatcher {
+
+		#region Public Methods
 
 		public void Invoke(Action action)
 		{
 			action.Invoke();
 		}
+
+		#endregion Public Methods
 	}
 }

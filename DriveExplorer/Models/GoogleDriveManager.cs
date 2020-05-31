@@ -10,44 +10,47 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.Models {
+
 	public class GoogleDriveManager : IDriveManager {
-		private readonly ILogger logger;
+
+		#region Private Fields
+
 		private readonly GoogleApiManager googleManager;
+		private readonly ILogger logger;
 		private readonly Dictionary<string, User> userRegistry = new Dictionary<string, User>();
 
-		public event EventHandler<IItem> LoginCompleted;
-		public event EventHandler<IItem> LogoutCompleted;
+		#endregion Private Fields
+
+		#region Public Events
+
 		public event EventHandler BeforeTaskExecuted {
 			add => googleManager.BeforeTaskExecute += value;
 			remove => googleManager.BeforeTaskExecute -= value;
 		}
+
+		public event EventHandler<IItem> LoginCompleted;
+
+		public event EventHandler<IItem> LogoutCompleted;
+
 		public event EventHandler TaskExecuted {
 			add => googleManager.TaskExecuted += value;
 			remove => googleManager.TaskExecuted -= value;
 		}
+
+		#endregion Public Events
+
+		#region Public Constructors
+
 		public GoogleDriveManager(ILogger logger, GoogleApiManager googleManager)
 		{
 			this.logger = logger;
 			this.googleManager = googleManager;
 		}
 
+		#endregion Public Constructors
 
-		public async Task LoginAsync()
-		{
-			if (googleManager == null) {
-				return;
-			}
-			var userId = await googleManager.UserLoginAsync().ConfigureAwait(true);
-			await CreateGoogleDrive(userId).ConfigureAwait(true);
-		}
-		public async Task LoginAsync(CancellationToken token)
-		{
-			if (googleManager == null) {
-				return;
-			}
-			var userId = await googleManager.UserLoginAsync(token).ConfigureAwait(true);
-			await CreateGoogleDrive(userId).ConfigureAwait(true);
-		}
+		#region Public Methods
+
 		public async Task AutoLoginAsync()
 		{
 			if (googleManager == null) {
@@ -58,6 +61,25 @@ namespace DriveExplorer.Models {
 				await CreateGoogleDrive(userId).ConfigureAwait(true);
 			}
 		}
+
+		public async Task LoginAsync()
+		{
+			if (googleManager == null) {
+				return;
+			}
+			var userId = await googleManager.UserLoginAsync().ConfigureAwait(true);
+			await CreateGoogleDrive(userId).ConfigureAwait(true);
+		}
+
+		public async Task LoginAsync(CancellationToken token)
+		{
+			if (googleManager == null) {
+				return;
+			}
+			var userId = await googleManager.UserLoginAsync(token).ConfigureAwait(true);
+			await CreateGoogleDrive(userId).ConfigureAwait(true);
+		}
+
 		public async Task LogoutAsync(IItem item)
 		{
 			if (googleManager == null) {
@@ -71,6 +93,11 @@ namespace DriveExplorer.Models {
 				LogoutCompleted?.Invoke(this, item);
 			}
 		}
+
+		#endregion Public Methods
+
+		#region Private Methods
+
 		private async Task CreateGoogleDrive(string userId)
 		{
 			if (userId == null) {
@@ -98,5 +125,7 @@ namespace DriveExplorer.Models {
 		{
 			return userRegistry.Any(pair => pair.Value.EmailAddress == user.EmailAddress);
 		}
+
+		#endregion Private Methods
 	}
 }

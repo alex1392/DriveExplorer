@@ -3,7 +3,10 @@ using System.Windows;
 using System.Windows.Threading;
 
 namespace DriveExplorer.ViewModels {
+
 	public class ApplicationDispatcher : IDispatcher {
+
+		#region Public Properties
 
 		public Dispatcher UnderlyingDispatcher {
 			get {
@@ -15,9 +18,15 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
+		#endregion Public Properties
+
+		#region Public Methods
+
 		public void Invoke(Action action)
 		{
 			UnderlyingDispatcher.Invoke(action);
 		}
+
+		#endregion Public Methods
 	}
 }

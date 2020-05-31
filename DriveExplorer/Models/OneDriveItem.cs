@@ -1,5 +1,4 @@
-﻿
-using Cyc.MicrosoftApi;
+﻿using Cyc.MicrosoftApi;
 
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
@@ -10,18 +9,29 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.Models {
+
 	public class OneDriveItem : IItem {
+
+		#region Private Fields
+
 		private readonly MicrosoftApiManager microsoftApiManager;
 
-		public ItemTypes Type { get; private set; }
-		public string Name { get; private set; }
+		#endregion Private Fields
+
+		#region Public Properties
+
 		public string FullPath { get; private set; }
 		public string Id { get; private set; }
+		public DateTimeOffset? LastModifiedTime { get; private set; }
+		public string Name { get; private set; }
+		public long? Size { get; private set; }
+		public ItemTypes Type { get; private set; }
 		public IAccount UserAccount { get; private set; }
 
-		public long? Size { get; private set; }
+		#endregion Public Properties
 
-		public DateTimeOffset? LastModifiedTime { get; private set; }
+		#region Public Constructors
+
 		/// <summary>
 		/// Root constructor
 		/// </summary>
@@ -36,6 +46,7 @@ namespace DriveExplorer.Models {
 			Size = 0;
 			LastModifiedTime = driveItem.LastModifiedDateTime;
 		}
+
 		/// <summary>
 		/// Child constructor
 		/// </summary>
@@ -50,6 +61,10 @@ namespace DriveExplorer.Models {
 			Size = driveItem.Size ?? 0;
 			LastModifiedTime = driveItem.LastModifiedDateTime;
 		}
+
+		#endregion Public Constructors
+
+		#region Public Methods
 
 		public async Task DownloadAsync(string localPath)
 		{
@@ -66,11 +81,15 @@ namespace DriveExplorer.Models {
 			}
 		}
 
+		#endregion Public Methods
+
+		#region Private Methods
+
 		private static bool IsFolder(DriveItem driveItem)
 		{
 			return driveItem.Folder != null;
 		}
 
-
+		#endregion Private Methods
 	}
 }

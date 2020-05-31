@@ -11,35 +11,53 @@ using System;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.Models.Tests {
+
 	[TestFixtureSource(typeof(TestSource))]
 	public class OneDriveItemTests {
+
+		#region Private Fields
+
+		private readonly IAccount account;
+		private readonly MicrosoftApiManager microsoftManager;
 		private DriveItem root;
 
-		private readonly MicrosoftApiManager microsoftManager;
-		private readonly IAccount account;
+		#endregion Private Fields
 
-		public OneDriveItemTests(object[] param) {
+		#region Public Constructors
+
+		public OneDriveItemTests(object[] param)
+		{
 			microsoftManager = (MicrosoftApiManager)param[0];
 			account = (IAccount)param[1];
 		}
-		[OneTimeSetUp]
-		public async Task OneTimeSetupAsync() {
-			root = await microsoftManager.GetDriveRootAsync(account).ConfigureAwait(false);
-		}
+
+		#endregion Public Constructors
+
+		#region Public Methods
 
 		[Test()]
-		public void OneDriveItemTest() {
-			var item = new OneDriveItem(microsoftManager, root, account);
-			Assert.NotNull(item);
-		}
-
-		[Test()]
-		public async Task GetChildrenAsyncTestAsync() {
+		public async Task GetChildrenAsyncTestAsync()
+		{
 			var item = new OneDriveItem(microsoftManager, root, account);
 			await foreach (var child in item.GetChildrenAsync().ConfigureAwait(false)) {
 				Console.WriteLine(child.Name);
 				Assert.NotNull(child);
 			}
 		}
+
+		[Test()]
+		public void OneDriveItemTest()
+		{
+			var item = new OneDriveItem(microsoftManager, root, account);
+			Assert.NotNull(item);
+		}
+
+		[OneTimeSetUp]
+		public async Task OneTimeSetupAsync()
+		{
+			root = await microsoftManager.GetDriveRootAsync(account).ConfigureAwait(false);
+		}
+
+		#endregion Public Methods
 	}
 }

@@ -7,10 +7,21 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace DriveExplorer.Views.Tests {
+
 	[TestFixture()]
 	public class FileImageConverterTests {
+
+		#region Public Methods
+
+		[Ignore("Not implemented")]
+		public void ConvertBackTest()
+		{
+			throw new NotImplementedException();
+		}
+
 		[Test()]
-		public void ConvertTest() {
+		public void ConvertTest()
+		{
 			var app = Application.Current; // ensure pack uri scheme
 			var converter = new TypeImageConverter();
 			var actual = (BitmapImage)converter.Convert(new LocalItem(@"C:\"), null, null, null);
@@ -18,9 +29,6 @@ namespace DriveExplorer.Views.Tests {
 			Assert.AreEqual(expected.BaseUri, actual.BaseUri);
 		}
 
-		[Ignore("Not implemented")]
-		public void ConvertBackTest() {
-			throw new NotImplementedException();
-		}
+		#endregion Public Methods
 	}
 }

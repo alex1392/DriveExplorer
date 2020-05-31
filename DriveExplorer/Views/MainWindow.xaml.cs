@@ -1,5 +1,4 @@
-﻿
-using DriveExplorer.Models;
+﻿using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
 
 using System;
@@ -8,11 +7,19 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DriveExplorer.Views {
+
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window {
+
+		#region Private Fields
+
 		private readonly MainWindowVM vm;
+
+		#endregion Private Fields
+
+		#region Public Constructors
 
 		public MainWindow()
 		{
@@ -26,15 +33,9 @@ namespace DriveExplorer.Views {
 			Loaded += MainWindow_Loaded;
 		}
 
-		private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
-		{
-			await vm.InitializeAsync().ConfigureAwait(false);
-		}
+		#endregion Public Constructors
 
-		private async void TreeViewItem_Selected(object sender, RoutedEventArgs e)
-		{
-			await vm.TreeItemSelectedAsync(sender, e).ConfigureAwait(false);
-		}
+		#region Private Methods
 
 		private async void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
@@ -51,6 +52,16 @@ namespace DriveExplorer.Views {
 			await vm.LoginOneDriveAsync().ConfigureAwait(false);
 		}
 
+		private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+		{
+			await vm.InitializeAsync().ConfigureAwait(false);
+		}
+
+		private void SpinnerBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			vm.CancelCurrentTask();
+		}
+
 		private async void TreeViewItem_MouseDown(object sender, MouseButtonEventArgs e)
 		{
 			if (!(sender is TreeViewItem treeViewItem) ||
@@ -62,6 +73,7 @@ namespace DriveExplorer.Views {
 					case ItemTypes.OneDrive:
 						await vm.LogoutOneDriveAsync(itemVM.Item).ConfigureAwait(false);
 						break;
+
 					case ItemTypes.GoogleDrive:
 						await vm.LogoutGoogleDriveAsync(itemVM.Item).ConfigureAwait(false);
 						break;
@@ -69,9 +81,11 @@ namespace DriveExplorer.Views {
 			}
 		}
 
-		private void SpinnerBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		private async void TreeViewItem_Selected(object sender, RoutedEventArgs e)
 		{
-			vm.CancelCurrentTask();
+			await vm.TreeItemSelectedAsync(sender, e).ConfigureAwait(false);
 		}
+
+		#endregion Private Methods
 	}
 }

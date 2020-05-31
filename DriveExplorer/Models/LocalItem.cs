@@ -6,13 +6,20 @@ using System.Threading.Tasks;
 using System.Windows;
 
 namespace DriveExplorer.Models {
+
 	public class LocalItem : IItem {
 
-		public ItemTypes Type { get; private set; }
-		public string Name { get; private set; }
+		#region Public Properties
+
 		public string FullPath { get; private set; }
-		public long? Size { get; private set; }
 		public DateTimeOffset? LastModifiedTime { get; private set; }
+		public string Name { get; private set; }
+		public long? Size { get; private set; }
+		public ItemTypes Type { get; private set; }
+
+		#endregion Public Properties
+
+		#region Public Constructors
 
 		/// <summary>
 		/// Root constructor
@@ -27,7 +34,6 @@ namespace DriveExplorer.Models {
 			LastModifiedTime = info.LastWriteTimeUtc;
 		}
 
-
 		/// <summary>
 		/// Child constructor
 		/// </summary>
@@ -40,6 +46,16 @@ namespace DriveExplorer.Models {
 			Name = Path.GetFileName(fullPath);
 			Size = isFolder ? 0 : (info as FileInfo).Length;
 			LastModifiedTime = info.LastWriteTimeUtc;
+		}
+
+		#endregion Public Constructors
+
+		#region Public Methods
+
+		public Task DownloadAsync(string localPath)
+		{
+			// this should never be executed
+			throw new InvalidOperationException();
 		}
 
 		public async IAsyncEnumerable<IItem> GetChildrenAsync()
@@ -64,6 +80,10 @@ namespace DriveExplorer.Models {
 			}
 		}
 
+		#endregion Public Methods
+
+		#region Private Methods
+
 		private static string FixFullPath(string fullPath)
 		{
 			while (fullPath.Last() == Path.DirectorySeparatorChar) {
@@ -72,12 +92,7 @@ namespace DriveExplorer.Models {
 
 			return fullPath;
 		}
-		public Task DownloadAsync(string localPath)
-		{
-			// this should never be executed
-			throw new InvalidOperationException();
-		}
+
+		#endregion Private Methods
 	}
-
-
 }

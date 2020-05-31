@@ -6,8 +6,17 @@ using System.Windows;
 using System.Windows.Data;
 
 namespace DriveExplorer.Views {
+
 	public class TypeVisibilityConverter : IValueConverter {
+
+		#region Public Fields
+
 		public static readonly TypeVisibilityConverter Instance = new TypeVisibilityConverter();
+
+		#endregion Public Fields
+
+		#region Public Methods
+
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
 			var type = (ItemTypes)value;
@@ -19,5 +28,7 @@ namespace DriveExplorer.Views {
 		{
 			throw new NotImplementedException();
 		}
+
+		#endregion Public Methods
 	}
 }

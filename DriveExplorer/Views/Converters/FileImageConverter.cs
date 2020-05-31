@@ -7,8 +7,17 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
 namespace DriveExplorer.Views {
+
 	public class TypeImageConverter : IValueConverter {
+
+		#region Public Fields
+
 		public static readonly TypeImageConverter Instance = new TypeImageConverter();
+
+		#endregion Public Fields
+
+		#region Public Methods
+
 		/// <param name="value"><see cref="IItem"/></param>
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
@@ -41,5 +50,7 @@ namespace DriveExplorer.Views {
 		{
 			throw new NotImplementedException();
 		}
+
+		#endregion Public Methods
 	}
 }

@@ -1,6 +1,4 @@
-﻿using Cyc.GoogleApi;
-using Cyc.MicrosoftApi;
-using Cyc.Standard;
+﻿using Cyc.Standard;
 
 using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
@@ -16,6 +14,9 @@ namespace DriveExplorer {
 	/// Interaction logic for App.xaml
 	/// </summary>
 	public partial class App : Application {
+
+		#region Protected Methods
+
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
@@ -27,6 +28,10 @@ namespace DriveExplorer {
 			MainWindow = serviceProvider.GetService<MainWindow>();
 			MainWindow.Show();
 		}
+
+		#endregion Protected Methods
+
+		#region Private Methods
 
 		private void ConfigureServices(ServiceCollection services)
 		{
@@ -44,5 +49,7 @@ namespace DriveExplorer {
 			services.AddSingleton<MainWindowVM>();
 			services.AddSingleton<MainWindow>();
 		}
+
+		#endregion Private Methods
 	}
 }

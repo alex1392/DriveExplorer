@@ -4,9 +4,12 @@ using System;
 using System.Text;
 using System.Windows;
 
-
 namespace DriveExplorer.Views {
+
 	public class MessageBoxLogger : ILogger {
+
+		#region Public Methods
+
 		public void Log(Exception ex)
 		{
 			var stringBuilder = new StringBuilder();
@@ -21,5 +24,7 @@ namespace DriveExplorer.Views {
 		{
 			MessageBox.Show(message);
 		}
+
+		#endregion Public Methods
 	}
 }

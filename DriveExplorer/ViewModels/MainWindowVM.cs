@@ -1,7 +1,7 @@
 ﻿using Cyc.Standard;
 
 using DriveExplorer.Models;
-using Newtonsoft.Json.Serialization;
+
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -15,21 +15,31 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DriveExplorer.ViewModels {
+
 	public class MainWindowVM : INotifyPropertyChanged {
+
+		#region Private Fields
+
 		private readonly string CacheRootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), nameof(DriveExplorer));
 
-		private readonly ILogger logger;
 		private readonly IDispatcher dispatcher;
-		private readonly LocalDriveManager localDriveManager;
-		private readonly IDriveManager oneDriveManager;
 		private readonly IDriveManager googleDriveManager;
-		private Visibility spinnerVisibility = Visibility.Collapsed;
+		private readonly LocalDriveManager localDriveManager;
+		private readonly ILogger logger;
+		private readonly IDriveManager oneDriveManager;
 		private CancellationTokenSource currentCancellationTokenSource;
 		private ItemVM currentFolder = null;
+		private Visibility spinnerVisibility = Visibility.Collapsed;
+
+		#endregion Private Fields
+
+		#region Public Events
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		public ObservableCollection<ItemVM> TreeItemVMs { get; } = new ObservableCollection<ItemVM>();
+		#endregion Public Events
+
+		#region Public Properties
 
 		public ItemVM CurrentFolder {
 			get => currentFolder;
@@ -40,6 +50,7 @@ namespace DriveExplorer.ViewModels {
 				}
 			}
 		}
+
 		public Visibility SpinnerVisibility {
 			get => spinnerVisibility;
 			set {
@@ -49,6 +60,12 @@ namespace DriveExplorer.ViewModels {
 				}
 			}
 		}
+
+		public ObservableCollection<ItemVM> TreeItemVMs { get; } = new ObservableCollection<ItemVM>();
+
+		#endregion Public Properties
+
+		#region Public Constructors
 
 		public MainWindowVM(
 			IDispatcher dispatcher,
@@ -95,6 +112,28 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
+		#endregion Public Constructors
+
+		#region Public Methods
+
+		public void CancelCurrentTask()
+		{
+			currentCancellationTokenSource?.Cancel();
+		}
+
+		public async Task CurrentItemSelectedAsync(object sender, MouseButtonEventArgs e = null)
+		{
+			var vm = (sender as ItemVM) ??
+				(sender as ListBoxItem).DataContext as ItemVM ??
+				throw new ArgumentException("invalid sender");
+			if (vm.Item.Type.Is(ItemTypes.Folders)) {
+				await CurrentItemFolderSelectedAsync(vm).ConfigureAwait(false);
+			} else if (vm.Item.Type == ItemTypes.File) {
+				await CurrentItemFileSelectedAsync(vm).ConfigureAwait(false);
+			} else {
+				throw new InvalidOperationException();
+			}
+		}
 
 		public async Task InitializeAsync()
 		{
@@ -112,6 +151,45 @@ namespace DriveExplorer.ViewModels {
 				await googleDriveManager.AutoLoginAsync().ConfigureAwait(true);
 			}
 		}
+
+		public async Task LoginGoogleDriveAsync()
+		{
+			if (googleDriveManager == null) {
+				return;
+			}
+			currentCancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+			await googleDriveManager.LoginAsync(currentCancellationTokenSource.Token).ConfigureAwait(false);
+		}
+
+		public async Task LoginOneDriveAsync()
+		{
+			if (oneDriveManager == null) {
+				return;
+			}
+			await oneDriveManager.LoginAsync().ConfigureAwait(false);
+		}
+
+		public async Task LogoutGoogleDriveAsync(IItem item)
+		{
+			if (googleDriveManager == null) {
+				return;
+			}
+			await googleDriveManager.LogoutAsync(item).ConfigureAwait(false);
+		}
+
+		public async Task LogoutOneDriveAsync(IItem item)
+		{
+			if (oneDriveManager == null) {
+				return;
+			}
+			await oneDriveManager.LogoutAsync(item).ConfigureAwait(false);
+		}
+
+		public void Reset()
+		{
+			TreeItemVMs.Clear();
+		}
+
 		public async Task TreeItemSelectedAsync(object sender, RoutedEventArgs e = null)
 		{
 			var itemVM = (sender as ItemVM) ??
@@ -123,19 +201,21 @@ namespace DriveExplorer.ViewModels {
 			await itemVM.SetIsExpandedAsync(true).ConfigureAwait(true);
 			CurrentFolder = itemVM;
 		}
-		public async Task CurrentItemSelectedAsync(object sender, MouseButtonEventArgs e = null)
+
+		#endregion Public Methods
+
+		#region Private Methods
+
+		private void AddTreeItemVM(IItem item)
 		{
-			var vm = (sender as ItemVM) ??
-				(sender as ListBoxItem).DataContext as ItemVM ??
-				throw new ArgumentException("invalid sender");
-			if (vm.Item.Type.Is(ItemTypes.Folders)) {
-				await CurrentItemFolderSelectedAsync(vm).ConfigureAwait(false);
-			} else if (vm.Item.Type == ItemTypes.File) {
-				await CurrentItemFileSelectedAsync(vm).ConfigureAwait(false);
-			} else {
-				throw new InvalidOperationException();
-			}
+			var itemVM = new ItemVM(item, CacheRootPath);
+			itemVM.BeforeExpand += (_, _) => ShowSpinner();
+			itemVM.Expanded += (_, _) => HideSpinner();
+			dispatcher?.Invoke(() => {
+				TreeItemVMs.Add(itemVM);
+			});
 		}
+
 		private async Task CurrentItemFileSelectedAsync(ItemVM vm)
 		{
 			// check if the file has been cached
@@ -170,52 +250,6 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
-		public void Reset()
-		{
-			TreeItemVMs.Clear();
-		}
-		public async Task LoginOneDriveAsync()
-		{
-			if (oneDriveManager == null) {
-				return;
-			}
-			await oneDriveManager.LoginAsync().ConfigureAwait(false);
-		}
-
-		public async Task LogoutOneDriveAsync(IItem item)
-		{
-			if (oneDriveManager == null) {
-				return;
-			}
-			await oneDriveManager.LogoutAsync(item).ConfigureAwait(false);
-		}
-		public void CancelCurrentTask()
-		{
-			currentCancellationTokenSource?.Cancel();
-		}
-		public async Task LoginGoogleDriveAsync()
-		{
-			if (googleDriveManager == null) {
-				return;
-			}
-			currentCancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
-			await googleDriveManager.LoginAsync(currentCancellationTokenSource.Token).ConfigureAwait(false);
-		}
-		public async Task LogoutGoogleDriveAsync(IItem item)
-		{
-			if (googleDriveManager == null) {
-				return;
-			}
-			await googleDriveManager.LogoutAsync(item).ConfigureAwait(false);
-		}
-
-		private void ShowSpinner()
-		{
-			dispatcher?.Invoke(() => {
-				SpinnerVisibility = Visibility.Visible;
-			});
-		}
-
 		private void HideSpinner()
 		{
 			dispatcher?.Invoke(() => {
@@ -223,15 +257,6 @@ namespace DriveExplorer.ViewModels {
 			});
 		}
 
-		private void AddTreeItemVM(IItem item)
-		{
-			var itemVM = new ItemVM(item, CacheRootPath);
-			itemVM.BeforeExpand += (_, _) => ShowSpinner();
-			itemVM.Expanded += (_, _) => HideSpinner();
-			dispatcher?.Invoke(() => {
-				TreeItemVMs.Add(itemVM);
-			});
-		}
 		private void RemoveTreeItemVM(IItem item)
 		{
 			// every account must be unique
@@ -241,6 +266,13 @@ namespace DriveExplorer.ViewModels {
 			});
 		}
 
+		private void ShowSpinner()
+		{
+			dispatcher?.Invoke(() => {
+				SpinnerVisibility = Visibility.Visible;
+			});
+		}
 
+		#endregion Private Methods
 	}
 }

@@ -8,17 +8,31 @@ using System.IO;
 using System.Threading.Tasks;
 
 using File = Google.Apis.Drive.v3.Data.File;
+
 namespace DriveExplorer.Models {
+
 	public class GoogleDriveItem : IItem {
 
+		#region Private Fields
+
 		private readonly GoogleApiManager googleApiManager;
-		public ItemTypes Type { get; private set; }
-		public string Name { get; private set; }
+
+		#endregion Private Fields
+
+		#region Public Properties
+
 		public string FullPath { get; private set; }
-		public string UserId { get; private set; }
 		public string Id { get; private set; }
-		public long? Size { get; private set; }
 		public DateTimeOffset? LastModifiedTime { get; private set; }
+		public string Name { get; private set; }
+		public long? Size { get; private set; }
+		public ItemTypes Type { get; private set; }
+		public string UserId { get; private set; }
+
+		#endregion Public Properties
+
+		#region Public Constructors
+
 		/// <summary>
 		/// Root constructor
 		/// </summary>
@@ -34,6 +48,7 @@ namespace DriveExplorer.Models {
 			Size = driveItem.Size;
 			LastModifiedTime = driveItem.ModifiedTime;
 		}
+
 		/// <summary>
 		/// Child constructor
 		/// </summary>
@@ -48,11 +63,16 @@ namespace DriveExplorer.Models {
 			Size = driveItem.Size;
 			LastModifiedTime = driveItem.ModifiedTime;
 		}
-		private bool IsFolder(File child)
+
+		#endregion Public Constructors
+
+		#region Public Methods
+
+		public async Task DownloadAsync(string localPath)
 		{
-			// application/vnd.google-apps.folder
-			return child.MimeType.Contains("folder");
+			await googleApiManager.DownloadAsync(UserId, Id, localPath).ConfigureAwait(false);
 		}
+
 		public async IAsyncEnumerable<IItem> GetChildrenAsync()
 		{
 			await foreach (var child in googleApiManager.GetChildrenAsync(UserId, Id).ConfigureAwait(false)) {
@@ -60,9 +80,16 @@ namespace DriveExplorer.Models {
 			}
 		}
 
-		public async Task DownloadAsync(string localPath)
+		#endregion Public Methods
+
+		#region Private Methods
+
+		private bool IsFolder(File child)
 		{
-			await googleApiManager.DownloadAsync(UserId, Id, localPath).ConfigureAwait(false);
+			// application/vnd.google-apps.folder
+			return child.MimeType.Contains("folder");
 		}
+
+		#endregion Private Methods
 	}
 }
