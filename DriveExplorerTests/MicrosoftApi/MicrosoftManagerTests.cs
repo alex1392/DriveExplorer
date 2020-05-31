@@ -22,7 +22,7 @@ namespace DriveExplorer.MicrosoftApi.Tests {
 		}
 
 		[Test()]
-		public void microsoftManagerTest() {
+		public void MicrosoftManagerTest() {
 			Assert.NotNull(microsoftManager);
 		}
 

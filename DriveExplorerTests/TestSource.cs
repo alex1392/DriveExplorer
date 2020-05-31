@@ -12,6 +12,8 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
+//using System.Security.Permissions;
+
 
 namespace DriveExplorer.Tests {
 	//public static class DispatcherUtil {

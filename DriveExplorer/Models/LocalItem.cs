@@ -19,7 +19,7 @@ namespace DriveExplorer.Models {
 		/// </summary>
 		public LocalItem(string fullPath)
 		{
-			fullPath = FixFullPath(fullPath);
+			fullPath = fullPath;
 			var info = new DirectoryInfo(fullPath);
 			FullPath = fullPath;
 			Type = ItemTypes.LocalDrive;
@@ -67,7 +67,7 @@ namespace DriveExplorer.Models {
 
 		private static string FixFullPath(string fullPath)
 		{
-			while (fullPath.Last() == Path.DirectorySeparatorChar) {
+			if (fullPath.Last() == Path.DirectorySeparatorChar) {
 				fullPath = fullPath.Remove(fullPath.Length - 1);
 			}
 
