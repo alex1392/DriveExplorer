@@ -13,11 +13,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace DriveExplorer.ViewModels {
 	public class MainWindowVM : INotifyPropertyChanged {
-		private string CacheRootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), nameof(DriveExplorer));
+		private readonly string CacheRootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), nameof(DriveExplorer));
 
 		private readonly ILogger logger;
 		private readonly IDispatcher dispatcher;
