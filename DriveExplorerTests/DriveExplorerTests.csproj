@@ -153,6 +153,7 @@
   <ItemGroup>
     <Compile Include="GoogleApi\GoogleManagerTests.cs" />
     <Compile Include="MicrosoftApi\MicrosoftManagerTests.cs" />
+    <Compile Include="MockDispatcher.cs" />
     <Compile Include="Models\OneDriveItemTests.cs" />
     <Compile Include="Models\LocalItemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

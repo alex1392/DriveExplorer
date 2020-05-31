@@ -3,7 +3,6 @@ using Cyc.MicrosoftApi;
 using Cyc.Standard;
 using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
-
 using Google.Apis.Auth.OAuth2;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +25,7 @@ namespace DriveExplorer.Tests {
 
 		static TestSource() {
 			var services = new ServiceCollection();
+			services.AddSingleton<IDispatcher, MockDispatcher>();
 			services.AddSingleton<ILogger, DebugLogger>();
 			services.AddSingleton(sp => new MicrosoftApiManager(sp.GetService<ILogger>(), MicrosoftApiManager.Authority.Organizations));
 			var fullPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, @"GoogleApi\client_secret.json");
@@ -35,8 +35,8 @@ namespace DriveExplorer.Tests {
 					dataStorePath: Path.Combine(GoogleWebAuthorizationBroker.Folder, "Test")));
 
 			services.AddSingleton<LocalDriveManager>();
-			//services.AddSingleton<GoogleDriveManager>();
-			//services.AddSingleton<OneDriveManager>();
+			services.AddSingleton<GoogleDriveManager>();
+			services.AddSingleton<OneDriveManager>();
 
 			services.AddSingleton<MainWindowVM>();
 

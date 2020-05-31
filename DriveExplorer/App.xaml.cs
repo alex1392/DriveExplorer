@@ -30,6 +30,7 @@ namespace DriveExplorer {
 
 		private void ConfigureServices(ServiceCollection services)
 		{
+			services.AddSingleton<IDispatcher, ApplicationDispatcher>();
 			services.AddSingleton<ILogger, MessageBoxLogger>();
 
 			services.AddSingleton<GoogleApiManager>();

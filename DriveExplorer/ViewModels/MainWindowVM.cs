@@ -19,6 +19,7 @@ namespace DriveExplorer.ViewModels {
 		private string CacheRootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), nameof(DriveExplorer));
 
 		private readonly ILogger logger;
+		private readonly IDispatcher dispatcher;
 		private readonly IDriveManager localDriveManager;
 		private readonly IDriveManager oneDriveManager;
 		private readonly IDriveManager googleDriveManager;
@@ -39,19 +40,19 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
-		public Dispatcher Dispatcher { get; private set; }
-
-		public MainWindowVM(ILogger logger = null,
+		public MainWindowVM(
+			IDispatcher dispatcher,
+			ILogger logger = null,
 			LocalDriveManager localDriveManager = null,
 			OneDriveManager oneDriveManager = null,
 			GoogleDriveManager googleDriveManager = null)
 		{
 			this.logger = logger;
+			this.dispatcher = dispatcher;
 			this.localDriveManager = localDriveManager;
 			this.oneDriveManager = oneDriveManager;
 			this.googleDriveManager = googleDriveManager;
 			SetupDriveManagers();
-			SetUpDispatcher();
 
 			void SetupDriveManagers()
 			{
@@ -81,14 +82,6 @@ namespace DriveExplorer.ViewModels {
 					googleDriveManager.LogoutCompleted += (_, item) => RemoveTreeItemVM(item);
 					googleDriveManager.BeforeTaskExecuted += (_, _) => ShowSpinner();
 					googleDriveManager.TaskExecuted += (_, _) => HideSpinner();
-				}
-			}
-			void SetUpDispatcher()
-			{
-				if (Application.Current != null) {
-					Dispatcher = Application.Current.Dispatcher;
-				} else {
-					Dispatcher = Dispatcher.CurrentDispatcher; // for testing
 				}
 			}
 		}
@@ -179,7 +172,7 @@ namespace DriveExplorer.ViewModels {
 						}
 					}.Start();
 				} catch (Win32Exception ex) {
-					logger.Log(ex);
+					logger?.Log(ex);
 				}
 			}
 		}
@@ -200,14 +193,14 @@ namespace DriveExplorer.ViewModels {
 
 		private void ShowSpinner()
 		{
-			Dispatcher.Invoke(() => {
+			dispatcher?.Invoke(() => {
 				SpinnerVisibility = Visibility.Visible;
 			});
 		}
 
 		private void HideSpinner()
 		{
-			Dispatcher.Invoke(() => {
+			dispatcher?.Invoke(() => {
 				SpinnerVisibility = Visibility.Collapsed;
 			});
 		}
@@ -217,14 +210,14 @@ namespace DriveExplorer.ViewModels {
 			var itemVM = new ItemVM(item, CacheRootPath);
 			itemVM.BeforeExpand += (_, _) => ShowSpinner();
 			itemVM.Expanded += (_, _) => HideSpinner();
-			Dispatcher.Invoke(() => {
+			dispatcher?.Invoke(() => {
 				TreeItemVMs.Add(itemVM);
 			});
 		}
 		private void RemoveTreeItemVM(IItem item)
 		{
 			var vm = TreeItemVMs.FirstOrDefault(vm => vm.Item.Name == item.Name) ?? throw new InvalidOperationException();
-			Dispatcher.Invoke(() => {
+			dispatcher?.Invoke(() => {
 				TreeItemVMs.Remove(vm);
 			});
 		}
