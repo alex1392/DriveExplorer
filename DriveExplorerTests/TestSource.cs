@@ -16,8 +16,8 @@ using System.Linq;
 
 namespace DriveExplorer.Tests {
 	public class TestSource : IEnumerable {
-		private static readonly MicrosoftManager microsoftManager;
-		private static readonly GoogleManager googleManager;
+		private static readonly MicrosoftApiManager microsoftManager;
+		private static readonly GoogleApiManager googleManager;
 		private static readonly MainWindowVM mainWindowVM;
 		private static readonly string googleDriveUserId;
 		private static readonly IAccount oneDriveAccount;
@@ -25,18 +25,18 @@ namespace DriveExplorer.Tests {
 		static TestSource() {
 			var services = new ServiceCollection();
 			services.AddSingleton<ILogger, DebugLogger>();
-			services.AddSingleton(sp => new MicrosoftManager(sp.GetService<ILogger>(), MicrosoftManager.Authority.Organizations));
+			services.AddSingleton(sp => new MicrosoftApiManager(sp.GetService<ILogger>(), MicrosoftApiManager.Authority.Organizations));
 			services.AddSingleton<MainWindowVM>();
 
 			var fullPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, @"GoogleApi\client_secret.json");
 			services.AddSingleton(sp =>
-				new GoogleManager(sp.GetService<ILogger>(),
+				new GoogleApiManager(sp.GetService<ILogger>(),
 					fullPath,
 					dataStorePath: Path.Combine(GoogleWebAuthorizationBroker.Folder, "Test")));
 
 			var serviceProvider = services.BuildServiceProvider();
-			microsoftManager = serviceProvider.GetService<MicrosoftManager>();
-			googleManager = serviceProvider.GetService<GoogleManager>();
+			microsoftManager = serviceProvider.GetService<MicrosoftApiManager>();
+			googleManager = serviceProvider.GetService<GoogleApiManager>();
 			mainWindowVM = serviceProvider.GetService<MainWindowVM>();
 			var result = microsoftManager.LoginWithUsernamePassword().Result;
 			oneDriveAccount = result.Account;

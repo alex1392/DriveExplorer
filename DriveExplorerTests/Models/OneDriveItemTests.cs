@@ -15,11 +15,11 @@ namespace DriveExplorer.Models.Tests {
 	public class OneDriveItemTests {
 		private DriveItem root;
 
-		private readonly MicrosoftManager microsoftManager;
+		private readonly MicrosoftApiManager microsoftManager;
 		private readonly IAccount account;
 
 		public OneDriveItemTests(object[] param) {
-			microsoftManager = (MicrosoftManager)param[0];
+			microsoftManager = (MicrosoftApiManager)param[0];
 			account = (IAccount)param[1];
 		}
 		[OneTimeSetUp]
