@@ -199,7 +199,7 @@
     <Compile Include="Models\LocalItem.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
     <Compile Include="Models\OneDriveItem.cs" />
-    <Compile Include="Views\Converters\TypeImageConverter.cs" />
+    <Compile Include="Views\Converters\FileImageConverter.cs" />
     <Compile Include="Views\Converters\TypeVisibilityConverter.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -233,7 +233,7 @@
     <Resource Include="Resources\img.png" />
     <Resource Include="Resources\folder.png" />
     <Resource Include="Resources\file.png" />
-    <Resource Include="Resources\drive.png" />
+    <Resource Include="Resources\localdrive.png" />
     <Resource Include="Resources\doc.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

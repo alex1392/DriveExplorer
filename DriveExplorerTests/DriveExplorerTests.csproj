@@ -160,7 +160,7 @@
     <Compile Include="ViewModels\ItemVMTests.cs" />
     <Compile Include="ViewModels\MainWindowVMTests.cs" />
     <Compile Include="TestSource.cs" />
-    <Compile Include="Views\Converters\TypeImageConverterTests.cs" />
+    <Compile Include="Views\Converters\FileImageConverterTests.cs" />
     <Compile Include="Views\Converters\TypeVisibilityConverterTests.cs" />
   </ItemGroup>
   <ItemGroup>
