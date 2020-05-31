@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +25,7 @@ namespace DriveExplorer.ViewModels {
 		private readonly IDriveManager oneDriveManager;
 		private readonly IDriveManager googleDriveManager;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
+		private CancellationTokenSource currentCancellationTokenSource;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -147,7 +149,8 @@ namespace DriveExplorer.ViewModels {
 		}
 		public async Task LoginGoogleDriveAsync()
 		{
-			await googleDriveManager.LoginAsync().ConfigureAwait(false);
+			currentCancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+			await googleDriveManager.LoginAsync(currentCancellationTokenSource.Token).ConfigureAwait(false);
 		}
 		public async Task LogoutGoogleDriveAsync(IItem item)
 		{

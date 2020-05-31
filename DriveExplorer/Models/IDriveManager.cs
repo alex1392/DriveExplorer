@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.Models {
@@ -11,5 +12,6 @@ namespace DriveExplorer.Models {
 		Task LoginAsync();
 		Task AutoLoginAsync();
 		Task LogoutAsync(IItem item);
+		Task LoginAsync(CancellationToken token);
 	}
 }

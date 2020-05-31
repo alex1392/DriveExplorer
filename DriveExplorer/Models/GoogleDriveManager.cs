@@ -2,6 +2,7 @@
 using Cyc.Standard;
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.Models {
@@ -31,8 +32,15 @@ namespace DriveExplorer.Models {
 			if (googleManager == null) {
 				return;
 			}
-			//TODO: add cancel for user login
 			var userId = await googleManager.UserLoginAsync().ConfigureAwait(true);
+			await CreateGoogleDrive(userId).ConfigureAwait(true);
+		}
+		public async Task LoginAsync(CancellationToken token)
+		{
+			if (googleManager == null) {
+				return;
+			}
+			var userId = await googleManager.UserLoginAsync(token).ConfigureAwait(true);
 			await CreateGoogleDrive(userId).ConfigureAwait(true);
 		}
 		public async Task AutoLoginAsync()
@@ -70,5 +78,6 @@ namespace DriveExplorer.Models {
 			var item = new GoogleDriveItem(googleManager, about, root, userId);
 			LoginCompleted?.Invoke(this, item);
 		}
+
 	}
 }

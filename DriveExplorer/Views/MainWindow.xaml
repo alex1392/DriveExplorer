@@ -74,11 +74,13 @@
 					Margin="462.333,315,10.333,67.667" />
 		</Grid>
 		<Border Background="#4C000000"
-				Visibility="{Binding SpinnerVisibility, FallbackValue=Collapsed}">
+				Visibility="{Binding SpinnerVisibility, FallbackValue=Collapsed}"
+				MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown">
 			<fa:ImageAwesome Icon="Spinner"
 							 Spin="True"
 							 Height="48"
-							 Width="48" />
+							 Width="48" 
+							 MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown"/>
 		</Border>
 	</Grid>
 </Window>

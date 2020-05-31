@@ -68,5 +68,10 @@ namespace DriveExplorer.Views {
 				}
 			}
 		}
+
+		private void SpinnerBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+
+		}
 	}
 }

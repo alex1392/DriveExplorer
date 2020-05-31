@@ -4,6 +4,7 @@ using Cyc.Standard;
 using Microsoft.Identity.Client;
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.Models {
@@ -35,6 +36,14 @@ namespace DriveExplorer.Models {
 				return;
 			}
 			var result = await microsoftManager.LoginInteractively().ConfigureAwait(true);
+			await CreateOneDriveAsync(result?.Account).ConfigureAwait(false);
+		}
+		public async Task LoginAsync(CancellationToken token)
+		{
+			if (microsoftManager == null) {
+				return;
+			}
+			var result = await microsoftManager.LoginInteractively(token).ConfigureAwait(true);
 			await CreateOneDriveAsync(result?.Account).ConfigureAwait(false);
 		}
 		/// <summary>
@@ -77,6 +86,7 @@ namespace DriveExplorer.Models {
 			var item = new OneDriveItem(microsoftManager, root, account);
 			LoginCompleted?.Invoke(this, item);
 		}
+
 
 	}
 }
