@@ -30,7 +30,8 @@ namespace DriveExplorer.ViewModels {
 
 		public ObservableCollection<ItemVM> TreeItemVMs { get; } = new ObservableCollection<ItemVM>();
 
-		public ObservableCollection<ItemVM> CurrentItemVMs { get; } = new ObservableCollection<ItemVM>();
+		public ObservableCollection<ItemVM> CurrentItemVMs => CurrentFolder?.Children;
+		public ItemVM CurrentFolder { get; private set; } = null;
 		public Visibility SpinnerVisibility {
 			get => spinnerVisibility;
 			set {
@@ -107,10 +108,11 @@ namespace DriveExplorer.ViewModels {
 			}
 			// update list box items, in case there's no items as it hasn't been expanded 
 			await itemVM.SetIsExpandedAsync(true).ConfigureAwait(true);
-			CurrentItemVMs.Clear();
-			foreach (var childVM in itemVM.Children) {
-				CurrentItemVMs.Add(childVM.Clone());
-			}
+			CurrentFolder = itemVM;
+			//CurrentItemVMs.Clear();
+			//foreach (var childVM in itemVM.Children) {
+			//	CurrentItemVMs.Add(childVM.Clone());
+			//}
 		}
 		public async Task CurrentItemSelectedAsync(object sender, MouseButtonEventArgs e = null)
 		{
@@ -125,7 +127,45 @@ namespace DriveExplorer.ViewModels {
 				throw new InvalidOperationException();
 			}
 		}
+		private async Task CurrentItemFileSelectedAsync(ItemVM vm)
+		{
+			// check if the file has been cached
+			if (!vm.IsCached) {
+				// download the file to cache
+				await vm.CacheFileAsync().ConfigureAwait(false);
+			}
+			// open the cached file with default application
+			try {
+				new Process
+				{
+					StartInfo = new ProcessStartInfo(vm.CacheFullPath)
+					{
+						UseShellExecute = true,
+					}
+				}.Start();
+			} catch (Win32Exception ex) {
+				logger?.Log(ex);
+			}
+		}
 
+		private async Task CurrentItemFolderSelectedAsync(ItemVM vm)
+		{
+			// expand all ancestor treeViewItems
+			var directories = vm.Item.FullPath
+				.Split(Path.DirectorySeparatorChar)
+				.Where(s => !string.IsNullOrEmpty(s));
+			//var treeVM = vm.LinkedVM;
+			//while (treeVM != null) {
+			//	await treeVM.SetIsExpandedAsync(true).ConfigureAwait(true);
+			//	treeVM = treeVM.Parent;
+			//}
+			//await vm.LinkedVM.SetIsSelectedAsync(true).ConfigureAwait(true);
+			await vm.SetIsSelectedAsync(true).ConfigureAwait(true);
+			while (vm != null) {
+				await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
+				vm = vm.Parent;
+			}
+		}
 		/// <summary>
 		/// Reset <see cref="TreeItemVMs"/> and <see cref="CurrentItemVMs"/>.
 		/// </summary>
@@ -155,41 +195,6 @@ namespace DriveExplorer.ViewModels {
 		public async Task LogoutGoogleDriveAsync(IItem item)
 		{
 			await googleDriveManager.LogoutAsync(item).ConfigureAwait(false);
-		}
-
-		private async Task CurrentItemFileSelectedAsync(ItemVM vm)
-		{
-			// check if the file has been cached
-			if (!vm.IsCached) {
-				// download the file to cache
-				await vm.CacheFileAsync().ConfigureAwait(false);
-			}
-			// open the cached file with default application
-			try {
-				new Process
-				{
-					StartInfo = new ProcessStartInfo(vm.CacheFullPath)
-					{
-						UseShellExecute = true,
-					}
-				}.Start();
-			} catch (Win32Exception ex) {
-				logger?.Log(ex);
-			}
-		}
-
-		private async Task CurrentItemFolderSelectedAsync(ItemVM vm)
-		{
-			// expand all treeViewItems
-			var directories = vm.Item.FullPath
-				.Split(Path.DirectorySeparatorChar)
-				.Where(s => !string.IsNullOrEmpty(s));
-			var treeVM = vm.LinkedVM;
-			while (treeVM != null) {
-				await treeVM.SetIsExpandedAsync(true).ConfigureAwait(true);
-				treeVM = treeVM.Parent;
-			}
-			await vm.LinkedVM.SetIsSelectedAsync(true).ConfigureAwait(true);
 		}
 
 		private void ShowSpinner()
