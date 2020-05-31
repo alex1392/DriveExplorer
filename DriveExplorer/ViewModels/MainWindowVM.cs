@@ -159,24 +159,22 @@ namespace DriveExplorer.ViewModels {
 
 		private async Task CurrentItemFileSelectedAsync(ItemVM vm)
 		{
-			if (vm.Item.Type == ItemTypes.File) {
-				// check if the file has been cached
-				if (!vm.IsCached) {
-					// download the file to cache
-					await vm.CacheFileAsync().ConfigureAwait(false);
-				}
-				// open the cached file with default application
-				try {
-					new Process
+			// check if the file has been cached
+			if (!vm.IsCached) {
+				// download the file to cache
+				await vm.CacheFileAsync().ConfigureAwait(false);
+			}
+			// open the cached file with default application
+			try {
+				new Process
+				{
+					StartInfo = new ProcessStartInfo(vm.CacheFullPath)
 					{
-						StartInfo = new ProcessStartInfo(vm.CacheFullPath)
-						{
-							UseShellExecute = true,
-						}
-					}.Start();
-				} catch (Win32Exception ex) {
-					logger?.Log(ex);
-				}
+						UseShellExecute = true,
+					}
+				}.Start();
+			} catch (Win32Exception ex) {
+				logger?.Log(ex);
 			}
 		}
 
