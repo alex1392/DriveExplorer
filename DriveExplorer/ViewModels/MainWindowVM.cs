@@ -1,10 +1,6 @@
-﻿using Cyc.GoogleApi;
-using Cyc.MicrosoftApi;
-using Cyc.Standard;
+﻿using Cyc.Standard;
 
 using DriveExplorer.Models;
-
-using Microsoft.Identity.Client;
 
 using System;
 using System.Collections.ObjectModel;
@@ -17,6 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+
 using Directory = System.IO.Directory;
 namespace DriveExplorer.ViewModels {
 	public class MainWindowVM : INotifyPropertyChanged {

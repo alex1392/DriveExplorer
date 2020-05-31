@@ -3,6 +3,7 @@ using Cyc.MicrosoftApi;
 
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
+
 using System;
 using System.Collections.Generic;
 using System.IO;

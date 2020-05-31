@@ -1,7 +1,7 @@
 ﻿using Cyc.GoogleApi;
 using Cyc.MicrosoftApi;
 using Cyc.Standard;
-
+using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
 
 using Google.Apis.Auth.OAuth2;
@@ -13,6 +13,8 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Security.Permissions;
+using System.Windows.Threading;
 
 namespace DriveExplorer.Tests {
 	public class TestSource : IEnumerable {
@@ -26,13 +28,17 @@ namespace DriveExplorer.Tests {
 			var services = new ServiceCollection();
 			services.AddSingleton<ILogger, DebugLogger>();
 			services.AddSingleton(sp => new MicrosoftApiManager(sp.GetService<ILogger>(), MicrosoftApiManager.Authority.Organizations));
-			services.AddSingleton<MainWindowVM>();
-
 			var fullPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, @"GoogleApi\client_secret.json");
 			services.AddSingleton(sp =>
 				new GoogleApiManager(sp.GetService<ILogger>(),
 					fullPath,
 					dataStorePath: Path.Combine(GoogleWebAuthorizationBroker.Folder, "Test")));
+
+			services.AddSingleton<LocalDriveManager>();
+			//services.AddSingleton<GoogleDriveManager>();
+			//services.AddSingleton<OneDriveManager>();
+
+			services.AddSingleton<MainWindowVM>();
 
 			var serviceProvider = services.BuildServiceProvider();
 			microsoftManager = serviceProvider.GetService<MicrosoftApiManager>();

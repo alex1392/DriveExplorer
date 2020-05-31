@@ -1,10 +1,12 @@
 ﻿using Cyc.GoogleApi;
-using Google.Apis.Download;
+
 using Google.Apis.Drive.v3.Data;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+
 using File = Google.Apis.Drive.v3.Data.File;
 namespace DriveExplorer.Models {
 	public class GoogleDriveItem : IItem {
