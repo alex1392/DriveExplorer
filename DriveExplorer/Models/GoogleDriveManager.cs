@@ -1,7 +1,9 @@
 ﻿using Cyc.GoogleApi;
 using Cyc.Standard;
-
+using Google.Apis.Drive.v3.Data;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,6 +11,7 @@ namespace DriveExplorer.Models {
 	public class GoogleDriveManager : IDriveManager {
 		private readonly ILogger logger;
 		private readonly GoogleApiManager googleManager;
+		private readonly Dictionary<string, User> userRegistry = new Dictionary<string, User>();
 
 		public event EventHandler<IItem> LoginCompleted;
 		public event EventHandler<IItem> LogoutCompleted;
@@ -62,6 +65,7 @@ namespace DriveExplorer.Models {
 				throw new InvalidOperationException();
 			}
 			if (await googleManager.UserLogoutAsync(googleDriveItem.UserId).ConfigureAwait(true)) {
+				userRegistry.Remove(googleDriveItem.UserId);
 				LogoutCompleted?.Invoke(this, item);
 			}
 		}
@@ -74,13 +78,23 @@ namespace DriveExplorer.Models {
 			if (about == null) {
 				return;
 			}
+			if (HasUser(about.User)) {
+				logger?.Log("User has already logged in.");
+				await googleManager.UserLogoutAsync(userId).ConfigureAwait(false);
+				return;
+			}
 			var root = await googleManager.GetDriveRootAsync(userId).ConfigureAwait(true);
 			if (root == null) {
 				return;
 			}
+			userRegistry.Add(userId, about.User);
 			var item = new GoogleDriveItem(googleManager, about, root, userId);
 			LoginCompleted?.Invoke(this, item);
 		}
 
+		private bool HasUser(User user)
+		{
+			return userRegistry.Any(pair => pair.Value.EmailAddress == user.EmailAddress);
+		}
 	}
 }

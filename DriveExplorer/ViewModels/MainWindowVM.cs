@@ -220,6 +220,7 @@ namespace DriveExplorer.ViewModels {
 		}
 		private void RemoveTreeItemVM(IItem item)
 		{
+			// every account must be unique
 			var vm = TreeItemVMs.FirstOrDefault(vm => vm.Item.Name == item.Name) ?? throw new InvalidOperationException();
 			dispatcher?.Invoke(() => {
 				TreeItemVMs.Remove(vm);
