@@ -13,8 +13,8 @@ namespace DriveExplorer.Models.Tests {
 		public void LocalItemTest(string fullPath, ItemTypes expectedType, string expectedName) {
 			var item = new LocalItem(fullPath);
 			Assert.NotNull(item);
-			Assert.AreEqual(item.Type, expectedType);
-			Assert.AreEqual(item.Name, expectedName);
+			Assert.AreEqual(expectedType, item.Type);
+			Assert.AreEqual(expectedName, item.Name);
 		}
 
 		[TestCase(@"C:\\")]
