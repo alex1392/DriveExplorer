@@ -109,8 +109,10 @@ namespace DriveExplorer.ViewModels {
 				throw new TypeInitializationException(nameof(ItemVM), null);
 			}
 			Item = item;
-			CacheRootPath = localRootPath;
-			CacheFullPath = Path.Combine(CacheRootPath, Item.Type.ToString(), Item.FullPath);
+			if (!(item.Type == ItemTypes.LocalDrive)) {
+				CacheRootPath = localRootPath;
+				CacheFullPath = Path.Combine(CacheRootPath, Item.Type.ToString(), Item.FullPath);
+			}
 			CacheFolder();
 		}
 
@@ -121,8 +123,11 @@ namespace DriveExplorer.ViewModels {
 		{
 			Item = item;
 			Parent = parent;
-			CacheRootPath = parent.CacheRootPath;
-			CacheFullPath = Path.Combine(parent.CacheFullPath, Item.Name);
+			if (parent.CacheFullPath != null) {
+				CacheRootPath = parent.CacheRootPath;
+				CacheFullPath = Path.Combine(parent.CacheFullPath, Item.Name);
+
+			}
 			// inherit parent's events
 			BeforeExpand += parent.BeforeExpand;
 			Expanded += parent.Expanded;
@@ -148,6 +153,9 @@ namespace DriveExplorer.ViewModels {
 
 		public async Task CacheFileAsync()
 		{
+			if (CacheFullPath == null) {
+				return;
+			}
 			await Item.DownloadAsync(CacheFullPath).ConfigureAwait(false);
 			// set file info
 			File.SetLastWriteTimeUtc(CacheFullPath, Item.LastModifiedTime.Value.LocalDateTime);
@@ -239,6 +247,9 @@ namespace DriveExplorer.ViewModels {
 				Children.Clear(); // clear dummy item
 				await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
 					Children.Add(new ItemVM(item, this));
+				}
+				if (CacheFullPath == null) {
+					return;
 				}
 				Directory.GetDirectories(CacheFullPath)
 					.Where(path => !Children.Any(vm => vm.CacheFullPath == path))
