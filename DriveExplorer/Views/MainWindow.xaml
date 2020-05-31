@@ -1,62 +1,68 @@
 ﻿<Window x:Class="DriveExplorer.Views.MainWindow"
-		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:fa="http://schemas.fontawesome.io/icons/"
-		xmlns:views="clr-namespace:DriveExplorer.Views"
-		xmlns:vm="clr-namespace:DriveExplorer.ViewModels"
-		mc:Ignorable="d"
-		Title="MainWindow"
-		Height="450"
-		Width="800">
-	<Grid>
+				xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+				xmlns:fa="http://schemas.fontawesome.io/icons/"
+				xmlns:views="clr-namespace:DriveExplorer.Views"
+				xmlns:vm="clr-namespace:DriveExplorer.ViewModels"
+				xmlns:mvvm="clr-namespace:Cyc.Mvvm.Commands;assembly=Cyc.Mvvm"
+				xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+				xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+				fw:AcrylicWindow.Enabled="True"
+				mc:Ignorable="d"
+				Title="MainWindow"
+				Height="450"
+				Width="800">
+	<Grid fw:PointerTracker.Enabled="True"
+				Background="#01FFFFFF">
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="3*" />
 			</Grid.ColumnDefinitions>
 			<TreeView ItemsSource="{Binding TreeItemVMs}">
-				<TreeView.Resources>
-				</TreeView.Resources>
 				<TreeView.ItemContainerStyle>
 					<Style TargetType="TreeViewItem">
 						<EventSetter Event="Selected"
-									 Handler="TreeViewItem_Selected" />
+												 Handler="TreeViewItem_Selected" />
 						<EventSetter Event="MouseDown"
-									 Handler="TreeViewItem_MouseDown" />
+												 Handler="TreeViewItem_MouseDown" />
 						<Setter Property="IsExpanded"
-								Value="{Binding IsExpanded, Mode=TwoWay}" />
+										Value="{Binding IsExpanded, Mode=TwoWay}" />
 						<Setter Property="IsSelected"
-								Value="{Binding IsSelected, Mode=TwoWay}" />
+										Value="{Binding IsSelected, Mode=TwoWay}" />
 						<Setter Property="Visibility"
-								Value="{Binding Item.Type, Converter={x:Static views:TypeVisibilityConverter.Instance}}" />
+										Value="{Binding Item.Type, Converter={x:Static views:TypeVisibilityConverter.Instance}}" />
 					</Style>
 				</TreeView.ItemContainerStyle>
 				<TreeView.ItemTemplate>
 					<HierarchicalDataTemplate DataType="{x:Type vm:ItemVM}"
-											  ItemsSource="{Binding Children}">
-						<TextBlock Text="{Binding Item.Name}" />
+																		ItemsSource="{Binding Children}">
+						<TextBox Text="{Binding Item.Name, Mode=OneWay}"
+										 IsEnabled="False"
+										 Style="{StaticResource TextBoxRevealStyle}"/>
 					</HierarchicalDataTemplate>
 				</TreeView.ItemTemplate>
 			</TreeView>
 			<GridSplitter Width="5" />
 
 			<ListBox ItemsSource="{Binding CurrentFolder.Children}"
-					 Grid.Column="1">
+							 Style="{StaticResource ListBoxRevealStyle}"
+							 Grid.Column="1">
 				<ListBox.ItemContainerStyle>
 					<Style TargetType="ListBoxItem">
 						<EventSetter Event="MouseDoubleClick"
-									 Handler="ListBoxItem_MouseDoubleClick" />
+												 Handler="ListBoxItem_MouseDoubleClick" />
 						<Setter Property="IsSelected"
-								Value="{Binding IsSelected, Mode=OneWay}" />
+										Value="{Binding IsSelected, Mode=OneWay}" />
 					</Style>
 				</ListBox.ItemContainerStyle>
 				<!--<ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel />
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>-->
+					<ItemsPanelTemplate>
+						<WrapPanel />
+					</ItemsPanelTemplate>
+				</ListBox.ItemsPanel>-->
 				<ListBox.ItemTemplate>
 					<DataTemplate DataType="{x:Type vm:ItemVM}">
 						<TextBlock Text="{Binding Item.Name}" />
@@ -65,22 +71,24 @@
 			</ListBox>
 
 			<Button Content="Login OneDrive"
-					Click="LoginOneDriveButton_Click"
-					Grid.Column="1"
-					Margin="462,373,10,10" />
+							Click="LoginOneDriveButton_Click"
+							Grid.Column="1"
+							Style="{StaticResource ButtonRevealStyle}"
+							Margin="462,373,10,10" />
 			<Button Content="Login GoogleDrive"
-					Click="LoginGoogleDriveButton_Click"
-					Grid.Column="1"
-					Margin="462.333,315,10.333,67.667" />
+							Click="LoginGoogleDriveButton_Click"
+							Grid.Column="1"
+							Style="{StaticResource ButtonRevealStyle}"
+							Margin="462.333,315,10.333,67.667" />
 		</Grid>
 		<Border Background="#4C000000"
-				Visibility="{Binding SpinnerVisibility, FallbackValue=Collapsed}"
-				MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown">
+						Visibility="{Binding SpinnerVisibility, FallbackValue=Collapsed}"
+						MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown">
 			<fa:ImageAwesome Icon="Spinner"
-							 Spin="True"
-							 Height="48"
-							 Width="48"
-							 MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown" />
+											 Spin="True"
+											 Height="48"
+											 Width="48"
+											 MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown" />
 		</Border>
 	</Grid>
 </Window>

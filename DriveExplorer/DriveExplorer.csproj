@@ -55,6 +55,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentWPF, Version=0.8.0.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentWPF.0.8.0\lib\net45\FluentWPF.dll</HintPath>
+    </Reference>
     <Reference Include="FontAwesome.WPF, Version=4.7.0.37774, Culture=neutral, PublicKeyToken=0758b07a11a4f466, processorArchitecture=MSIL">
       <HintPath>..\packages\FontAwesome.WPF.4.7.0.9\lib\net40\FontAwesome.WPF.dll</HintPath>
     </Reference>
@@ -261,6 +264,10 @@
     <ProjectReference Include="..\Cyc\Cyc.MicrosoftApi\Cyc.MicrosoftApi.csproj">
       <Project>{BD671F7E-9628-466F-8E8E-82A83AF19CA9}</Project>
       <Name>Cyc.MicrosoftApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cyc\Cyc.Mvvm\Cyc.Mvvm.csproj">
+      <Project>{f465ee5c-8383-4962-9141-8542702d9053}</Project>
+      <Name>Cyc.Mvvm</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cyc\Cyc.Standard\Cyc.Standard.csproj">
       <Project>{1415E977-CDF6-4507-AE7A-41780DCB1A77}</Project>
