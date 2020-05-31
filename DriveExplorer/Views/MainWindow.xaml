@@ -42,14 +42,14 @@
 			</TreeView>
 			<GridSplitter Width="5" />
 
-			<ListBox ItemsSource="{Binding CurrentItemVMs}"
+			<ListBox ItemsSource="{Binding CurrentFolder.Children}"
 					 Grid.Column="1">
 				<ListBox.ItemContainerStyle>
 					<Style TargetType="ListBoxItem">
 						<EventSetter Event="MouseDoubleClick"
 									 Handler="ListBoxItem_MouseDoubleClick" />
 						<Setter Property="IsSelected"
-								Value="{Binding IsSelected, Mode=TwoWay}" />
+								Value="{Binding IsSelected, Mode=OneWay}" />
 					</Style>
 				</ListBox.ItemContainerStyle>
 				<!--<ListBox.ItemsPanel>
@@ -79,8 +79,8 @@
 			<fa:ImageAwesome Icon="Spinner"
 							 Spin="True"
 							 Height="48"
-							 Width="48" 
-							 MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown"/>
+							 Width="48"
+							 MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown" />
 		</Border>
 	</Grid>
 </Window>

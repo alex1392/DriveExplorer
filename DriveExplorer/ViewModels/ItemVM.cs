@@ -61,9 +61,7 @@ namespace DriveExplorer.ViewModels {
 				}
 			}
 		}
-		/// <summary>
-		/// Optional property Injection
-		/// </summary>
+
 		public IItem Item { get; private set; }
 		public ItemVM Parent { get; }
 		public ObservableCollection<ItemVM> Children { get; private set; } = new ObservableCollection<ItemVM>
@@ -74,7 +72,6 @@ namespace DriveExplorer.ViewModels {
 		public string CacheFullPath { get; private set; }
 
 		public string CacheRootPath { get; private set; }
-		public ItemVM LinkedVM { get; private set; }
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		public event EventHandler BeforeExpand;
@@ -82,10 +79,7 @@ namespace DriveExplorer.ViewModels {
 
 		public event EventHandler BeforeSelect;
 		public event EventHandler Selected;
-		/// <summary>
-		/// Clone constructor
-		/// </summary>
-		private ItemVM() { }
+
 		/// <summary>
 		/// Root Constructor
 		/// </summary>
@@ -141,16 +135,6 @@ namespace DriveExplorer.ViewModels {
 			await SelectAsync().ConfigureAwait(false);
 		}
 
-		public ItemVM Clone()
-		{
-			return new ItemVM
-			{
-				Item = Item,
-				CacheFullPath = CacheFullPath,
-				CacheRootPath = CacheRootPath,
-				LinkedVM = this,
-			};
-		}
 		private async Task ExpandAsync()
 		{
 			if (!Item.Type.Is(ItemTypes.Folders)) {
@@ -182,7 +166,7 @@ namespace DriveExplorer.ViewModels {
 		{
 			BeforeSelect?.Invoke(this, null);
 
-
+			await Task.CompletedTask;
 
 			Selected?.Invoke(this, null);
 		}

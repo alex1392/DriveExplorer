@@ -25,13 +25,21 @@ namespace DriveExplorer.ViewModels {
 		private readonly IDriveManager googleDriveManager;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
 		private CancellationTokenSource currentCancellationTokenSource;
+		private ItemVM currentFolder = null;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		public ObservableCollection<ItemVM> TreeItemVMs { get; } = new ObservableCollection<ItemVM>();
 
-		public ObservableCollection<ItemVM> CurrentItemVMs => CurrentFolder?.Children;
-		public ItemVM CurrentFolder { get; private set; } = null;
+		public ItemVM CurrentFolder {
+			get => currentFolder;
+			private set {
+				if (currentFolder != value) {
+					currentFolder = value;
+					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentFolder)));
+				}
+			}
+		}
 		public Visibility SpinnerVisibility {
 			get => spinnerVisibility;
 			set {
@@ -112,13 +120,8 @@ namespace DriveExplorer.ViewModels {
 			if (e != null) {
 				e.Handled = true; // avoid recursive calls of treeViewItem.select
 			}
-			// update list box items, in case there's no items as it hasn't been expanded 
 			await itemVM.SetIsExpandedAsync(true).ConfigureAwait(true);
 			CurrentFolder = itemVM;
-			//CurrentItemVMs.Clear();
-			//foreach (var childVM in itemVM.Children) {
-			//	CurrentItemVMs.Add(childVM.Clone());
-			//}
 		}
 		public async Task CurrentItemSelectedAsync(object sender, MouseButtonEventArgs e = null)
 		{
@@ -156,29 +159,20 @@ namespace DriveExplorer.ViewModels {
 
 		private async Task CurrentItemFolderSelectedAsync(ItemVM vm)
 		{
+			await vm.SetIsSelectedAsync(true).ConfigureAwait(true);
 			// expand all ancestor treeViewItems
 			var directories = vm.Item.FullPath
 				.Split(Path.DirectorySeparatorChar)
 				.Where(s => !string.IsNullOrEmpty(s));
-			//var treeVM = vm.LinkedVM;
-			//while (treeVM != null) {
-			//	await treeVM.SetIsExpandedAsync(true).ConfigureAwait(true);
-			//	treeVM = treeVM.Parent;
-			//}
-			//await vm.LinkedVM.SetIsSelectedAsync(true).ConfigureAwait(true);
-			await vm.SetIsSelectedAsync(true).ConfigureAwait(true);
 			while (vm != null) {
 				await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
 				vm = vm.Parent;
 			}
 		}
-		/// <summary>
-		/// Reset <see cref="TreeItemVMs"/> and <see cref="CurrentItemVMs"/>.
-		/// </summary>
+
 		public void Reset()
 		{
 			TreeItemVMs.Clear();
-			CurrentItemVMs.Clear();
 		}
 		public async Task LoginOneDriveAsync()
 		{
