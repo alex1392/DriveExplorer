@@ -21,7 +21,7 @@ namespace DriveExplorer.ViewModels {
 
 		private readonly ILogger logger;
 		private readonly IDispatcher dispatcher;
-		private readonly IDriveManager localDriveManager;
+		private readonly LocalDriveManager localDriveManager;
 		private readonly IDriveManager oneDriveManager;
 		private readonly IDriveManager googleDriveManager;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
@@ -65,7 +65,6 @@ namespace DriveExplorer.ViewModels {
 					Console.WriteLine($"{typeof(LocalDriveManager)} is not attached to {this.GetType()}.");
 				} else {
 					localDriveManager.LoginCompleted += (_, item) => AddTreeItemVM(item);
-					localDriveManager.LogoutCompleted += (_, item) => RemoveTreeItemVM(item);
 				}
 				if (this.oneDriveManager == null) {
 					Console.WriteLine($"{typeof(OneDriveManager)} is not attached to {this.GetType()}.");
@@ -87,10 +86,8 @@ namespace DriveExplorer.ViewModels {
 				}
 			}
 		}
-		public void SetCacheRootPath(string path)
-		{
-			CacheRootPath = path;
-		}
+
+
 		public async Task InitializeAsync()
 		{
 			// check local cache

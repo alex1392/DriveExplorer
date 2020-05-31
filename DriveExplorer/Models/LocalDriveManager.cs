@@ -2,16 +2,14 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DriveExplorer.Models {
-	public class LocalDriveManager : IDriveManager {
+	public class LocalDriveManager {
 		private readonly ILogger logger;
 
 		public event EventHandler<IItem> LoginCompleted;
-		public event EventHandler<IItem> LogoutCompleted;
-		public event EventHandler BeforeTaskExecuted;
-		public event EventHandler TaskExecuted;
 
 		public LocalDriveManager(ILogger logger)
 		{
@@ -30,17 +28,6 @@ namespace DriveExplorer.Models {
 				LoginCompleted?.Invoke(this, item);
 			}
 			return Task.CompletedTask;
-		}
-
-		[Obsolete]
-		public Task LoginAsync()
-		{
-			throw new NotImplementedException();
-		}
-		[Obsolete]
-		public Task LogoutAsync(IItem item)
-		{
-			throw new NotImplementedException();
 		}
 	}
 }
