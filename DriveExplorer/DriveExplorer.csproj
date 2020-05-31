@@ -185,6 +185,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\GoogleDriveItem.cs" />
+    <Compile Include="Models\GoogleDriveManager.cs" />
+    <Compile Include="Models\IDriveManager.cs" />
+    <Compile Include="Models\LocalDriveManager.cs" />
+    <Compile Include="Models\OneDriveManager.cs" />
     <Compile Include="Views\MessageBoxLogger.cs" />
     <Compile Include="Views\Converters\DebugConverter.cs" />
     <Compile Include="Models\IItem.cs" />
