@@ -1,4 +1,6 @@
-﻿using Cyc.Standard;
+﻿using Cyc.GoogleApi;
+using Cyc.MicrosoftApi;
+using Cyc.Standard;
 
 using DriveExplorer.Models;
 using DriveExplorer.ViewModels;
@@ -38,11 +40,11 @@ namespace DriveExplorer {
 			services.AddSingleton<IDispatcher, ApplicationDispatcher>();
 			services.AddSingleton<ILogger, MessageBoxLogger>();
 
-			//services.AddSingleton<GoogleApiManager>();
-			//services.AddSingleton<MicrosoftApiManager>();
+			services.AddSingleton<GoogleApiManager>();
+			services.AddSingleton<GoogleDriveManager>();
 
-			//services.AddSingleton<GoogleDriveManager>();
-			//services.AddSingleton<OneDriveManager>();
+			services.AddSingleton<MicrosoftApiManager>();
+			services.AddSingleton<OneDriveManager>();
 
 			services.AddSingleton<LocalDriveManager>();
 

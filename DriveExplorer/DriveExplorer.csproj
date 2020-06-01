@@ -179,6 +179,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Views\AddDrivePopupWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -194,6 +198,9 @@
     <Compile Include="Models\OneDriveManager.cs" />
     <Compile Include="ViewModels\ApplicationDispatcher.cs" />
     <Compile Include="ViewModels\IDispatcher.cs" />
+    <Compile Include="Views\AddDrivePopupWindow.xaml.cs">
+      <DependentUpon>AddDrivePopupWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MessageBoxLogger.cs" />
     <Compile Include="Views\Converters\DebugConverter.cs" />
     <Compile Include="Models\IItem.cs" />

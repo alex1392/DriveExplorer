@@ -110,7 +110,7 @@ namespace DriveExplorer.ViewModels.Tests {
 		public void Setup()
 		{
 			foreach (var vm in treeItemVMs) {
-				mainWindowVM.TreeItemVMs.Add(vm.Clone());
+				mainWindowVM.TreeItemVMs.Add(new ItemVM(vm.Item, vm.CacheRootPath));
 			}
 		}
 

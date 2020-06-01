@@ -3,6 +3,7 @@
 using DriveExplorer.Models;
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -40,6 +41,20 @@ namespace DriveExplorer.ViewModels {
 		#endregion Public Events
 
 		#region Public Properties
+		public ObservableCollection<ItemVM> CurrentItemVMs => currentFolder?.Children;
+
+		public List<ItemVM> PathItemVMs {
+			get {
+				var list = new List<ItemVM>();
+				var vm = currentFolder;
+				while (vm != null) {
+					list.Add(vm);
+					vm = vm.Parent;
+				}
+				list.Reverse();
+				return list;
+			}
+		}
 
 		public ItemVM CurrentFolder {
 			get => currentFolder;
@@ -47,6 +62,8 @@ namespace DriveExplorer.ViewModels {
 				if (currentFolder != value) {
 					currentFolder = value;
 					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentFolder)));
+					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentItemVMs)));
+					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PathItemVMs)));
 				}
 			}
 		}
@@ -241,9 +258,6 @@ namespace DriveExplorer.ViewModels {
 		{
 			await vm.SetIsSelectedAsync(true).ConfigureAwait(true);
 			// expand all ancestor treeViewItems
-			var directories = vm.Item.FullPath
-				.Split(Path.DirectorySeparatorChar)
-				.Where(s => !string.IsNullOrEmpty(s));
 			while (vm != null) {
 				await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
 				vm = vm.Parent;

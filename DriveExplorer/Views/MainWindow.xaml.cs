@@ -87,5 +87,14 @@ namespace DriveExplorer.Views {
 		}
 
 		#endregion Private Methods
+
+		private void AddDriveButton_Click(object sender, RoutedEventArgs e)
+		{
+			var popup = new AddDrivePopupWindow(vm)
+			{
+				Owner = this
+			};
+			popup.ShowDialog();
+		}
 	}
 }

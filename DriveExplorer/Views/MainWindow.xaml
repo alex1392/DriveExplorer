@@ -11,75 +11,129 @@
 				xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
 				fw:AcrylicWindow.Enabled="True"
 				mc:Ignorable="d"
-				Title="MainWindow"
+				Title="Drive Explorer"
 				Height="450"
 				Width="800">
-	<Grid fw:PointerTracker.Enabled="True"
-				Background="#01FFFFFF">
+	<Grid fw:PointerTracker.Enabled="True">
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="3*" />
 			</Grid.ColumnDefinitions>
-			<TreeView ItemsSource="{Binding TreeItemVMs}">
-				<TreeView.ItemContainerStyle>
-					<Style TargetType="TreeViewItem">
-						<EventSetter Event="Selected"
-												 Handler="TreeViewItem_Selected" />
-						<EventSetter Event="MouseDown"
-												 Handler="TreeViewItem_MouseDown" />
-						<Setter Property="IsExpanded"
-										Value="{Binding IsExpanded, Mode=TwoWay}" />
-						<Setter Property="IsSelected"
-										Value="{Binding IsSelected, Mode=TwoWay}" />
-						<Setter Property="Visibility"
-										Value="{Binding Item.Type, Converter={x:Static views:TypeVisibilityConverter.Instance}}" />
-					</Style>
-				</TreeView.ItemContainerStyle>
-				<TreeView.ItemTemplate>
-					<HierarchicalDataTemplate DataType="{x:Type vm:ItemVM}"
-																		ItemsSource="{Binding Children}">
-						<TextBox Text="{Binding Item.Name, Mode=OneWay}"
-										 IsEnabled="False"
-										 Style="{StaticResource TextBoxRevealStyle}"/>
-					</HierarchicalDataTemplate>
-				</TreeView.ItemTemplate>
-			</TreeView>
-			<GridSplitter Width="5" />
+			<DockPanel>
+				<StackPanel Orientation="Horizontal"
+										DockPanel.Dock="Top">
+					<Button>
+						<fa:ImageAwesome Icon="ArrowLeft"
+														 Height="20"
+														 Margin="5" />
+					</Button>
+					<Button>
+						<fa:ImageAwesome Icon="ArrowRight"
+														 Height="20"
+														 Margin="5" />
+					</Button>
+					<Button>
+						<fa:ImageAwesome Icon="ArrowUp"
+														 Height="20"
+														 Margin="5" />
+					</Button>
+					<Button>
+						<fa:ImageAwesome Icon="Undo"
+														 Height="20"
+														 Margin="5"
+														 FlipOrientation="Horizontal" />
+					</Button>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal"
+										DockPanel.Dock="Bottom">
+					<Button Name="AddDriveButton"
+									Click="AddDriveButton_Click">
+						<fa:ImageAwesome Icon="Plus"
+														 Height="20"
+														 Margin="5" />
+					</Button>
+					<Button>
+						<fa:ImageAwesome Icon="Refresh"
+														 Height="20"
+														 Margin="5" />
+					</Button>
+				</StackPanel>
+				<TreeView ItemsSource="{Binding TreeItemVMs}"
+									Background="Transparent">
+					<TreeView.ItemContainerStyle>
+						<Style TargetType="TreeViewItem">
+							<EventSetter Event="Selected"
+													 Handler="TreeViewItem_Selected" />
+							<EventSetter Event="MouseDown"
+													 Handler="TreeViewItem_MouseDown" />
+							<Setter Property="IsExpanded"
+											Value="{Binding IsExpanded, Mode=TwoWay}" />
+							<Setter Property="IsSelected"
+											Value="{Binding IsSelected, Mode=TwoWay}" />
+							<Setter Property="Visibility"
+											Value="{Binding Item.Type, Converter={x:Static views:TypeVisibilityConverter.Instance}}" />
+						</Style>
+					</TreeView.ItemContainerStyle>
+					<TreeView.ItemTemplate>
+						<HierarchicalDataTemplate DataType="{x:Type vm:ItemVM}"
+																			ItemsSource="{Binding Children}">
+							<TextBox Text="{Binding Item.Name, Mode=OneWay}"
+											 IsEnabled="False"
+											 Style="{StaticResource TextBoxRevealStyle}" />
+						</HierarchicalDataTemplate>
+					</TreeView.ItemTemplate>
+				</TreeView>
+			</DockPanel>
 
-			<ListBox ItemsSource="{Binding CurrentFolder.Children}"
-							 Style="{StaticResource ListBoxRevealStyle}"
-							 Grid.Column="1">
-				<ListBox.ItemContainerStyle>
-					<Style TargetType="ListBoxItem">
-						<EventSetter Event="MouseDoubleClick"
-												 Handler="ListBoxItem_MouseDoubleClick" />
-						<Setter Property="IsSelected"
-										Value="{Binding IsSelected, Mode=OneWay}" />
-					</Style>
-				</ListBox.ItemContainerStyle>
-				<!--<ListBox.ItemsPanel>
+			<DockPanel Grid.Column="1">
+				<ListBox ItemsSource="{Binding PathItemVMs}"
+								 Background="Transparent"
+								 DockPanel.Dock="Top">
+					<ListBox.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel Orientation="Horizontal"
+													Height="35"
+													/>
+						</ItemsPanelTemplate>
+					</ListBox.ItemsPanel>
+					<ListBox.ItemTemplate>
+						<DataTemplate DataType="{x:Type vm:ItemVM}">
+							<TextBox Text="{Binding Item.Name, Mode=OneWay}"
+											 IsEnabled="False"
+											 Height="20"
+											 Margin="5"/>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+
+				<ListBox ItemsSource="{Binding CurrentItemVMs}"
+								 Style="{StaticResource ListBoxRevealStyle}"
+								 Background="Transparent"
+								 Grid.Column="1">
+					<ListBox.ItemContainerStyle>
+						<Style TargetType="ListBoxItem">
+							<EventSetter Event="MouseDoubleClick"
+													 Handler="ListBoxItem_MouseDoubleClick" />
+							<Setter Property="IsSelected"
+											Value="{Binding IsSelected, Mode=OneWay}" />
+						</Style>
+					</ListBox.ItemContainerStyle>
+					<!--<ListBox.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel />
 					</ItemsPanelTemplate>
 				</ListBox.ItemsPanel>-->
-				<ListBox.ItemTemplate>
-					<DataTemplate DataType="{x:Type vm:ItemVM}">
-						<TextBlock Text="{Binding Item.Name}" />
-					</DataTemplate>
-				</ListBox.ItemTemplate>
-			</ListBox>
+					<ListBox.ItemTemplate>
+						<DataTemplate DataType="{x:Type vm:ItemVM}">
+							<TextBox Text="{Binding Item.Name, Mode=OneWay}"
+											 Style="{StaticResource TextBoxRevealStyle}"
+											 IsEnabled="False" />
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
 
-			<Button Content="Login OneDrive"
-							Click="LoginOneDriveButton_Click"
-							Grid.Column="1"
-							Style="{StaticResource ButtonRevealStyle}"
-							Margin="462,373,10,10" />
-			<Button Content="Login GoogleDrive"
-							Click="LoginGoogleDriveButton_Click"
-							Grid.Column="1"
-							Style="{StaticResource ButtonRevealStyle}"
-							Margin="462.333,315,10.333,67.667" />
+			</DockPanel>
 		</Grid>
 		<Border Background="#4C000000"
 						Visibility="{Binding SpinnerVisibility, FallbackValue=Collapsed}"
