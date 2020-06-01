@@ -97,10 +97,6 @@ namespace DriveExplorer.Views {
 			popup.ShowDialog();
 		}
 
-		private void PathButton_Click(object sender, RoutedEventArgs e)
-		{
-		}
-
 		private async void PathButton_Click(object sender, MouseButtonEventArgs e)
 		{
 			if (!(sender is ListBoxItem listBoxItem) || 
@@ -108,7 +104,6 @@ namespace DriveExplorer.Views {
 				return;
 			}
 			await itemVM.SetIsSelectedAsync(true).ConfigureAwait(true);
-			vm.CurrentFolder = itemVM;
 		}
 	}
 }

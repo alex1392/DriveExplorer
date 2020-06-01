@@ -23,12 +23,12 @@
 			<DockPanel>
 				<StackPanel Orientation="Horizontal"
 										DockPanel.Dock="Top">
-					<Button>
+					<Button Command="{Binding PreviousPageCommand}">
 						<fa:ImageAwesome Icon="ArrowLeft"
 														 Height="20"
 														 Margin="5" />
 					</Button>
-					<Button>
+					<Button Command="{Binding NextPageCommand}">
 						<fa:ImageAwesome Icon="ArrowRight"
 														 Height="20"
 														 Margin="5" />

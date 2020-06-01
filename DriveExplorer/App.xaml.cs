@@ -39,6 +39,7 @@ namespace DriveExplorer {
 		{
 			services.AddSingleton<IDispatcher, ApplicationDispatcher>();
 			services.AddSingleton<ILogger, MessageBoxLogger>();
+			services.AddSingleton<NavigationManager<ItemVM>>();
 
 			services.AddSingleton<GoogleApiManager>();
 			services.AddSingleton<GoogleDriveManager>();

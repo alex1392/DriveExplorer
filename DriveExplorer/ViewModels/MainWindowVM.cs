@@ -24,13 +24,14 @@ namespace DriveExplorer.ViewModels {
 		private readonly string CacheRootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), nameof(DriveExplorer));
 
 		private readonly IDispatcher dispatcher;
+		private readonly NavigationManager<ItemVM> navigationManager;
 		private readonly IDriveManager googleDriveManager;
 		private readonly LocalDriveManager localDriveManager;
 		private readonly ILogger logger;
 		private readonly IDriveManager oneDriveManager;
 		private CancellationTokenSource currentCancellationTokenSource;
-		private ItemVM currentFolder = null;
 		private Visibility spinnerVisibility = Visibility.Collapsed;
+
 
 		#endregion Private Fields
 
@@ -41,12 +42,12 @@ namespace DriveExplorer.ViewModels {
 		#endregion Public Events
 
 		#region Public Properties
-		public ObservableCollection<ItemVM> CurrentItemVMs => currentFolder?.Children;
+		public ObservableCollection<ItemVM> CurrentItemVMs => CurrentFolder?.Children;
 
 		public List<ItemVM> PathItemVMs {
 			get {
 				var list = new List<ItemVM>();
-				var vm = currentFolder;
+				var vm = CurrentFolder;
 				while (vm != null) {
 					list.Add(vm);
 					vm = vm.Parent;
@@ -60,18 +61,7 @@ namespace DriveExplorer.ViewModels {
 		/// Should always be the selected <see cref="ItemVM"/>
 		/// </summary>
 		public ItemVM CurrentFolder {
-			get => currentFolder;
-			set {
-				if (currentFolder != value) {
-					if (!value.IsSelected) {
-						throw new InvalidOperationException("CurrentFolder should always be the selected itemVM");
-					}
-					currentFolder = value;
-					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentFolder)));
-					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentItemVMs)));
-					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PathItemVMs)));
-				}
-			}
+			get => navigationManager.Current;
 		}
 
 		public Visibility SpinnerVisibility {
@@ -86,12 +76,16 @@ namespace DriveExplorer.ViewModels {
 
 		public ObservableCollection<ItemVM> TreeItemVMs { get; } = new ObservableCollection<ItemVM>();
 
+		public ICommand PreviousPageCommand { get; private set; }
+		public ICommand NextPageCommand { get; private set; }
+
 		#endregion Public Properties
 
 		#region Public Constructors
 
 		public MainWindowVM(
 			IDispatcher dispatcher,
+			NavigationManager<ItemVM> navigationManager,
 			ILogger logger = null,
 			LocalDriveManager localDriveManager = null,
 			OneDriveManager oneDriveManager = null,
@@ -99,9 +93,20 @@ namespace DriveExplorer.ViewModels {
 		{
 			this.logger = logger;
 			this.dispatcher = dispatcher;
+			this.navigationManager = navigationManager;
 			this.localDriveManager = localDriveManager;
 			this.oneDriveManager = oneDriveManager;
 			this.googleDriveManager = googleDriveManager;
+
+			PreviousPageCommand = new PreviousPageCommand(navigationManager);
+			NextPageCommand = new NextPageCommand(navigationManager);
+
+			navigationManager.CurrentChanged += (_, _) => {
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentFolder)));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentItemVMs)));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PathItemVMs)));
+			};
+
 			SetupDriveManagers();
 
 			void SetupDriveManagers()
@@ -222,7 +227,7 @@ namespace DriveExplorer.ViewModels {
 				e.Handled = true; // avoid recursive calls of treeViewItem.select
 			}
 			await itemVM.SetIsExpandedAsync(true).ConfigureAwait(true);
-			CurrentFolder = itemVM;
+			navigationManager.Add(itemVM);
 		}
 
 		#endregion Public Methods
@@ -250,7 +255,7 @@ namespace DriveExplorer.ViewModels {
 			try {
 				new Process
 				{
-					StartInfo = new ProcessStartInfo(vm.CacheFullPath)
+					StartInfo = new ProcessStartInfo(vm.CacheFullPath ?? vm.Item.FullPath)
 					{
 						UseShellExecute = true,
 					}

@@ -51,6 +51,9 @@ namespace DriveExplorer.ViewModels {
 
 		public bool IsCached {
 			get {
+				if (CacheFullPath == null) {
+					return true;
+				}
 				// check if cache file exist, and the last modified date and file size is matched
 				if (Item.Type.Is(ItemTypes.Folders)) {
 					return Directory.Exists(CacheFullPath);
@@ -208,11 +211,11 @@ namespace DriveExplorer.ViewModels {
 		/// </summary>
 		public async Task SetIsExpandedAsync(bool value)
 		{
+			await ExpandAsync().ConfigureAwait(false);
 			if (value != isExpanded) {
 				isExpanded = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsExpanded)));
 			}
-			await ExpandAsync().ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -220,11 +223,11 @@ namespace DriveExplorer.ViewModels {
 		/// </summary>
 		public async Task SetIsSelectedAsync(bool value)
 		{
+			await SelectAsync().ConfigureAwait(false);
 			if (value != isSelected) {
 				isSelected = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
 			}
-			await SelectAsync().ConfigureAwait(false);
 		}
 
 		public override string ToString()
@@ -251,7 +254,6 @@ namespace DriveExplorer.ViewModels {
 			if (!Item.Type.Is(ItemTypes.Folders)) {
 				return;
 			}
-			// attach children
 			if (haveExpanded) {
 				return;
 			}
@@ -263,16 +265,17 @@ namespace DriveExplorer.ViewModels {
 			{
 				haveExpanded = true;
 				Children.Clear(); // clear dummy item
+				// attach children
 				await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
 					Children.Add(new ItemVM(item, this));
 				}
-				if (CacheFullPath == null) {
-					return;
+				if (CacheFullPath != null) {
+					// delete any folder is not consistent with cloud
+					Directory.GetDirectories(CacheFullPath)
+						.Where(path => !Children.Any(vm => vm.CacheFullPath == path))
+						.ToList()
+						.ForEach(path => Directory.Delete(path, recursive: true));
 				}
-				Directory.GetDirectories(CacheFullPath)
-					.Where(path => !Children.Any(vm => vm.CacheFullPath == path))
-					.ToList()
-					.ForEach(path => Directory.Delete(path, recursive: true));
 			}
 		}
 

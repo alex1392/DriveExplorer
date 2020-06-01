@@ -195,7 +195,10 @@
     <Compile Include="Models\GoogleDriveManager.cs" />
     <Compile Include="Models\IDriveManager.cs" />
     <Compile Include="Models\LocalDriveManager.cs" />
+    <Compile Include="Models\NavigationManager.cs" />
+    <Compile Include="ViewModels\NextPageCommand.cs" />
     <Compile Include="Models\OneDriveManager.cs" />
+    <Compile Include="ViewModels\PreviousPageCommand.cs" />
     <Compile Include="ViewModels\ApplicationDispatcher.cs" />
     <Compile Include="ViewModels\IDispatcher.cs" />
     <Compile Include="Views\AddDrivePopupWindow.xaml.cs">
