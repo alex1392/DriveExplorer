@@ -23,7 +23,7 @@
 				<Setter Property="Height" 
 								Value="50"/>
 				<Setter Property="Width"
-								Value="220" />
+								Value="140" />
 				<Setter Property="Margin"
 								Value="5,5,5,0" />
 				<Setter Property="HorizontalContentAlignment"

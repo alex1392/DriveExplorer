@@ -56,10 +56,16 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Should always be the selected <see cref="ItemVM"/>
+		/// </summary>
 		public ItemVM CurrentFolder {
 			get => currentFolder;
-			private set {
+			set {
 				if (currentFolder != value) {
+					if (!value.IsSelected) {
+						throw new InvalidOperationException("CurrentFolder should always be the selected itemVM");
+					}
 					currentFolder = value;
 					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentFolder)));
 					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentItemVMs)));

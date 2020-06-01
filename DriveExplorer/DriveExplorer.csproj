@@ -209,7 +209,6 @@
     <Compile Include="Models\LocalItem.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
     <Compile Include="Models\OneDriveItem.cs" />
-    <Compile Include="Views\Converters\FileImageConverter.cs" />
     <Compile Include="Views\Converters\TypeVisibilityConverter.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

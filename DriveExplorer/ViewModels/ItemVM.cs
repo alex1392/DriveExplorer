@@ -7,6 +7,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace DriveExplorer.ViewModels {
 
@@ -95,6 +99,7 @@ namespace DriveExplorer.ViewModels {
 
 		public IItem Item { get; private set; }
 		public ItemVM Parent { get; }
+		public ImageSource Icon { get; private set; }
 
 		#endregion Public Properties
 
@@ -114,6 +119,18 @@ namespace DriveExplorer.ViewModels {
 				CacheFullPath = Path.Combine(CacheRootPath, Item.Type.ToString(), Item.FullPath);
 			}
 			CacheFolder();
+			SetIcon();
+		}
+
+		private void SetIcon()
+		{
+			if (Item.Type.Is(ItemTypes.Folders)) {
+				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{Item.Type}.png"));
+			} else {
+				var icon = System.Drawing.Icon.ExtractAssociatedIcon(Item.FullPath);
+				Icon = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+
+			}
 		}
 
 		/// <summary>
@@ -135,6 +152,7 @@ namespace DriveExplorer.ViewModels {
 			if (Item.Type.Is(ItemTypes.Folders)) {
 				CacheFolder();
 			}
+			SetIcon();
 		}
 
 		#endregion Public Constructors

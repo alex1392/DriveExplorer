@@ -93,16 +93,27 @@
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>
 							<StackPanel Orientation="Horizontal"
-													Height="35"
-													/>
+													Height="35" />
 						</ItemsPanelTemplate>
 					</ListBox.ItemsPanel>
+					<ListBox.ItemContainerStyle>
+						<Style TargetType="ListBoxItem">
+							<EventSetter Event="MouseDoubleClick"
+													 Handler="PathButton_Click" />
+						</Style>
+					</ListBox.ItemContainerStyle>
 					<ListBox.ItemTemplate>
 						<DataTemplate DataType="{x:Type vm:ItemVM}">
-							<TextBox Text="{Binding Item.Name, Mode=OneWay}"
-											 IsEnabled="False"
-											 Height="20"
-											 Margin="5"/>
+								<StackPanel Orientation="Horizontal">
+									<Image Source="{Binding Icon}"
+												 Width="20"
+												 Height="20" />
+									<TextBox Text="{Binding Item.Name, Mode=OneWay}"
+													 IsEnabled="False"
+													 Height="20"
+													 Margin="5" />
+
+								</StackPanel>
 						</DataTemplate>
 					</ListBox.ItemTemplate>
 				</ListBox>
@@ -126,9 +137,16 @@
 				</ListBox.ItemsPanel>-->
 					<ListBox.ItemTemplate>
 						<DataTemplate DataType="{x:Type vm:ItemVM}">
-							<TextBox Text="{Binding Item.Name, Mode=OneWay}"
-											 Style="{StaticResource TextBoxRevealStyle}"
-											 IsEnabled="False" />
+							<StackPanel Orientation="Horizontal">
+								<Image Source="{Binding Icon}"
+											 Width="20"
+											 Height="20" />
+								<TextBox Text="{Binding Item.Name, Mode=OneWay}"
+												 IsEnabled="False"
+												 Height="20"
+												 Margin="5" />
+
+							</StackPanel>
 						</DataTemplate>
 					</ListBox.ItemTemplate>
 				</ListBox>
