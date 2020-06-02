@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cyc.Mvvm", "Cyc\Cyc.Mvvm\Cy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp1", "WpfApp1\WpfApp1.csproj", "{7E9DF5E2-C3CB-4905-8E5F-64042581C1EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cyc.FluentDesign", "Cyc\Cyc.FluentDesign\Cyc.FluentDesign.csproj", "{BF1F329D-2A66-48F8-BD93-96F95C9024F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,16 @@ Global
 		{7E9DF5E2-C3CB-4905-8E5F-64042581C1EA}.Microsoft|Any CPU.Build.0 = Microsoft|Any CPU
 		{7E9DF5E2-C3CB-4905-8E5F-64042581C1EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E9DF5E2-C3CB-4905-8E5F-64042581C1EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Google|Any CPU.ActiveCfg = Release|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Google|Any CPU.Build.0 = Release|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Local|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Microsoft|Any CPU.ActiveCfg = Release|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Microsoft|Any CPU.Build.0 = Release|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

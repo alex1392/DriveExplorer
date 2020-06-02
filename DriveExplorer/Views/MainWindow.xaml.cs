@@ -6,8 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Linq;
-using System.Collections.Generic;
-using System.Windows.Threading;
+using Cyc;
 
 namespace DriveExplorer.Views {
 

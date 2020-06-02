@@ -9,8 +9,9 @@
 				xmlns:mvvm="clr-namespace:Cyc.Mvvm.Commands;assembly=Cyc.Mvvm"
 				xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 				xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
-				fw:AcrylicWindow.Enabled="True"
+				xmlns:fd="clr-namespace:Cyc.FluentDesign;assembly=Cyc.FluentDesign"
 				mc:Ignorable="d"
+				Style="{StaticResource RevealWindowStyle}"
 				Title="Drive Explorer"
 				Height="450"
 				Width="800">
@@ -59,7 +60,7 @@
 														 Margin="5" />
 					</Button>
 				</StackPanel>
-				<TreeView Name="treeView" 
+				<TreeView Name="treeView"
 									ItemsSource="{Binding TreeItemVMs}"
 									Background="Transparent"
 									BorderThickness="0"
@@ -109,16 +110,16 @@
 					</ListBox.ItemContainerStyle>
 					<ListBox.ItemTemplate>
 						<DataTemplate DataType="{x:Type vm:ItemVM}">
-								<StackPanel Orientation="Horizontal">
-									<Image Source="{Binding Icon}"
-												 Width="20"
-												 Height="20" />
-									<TextBox Text="{Binding Item.Name, Mode=OneWay}"
-													 IsEnabled="False"
-													 Height="20"
-													 Margin="3" />
+							<StackPanel Orientation="Horizontal">
+								<Image Source="{Binding Icon}"
+											 Width="20"
+											 Height="20" />
+								<TextBox Text="{Binding Item.Name, Mode=OneWay}"
+												 IsEnabled="False"
+												 Height="20"
+												 Margin="3" />
 
-								</StackPanel>
+							</StackPanel>
 						</DataTemplate>
 					</ListBox.ItemTemplate>
 				</ListBox>
@@ -133,11 +134,11 @@
 													 Handler="ListBoxItem_MouseDoubleClick" />
 						</Style>
 					</ListBox.ItemContainerStyle>
-					<!--<ListBox.ItemsPanel>
+					<ListBox.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel />
 					</ItemsPanelTemplate>
-				</ListBox.ItemsPanel>-->
+				</ListBox.ItemsPanel>
 					<ListBox.ItemTemplate>
 						<DataTemplate DataType="{x:Type vm:ItemVM}">
 							<StackPanel Orientation="Horizontal">

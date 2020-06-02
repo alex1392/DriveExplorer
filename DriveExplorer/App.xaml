@@ -8,6 +8,7 @@
 			<ResourceDictionary.MergedDictionaries>
 				<!--  FluentWPF Controls  -->
 				<ResourceDictionary Source="pack://application:,,,/FluentWPF;component/Styles/Controls.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/Cyc.FluentDesign;component/Themes/RevealWindow.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 
 			<sys:Double x:Key="ScrollBarWidth">5</sys:Double>

@@ -298,6 +298,10 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cyc\Cyc.FluentDesign\Cyc.FluentDesign.csproj">
+      <Project>{bf1f329d-2a66-48f8-bd93-96f95c9024f8}</Project>
+      <Name>Cyc.FluentDesign</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cyc\Cyc.GoogleApi\Cyc.GoogleApi.csproj">
       <Project>{40DCA5C6-9BD9-40F5-AE71-8DB12F77A3A2}</Project>
       <Name>Cyc.GoogleApi</Name>
