@@ -59,7 +59,8 @@
 														 Margin="5" />
 					</Button>
 				</StackPanel>
-				<TreeView ItemsSource="{Binding TreeItemVMs}"
+				<TreeView Name="treeView" 
+									ItemsSource="{Binding TreeItemVMs}"
 									Background="Transparent"
 									BorderThickness="0"
 									Margin="5">

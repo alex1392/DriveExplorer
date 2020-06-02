@@ -29,7 +29,7 @@ namespace DriveExplorer.Models {
 			var info = new DirectoryInfo(fullPath);
 			FullPath = fullPath;
 			Type = ItemTypes.LocalDrive;
-			Name = fullPath;
+			Name = FixFullPath(fullPath);
 			Size = 0;
 			LastModifiedTime = info.LastWriteTimeUtc;
 		}
@@ -55,7 +55,8 @@ namespace DriveExplorer.Models {
 		public Task DownloadAsync(string localPath)
 		{
 			// this should never be executed
-			throw new InvalidOperationException();
+			// or simply just do nothing
+			return Task.CompletedTask;
 		}
 
 		public async IAsyncEnumerable<IItem> GetChildrenAsync()

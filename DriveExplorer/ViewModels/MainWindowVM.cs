@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -80,6 +81,7 @@ namespace DriveExplorer.ViewModels {
 		public ICommand NextPageCommand { get; private set; }
 		public ICommand ParentFolderCommand { get; private set; }
 		public bool IsBusy { get; private set; }
+		public ItemVM StartupItemVM { get; private set; }
 
 		#endregion Public Properties
 
@@ -99,7 +101,7 @@ namespace DriveExplorer.ViewModels {
 			this.localDriveManager = localDriveManager;
 			this.oneDriveManager = oneDriveManager;
 			this.googleDriveManager = googleDriveManager;
-			
+
 			PreviousPageCommand = new PreviousPageCommand(navigationManager);
 			NextPageCommand = new NextPageCommand(navigationManager);
 			ParentFolderCommand = new ParentFolderCommand(navigationManager);
@@ -120,7 +122,7 @@ namespace DriveExplorer.ViewModels {
 				if (this.localDriveManager == null) {
 					Console.WriteLine($"{typeof(LocalDriveManager)} is not attached to {this.GetType()}.");
 				} else {
-					localDriveManager.LoginCompleted += (_, item) => AddTreeItemVM(item);
+					localDriveManager.GetDriveCompleted += (_, item) => AddTreeItemVM(item);
 				}
 				if (this.oneDriveManager == null) {
 					Console.WriteLine($"{typeof(OneDriveManager)} is not attached to {this.GetType()}.");
@@ -173,7 +175,12 @@ namespace DriveExplorer.ViewModels {
 				Directory.CreateDirectory(CacheRootPath);
 			}
 			if (localDriveManager != null) {
-				await localDriveManager.AutoLoginAsync().ConfigureAwait(true);
+				localDriveManager.GetLocalDrives();
+				var desktopPath = localDriveManager.GetDesktop();
+				//var desktopVM = CreatePath(desktopPath);
+				//StartupItemVM = desktopVM;
+				//await TreeItemSelectedAsync(StartupItemVM).ConfigureAwait(true);
+				await NavigateToPathAsync(desktopPath).ConfigureAwait(true);
 			}
 			if (oneDriveManager != null) {
 				await oneDriveManager.AutoLoginAsync().ConfigureAwait(true);
@@ -181,6 +188,42 @@ namespace DriveExplorer.ViewModels {
 			if (googleDriveManager != null) {
 				await googleDriveManager.AutoLoginAsync().ConfigureAwait(true);
 			}
+		}
+
+		private ItemVM CreatePath(string fullpath)
+		{
+			var levels = fullpath.Split(Path.DirectorySeparatorChar).ToList();
+			var root = levels[0];
+			levels.RemoveAt(0);
+
+			var parentVM = TreeItemVMs.FirstOrDefault(vm => vm.Item.Name == root);
+			if (parentVM == null) {
+				throw new Exception("Cannot find root for desktop path.");
+			}
+			var currentpath = root;
+			foreach (var level in levels) {
+				currentpath = string.Join(Path.DirectorySeparatorChar.ToString() ,currentpath, level);
+				parentVM = parentVM.Children.FirstOrDefault(vm =>
+					vm?.Item.Name == level) ??
+					parentVM.AttachChild(new LocalItem(currentpath, true));
+			}
+			return parentVM;
+		}
+
+		private async Task NavigateToPathAsync(string fullpath)
+		{
+			var levels = fullpath.Split(Path.DirectorySeparatorChar).ToList();
+			var vms = TreeItemVMs;
+			ItemVM vm = null;
+			foreach (var level in levels) {
+				vm = vms.FirstOrDefault(vm => vm.Item.Name == level);
+				if (vm == null) {
+					throw new Exception();
+				}
+				await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
+				vms = vm.Children;
+			}
+			await vm.SetIsSelectedAsync(true).ConfigureAwait(false);
 		}
 
 		public async Task LoginGoogleDriveAsync()

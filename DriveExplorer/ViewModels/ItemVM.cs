@@ -232,6 +232,19 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Attach certain child without expand it
+		/// </summary>
+		public ItemVM AttachChild(IItem item)
+		{
+			if (HasDummyItem) {
+				Children.Clear();
+			}
+			var itemVM = new ItemVM(item, this);
+			Children.Add(itemVM);
+			return itemVM;
+		}
+
 		public override string ToString()
 		{
 			return $"{Item.Name}, Items: {Children.Count}";
@@ -266,10 +279,15 @@ namespace DriveExplorer.ViewModels {
 			async Task DoExpand()
 			{
 				haveExpanded = true;
-				Children.Clear(); // clear dummy item
-								  // attach children
+				if (HasDummyItem) {
+					Children.Clear(); // clear dummy item
+				}
+				// attach children
 				await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
-					Children.Add(new ItemVM(item, this));
+					// item with the same name is not allowed
+					if (!Children.Any(vm => vm.Item.Name == item.Name)) {
+						Children.Add(new ItemVM(item, this));
+					}
 				}
 				if (!IsLocal) {
 					// delete any folder is not consistent with cloud
@@ -280,6 +298,7 @@ namespace DriveExplorer.ViewModels {
 				}
 			}
 		}
+		public bool HasDummyItem => Children.Count == 1 && Children[0] == null;
 
 		private async Task SelectAsync()
 		{

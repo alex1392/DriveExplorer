@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Linq;
 using System.Collections.Generic;
+using System.Windows.Threading;
 
 namespace DriveExplorer.Views {
 
@@ -90,6 +91,7 @@ namespace DriveExplorer.Views {
 				return;
 			}
 			await vm.TreeItemSelectedAsync(sender, e).ConfigureAwait(false);
+			(sender as TreeViewItem).BringIntoView();
 		}
 
 		#endregion Private Methods

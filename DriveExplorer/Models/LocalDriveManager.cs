@@ -16,7 +16,7 @@ namespace DriveExplorer.Models {
 
 		#region Public Events
 
-		public event EventHandler<IItem> LoginCompleted;
+		public event EventHandler<IItem> GetDriveCompleted;
 
 		#endregion Public Events
 
@@ -31,7 +31,7 @@ namespace DriveExplorer.Models {
 
 		#region Public Methods
 
-		public Task AutoLoginAsync()
+		public void GetLocalDrives()
 		{
 			string[] drivePaths = null;
 			try {
@@ -41,9 +41,13 @@ namespace DriveExplorer.Models {
 			}
 			foreach (var drivePath in drivePaths) {
 				var item = new LocalItem(drivePath);
-				LoginCompleted?.Invoke(this, item);
+				GetDriveCompleted?.Invoke(this, item);
 			}
-			return Task.CompletedTask;
+		}
+
+		public string GetDesktop()
+		{
+			return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 		}
 
 		#endregion Public Methods
