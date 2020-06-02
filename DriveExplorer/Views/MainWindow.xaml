@@ -33,7 +33,7 @@
 														 Height="20"
 														 Margin="5" />
 					</Button>
-					<Button>
+					<Button Command="{Binding ParentFolderCommand}">
 						<fa:ImageAwesome Icon="ArrowUp"
 														 Height="20"
 														 Margin="5" />

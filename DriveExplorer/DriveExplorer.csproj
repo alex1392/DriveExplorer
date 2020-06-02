@@ -198,6 +198,7 @@
     <Compile Include="Models\NavigationManager.cs" />
     <Compile Include="ViewModels\NextPageCommand.cs" />
     <Compile Include="Models\OneDriveManager.cs" />
+    <Compile Include="ViewModels\ParentFolderCommand.cs" />
     <Compile Include="ViewModels\PreviousPageCommand.cs" />
     <Compile Include="ViewModels\ApplicationDispatcher.cs" />
     <Compile Include="ViewModels\IDispatcher.cs" />

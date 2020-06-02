@@ -25,10 +25,8 @@ namespace DriveExplorer.Models {
 
 		public async void Execute(object parameter)
 		{
-			var vm = navigationManager.GoPrevious();
-			navigationManager.AddLock = true;
-			await vm.SetIsSelectedAsync(true).ConfigureAwait(false);
-			navigationManager.AddLock = false;
+			await navigationManager.GoPreviousAsync(async vm => 
+				await vm.SetIsSelectedAsync(true).ConfigureAwait(false)).ConfigureAwait(false);
 		}
 	}
 }

@@ -9,6 +9,7 @@ namespace DriveExplorer.Models {
 		private readonly List<T> list = new List<T>();
 		private readonly int capacity;
 		private int index = -1;
+		private bool AddLock = false;
 
 		public event EventHandler CanGoPreviousChanged;
 		public event EventHandler CanGoNextChanged;
@@ -18,7 +19,6 @@ namespace DriveExplorer.Models {
 		public T Current => index >= 0 && index < list.Count ?
 			list[Index] : default;
 
-		public bool AddLock { get; set; } = false;
 
 		public int Index {
 			get => index;
@@ -54,10 +54,10 @@ namespace DriveExplorer.Models {
 		}
 
 
-		public T GoPrevious()
+		public async Task GoPreviousAsync(Func<T, Task> func)
 		{
 			if (!CanGoPrevious) {
-				return null;
+				return;
 			}
 			var canGoNextCache = CanGoNext;
 			Index--;
@@ -67,13 +67,15 @@ namespace DriveExplorer.Models {
 			if (!CanGoPrevious) {
 				CanGoPreviousChanged?.Invoke(this, null);
 			}
-			return list[Index];
+			AddLock = true;
+			await func.Invoke(list[index]).ConfigureAwait(false);
+			AddLock = false;
 		}
 
-		public T GoNext()
+		public async Task GoNextAsync(Func<T, Task> func)
 		{
 			if (!CanGoNext) {
-				return null;
+				return;
 			}
 			var canGoPreviousCache = CanGoPrevious;
 			Index++;
@@ -83,7 +85,9 @@ namespace DriveExplorer.Models {
 			if (!CanGoNext) {
 				CanGoNextChanged?.Invoke(this, null);
 			}
-			return list[Index];
+			AddLock = true;
+			await func.Invoke(list[index]).ConfigureAwait(false);
+			AddLock = false;
 		}
 
 	}

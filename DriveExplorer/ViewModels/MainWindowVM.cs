@@ -78,6 +78,7 @@ namespace DriveExplorer.ViewModels {
 
 		public ICommand PreviousPageCommand { get; private set; }
 		public ICommand NextPageCommand { get; private set; }
+		public ICommand ParentFolderCommand { get; private set; }
 
 		#endregion Public Properties
 
@@ -100,6 +101,7 @@ namespace DriveExplorer.ViewModels {
 
 			PreviousPageCommand = new PreviousPageCommand(navigationManager);
 			NextPageCommand = new NextPageCommand(navigationManager);
+			ParentFolderCommand = new ParentFolderCommand(navigationManager);
 
 			navigationManager.CurrentChanged += (_, _) => {
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentFolder)));
