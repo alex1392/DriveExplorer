@@ -40,13 +40,13 @@ namespace DriveExplorer {
 			services.AddSingleton<IDispatcher, ApplicationDispatcher>();
 			services.AddSingleton<ILogger, MessageBoxLogger>();
 			services.AddSingleton<NavigationManager<ItemVM>>();
-
+#if !LOCAL
 			services.AddSingleton<GoogleApiManager>();
 			services.AddSingleton<GoogleDriveManager>();
 
 			services.AddSingleton<MicrosoftApiManager>();
 			services.AddSingleton<OneDriveManager>();
-
+#endif
 			services.AddSingleton<LocalDriveManager>();
 
 			services.AddSingleton<MainWindowVM>();

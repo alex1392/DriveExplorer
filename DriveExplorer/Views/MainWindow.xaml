@@ -94,7 +94,7 @@
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>
 							<StackPanel Orientation="Horizontal"
-													Height="35" />
+													Height="30" />
 						</ItemsPanelTemplate>
 					</ListBox.ItemsPanel>
 					<ListBox.ItemContainerStyle>
@@ -112,7 +112,7 @@
 									<TextBox Text="{Binding Item.Name, Mode=OneWay}"
 													 IsEnabled="False"
 													 Height="20"
-													 Margin="5" />
+													 Margin="3" />
 
 								</StackPanel>
 						</DataTemplate>
