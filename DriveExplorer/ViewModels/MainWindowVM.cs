@@ -79,6 +79,7 @@ namespace DriveExplorer.ViewModels {
 		public ICommand PreviousPageCommand { get; private set; }
 		public ICommand NextPageCommand { get; private set; }
 		public ICommand ParentFolderCommand { get; private set; }
+		public bool IsBusy { get; private set; }
 
 		#endregion Public Properties
 
@@ -225,11 +226,13 @@ namespace DriveExplorer.ViewModels {
 			var itemVM = (sender as ItemVM) ??
 				(sender as TreeViewItem).DataContext as ItemVM ??
 				throw new ArgumentException("invalid sender");
+			IsBusy = true;
 			if (e != null) {
 				e.Handled = true; // avoid recursive calls of treeViewItem.select
 			}
 			await itemVM.SetIsExpandedAsync(true).ConfigureAwait(true);
 			navigationManager.Add(itemVM);
+			IsBusy = false;
 		}
 
 		#endregion Public Methods
@@ -257,7 +260,7 @@ namespace DriveExplorer.ViewModels {
 			try {
 				new Process
 				{
-					StartInfo = new ProcessStartInfo(vm.CacheFullPath ?? vm.Item.FullPath)
+					StartInfo = new ProcessStartInfo(vm.CacheFullPath)
 					{
 						UseShellExecute = true,
 					}

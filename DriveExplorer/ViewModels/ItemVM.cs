@@ -40,6 +40,9 @@ namespace DriveExplorer.ViewModels {
 
 		#region Public Properties
 
+
+		public bool IsLocal => CacheRootPath == null;
+
 		public string CacheFullPath { get; private set; }
 
 		public string CacheRootPath { get; private set; }
@@ -51,9 +54,6 @@ namespace DriveExplorer.ViewModels {
 
 		public bool IsCached {
 			get {
-				if (CacheFullPath == null) {
-					return true;
-				}
 				// check if cache file exist, and the last modified date and file size is matched
 				if (Item.Type.Is(ItemTypes.Folders)) {
 					return Directory.Exists(CacheFullPath);
@@ -120,6 +120,8 @@ namespace DriveExplorer.ViewModels {
 			if (!(item.Type == ItemTypes.LocalDrive)) {
 				CacheRootPath = localRootPath;
 				CacheFullPath = Path.Combine(CacheRootPath, Item.Type.ToString(), Item.FullPath);
+			} else {
+				CacheFullPath = Item.FullPath;
 			}
 			CacheFolder();
 			SetIcon();
@@ -129,10 +131,11 @@ namespace DriveExplorer.ViewModels {
 		{
 			if (Item.Type.Is(ItemTypes.Folders)) {
 				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{Item.Type}.png"));
-			} else {
-				var icon = System.Drawing.Icon.ExtractAssociatedIcon(Item.FullPath);
+			} else if (IsCached) {
+				var icon = System.Drawing.Icon.ExtractAssociatedIcon(CacheFullPath);
 				Icon = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
+			} else {
+				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/file.png"));
 			}
 		}
 
@@ -143,11 +146,10 @@ namespace DriveExplorer.ViewModels {
 		{
 			Item = item;
 			Parent = parent;
-			if (parent.CacheFullPath != null) {
+			if (!parent.IsLocal) {
 				CacheRootPath = parent.CacheRootPath;
-				CacheFullPath = Path.Combine(parent.CacheFullPath, Item.Name);
-
 			}
+			CacheFullPath = Path.Combine(parent.CacheFullPath, Item.Name);
 			// inherit parent's events
 			BeforeExpand += parent.BeforeExpand;
 			Expanded += parent.Expanded;
@@ -174,7 +176,7 @@ namespace DriveExplorer.ViewModels {
 
 		public async Task CacheFileAsync()
 		{
-			if (CacheFullPath == null) {
+			if (IsCached) {
 				return;
 			}
 			await Item.DownloadAsync(CacheFullPath).ConfigureAwait(false);
@@ -241,7 +243,7 @@ namespace DriveExplorer.ViewModels {
 
 		private void CacheFolder()
 		{
-			if (CacheRootPath == null) {
+			if (IsLocal) {
 				return;
 			}
 			if (!IsCached) {
@@ -265,11 +267,11 @@ namespace DriveExplorer.ViewModels {
 			{
 				haveExpanded = true;
 				Children.Clear(); // clear dummy item
-				// attach children
+								  // attach children
 				await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
 					Children.Add(new ItemVM(item, this));
 				}
-				if (CacheFullPath != null) {
+				if (!IsLocal) {
 					// delete any folder is not consistent with cloud
 					Directory.GetDirectories(CacheFullPath)
 						.Where(path => !Children.Any(vm => vm.CacheFullPath == path))

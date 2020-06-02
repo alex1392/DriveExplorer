@@ -1,11 +1,13 @@
-﻿using System;
+﻿using DriveExplorer.ViewModels;
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Markup;
 
 namespace DriveExplorer.Views {
 
-	public class DebugConverter : IValueConverter {
+	public class DebugConverter : MarkupExtension, IValueConverter {
 
 		#region Public Fields
 
@@ -25,6 +27,11 @@ namespace DriveExplorer.Views {
 		{
 			Debugger.Break();
 			return value;
+		}
+
+		public override object ProvideValue(IServiceProvider serviceProvider)
+		{
+			return Instance;
 		}
 
 		#endregion Public Methods

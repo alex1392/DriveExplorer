@@ -89,6 +89,7 @@
 			<DockPanel Grid.Column="1">
 				<ListBox ItemsSource="{Binding PathItemVMs}"
 								 Background="Transparent"
+								 SelectionChanged="ListBox_SelectionChanged"
 								 DockPanel.Dock="Top">
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>
@@ -98,8 +99,8 @@
 					</ListBox.ItemsPanel>
 					<ListBox.ItemContainerStyle>
 						<Style TargetType="ListBoxItem">
-							<EventSetter Event="MouseDoubleClick"
-													 Handler="PathButton_Click" />
+							<EventSetter Event="Selected"
+													 Handler="ListBoxItem_Selected" />
 						</Style>
 					</ListBox.ItemContainerStyle>
 					<ListBox.ItemTemplate>
@@ -126,8 +127,6 @@
 						<Style TargetType="ListBoxItem">
 							<EventSetter Event="MouseDoubleClick"
 													 Handler="ListBoxItem_MouseDoubleClick" />
-							<Setter Property="IsSelected"
-											Value="{Binding IsSelected, Mode=OneWay}" />
 						</Style>
 					</ListBox.ItemContainerStyle>
 					<!--<ListBox.ItemsPanel>
@@ -153,13 +152,14 @@
 
 			</DockPanel>
 		</Grid>
-		<Border Background="#4C000000"
+		<Border Background="#4CFFFFFF"
 						Visibility="{Binding SpinnerVisibility, FallbackValue=Collapsed}"
 						MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown">
 			<fa:ImageAwesome Icon="Spinner"
 											 Spin="True"
 											 Height="48"
 											 Width="48"
+											 Foreground="GhostWhite"
 											 MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown" />
 		</Border>
 	</Grid>

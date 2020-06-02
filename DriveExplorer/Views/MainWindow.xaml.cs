@@ -5,6 +5,8 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace DriveExplorer.Views {
 
@@ -16,6 +18,7 @@ namespace DriveExplorer.Views {
 		#region Private Fields
 
 		private readonly MainWindowVM vm;
+		private bool selectLock;
 
 		#endregion Private Fields
 
@@ -83,6 +86,9 @@ namespace DriveExplorer.Views {
 
 		private async void TreeViewItem_Selected(object sender, RoutedEventArgs e)
 		{
+			if (vm.IsBusy) {
+				return;
+			}
 			await vm.TreeItemSelectedAsync(sender, e).ConfigureAwait(false);
 		}
 
@@ -99,11 +105,46 @@ namespace DriveExplorer.Views {
 
 		private async void PathButton_Click(object sender, MouseButtonEventArgs e)
 		{
-			if (!(sender is ListBoxItem listBoxItem) || 
+			if (!(sender is ListBoxItem listBoxItem) ||
 				!(listBoxItem.DataContext is ItemVM itemVM)) {
 				return;
 			}
 			await itemVM.SetIsSelectedAsync(true).ConfigureAwait(true);
+		}
+
+		private async void ListBoxItem_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (!(sender is ListBoxItem listBoxItem) ||
+				!(listBoxItem.DataContext is ItemVM itemVM)) {
+				return;
+			}
+			if (e.LeftButton == MouseButtonState.Pressed) {
+				await itemVM.SetIsSelectedAsync(true).ConfigureAwait(true);
+			}
+		}
+
+		private async void ListBoxItem_Selected(object sender, RoutedEventArgs e)
+		{
+			if (!(sender is ListBoxItem listBoxItem) ||
+				!(listBoxItem.DataContext is ItemVM itemVM)) {
+				return;
+			}
+			await itemVM.SetIsSelectedAsync(true).ConfigureAwait(true);
+		}
+		/// <summary>
+		/// somehow listbox selectedItem is not consistent with its datacontext...
+		/// </summary>
+		[Obsolete]
+		private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (selectLock) {
+				return;
+			}
+			var listbox = (sender as ListBox);
+			var selected = listbox.Items.Cast<ItemVM>().FirstOrDefault(vm => vm.IsSelected);
+			selectLock = true;
+			listbox.SelectedItem = selected;
+			selectLock = false;
 		}
 	}
 }

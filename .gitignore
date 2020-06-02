@@ -345,3 +345,4 @@ dotcover*
 client_secret.json
 DriveExplorer.Core/
 DriveExplorerTests.Core/
+/WpfApp1
