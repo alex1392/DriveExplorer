@@ -60,7 +60,9 @@
 					</Button>
 				</StackPanel>
 				<TreeView ItemsSource="{Binding TreeItemVMs}"
-									Background="Transparent">
+									Background="Transparent"
+									BorderThickness="0"
+									Margin="5">
 					<TreeView.ItemContainerStyle>
 						<Style TargetType="TreeViewItem">
 							<EventSetter Event="Selected"
@@ -89,6 +91,7 @@
 			<DockPanel Grid.Column="1">
 				<ListBox ItemsSource="{Binding PathItemVMs}"
 								 Background="Transparent"
+								 BorderThickness="0"
 								 SelectionChanged="ListBox_SelectionChanged"
 								 DockPanel.Dock="Top">
 					<ListBox.ItemsPanel>

@@ -99,7 +99,7 @@ namespace DriveExplorer.ViewModels {
 			this.localDriveManager = localDriveManager;
 			this.oneDriveManager = oneDriveManager;
 			this.googleDriveManager = googleDriveManager;
-
+			
 			PreviousPageCommand = new PreviousPageCommand(navigationManager);
 			NextPageCommand = new NextPageCommand(navigationManager);
 			ParentFolderCommand = new ParentFolderCommand(navigationManager);
