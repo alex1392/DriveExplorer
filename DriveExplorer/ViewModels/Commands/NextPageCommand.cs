@@ -1,8 +1,8 @@
-﻿using DriveExplorer.ViewModels;
+﻿using DriveExplorer.Models;
 using System;
 using System.Windows.Input;
 
-namespace DriveExplorer.Models {
+namespace DriveExplorer.ViewModels {
 	public class NextPageCommand : ICommand {
 		private readonly NavigationManager<ItemVM> navigationManager;
 

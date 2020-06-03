@@ -1,4 +1,4 @@
-﻿using DriveExplorer.ViewModels;
+﻿using DriveExplorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace DriveExplorer.Models {
+namespace DriveExplorer.ViewModels {
 	public class PreviousPageCommand : ICommand {
 		private readonly NavigationManager<ItemVM> navigationManager;
 
