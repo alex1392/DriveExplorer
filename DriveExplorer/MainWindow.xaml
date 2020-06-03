@@ -12,7 +12,10 @@
 								 xmlns:fd="clr-namespace:Cyc.FluentDesign;assembly=Cyc.FluentDesign"
 								 mc:Ignorable="d"
 								 Style="{StaticResource RevealWindowStyle}"
-								 WindowStyle="None"
+								 EnableNotifyIconButton="True"
+								 EnableTopMostButton="True"
+								 EnableDragMove="False"
+								 Background="#4C000000"
 								 Title="Drive Explorer"
 								 Height="450"
 								 Width="800">
@@ -118,7 +121,7 @@
 								<TextBox Text="{Binding Item.Name, Mode=OneWay}"
 												 IsEnabled="False"
 												 Height="20"
-												 Margin="3" />
+												 Margin="2" />
 
 							</StackPanel>
 						</DataTemplate>
@@ -128,6 +131,7 @@
 				<ListBox ItemsSource="{Binding CurrentItemVMs}"
 								 Style="{StaticResource ListBoxRevealStyle}"
 								 Background="Transparent"
+								 BorderThickness="0"
 								 Grid.Column="1">
 					<ListBox.ItemContainerStyle>
 						<Style TargetType="ListBoxItem">
