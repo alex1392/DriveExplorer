@@ -25,11 +25,11 @@ namespace DriveExplorer.Models {
 		/// <summary>
 		/// Root constructor
 		/// </summary>
-		public LocalItem(string fullPath, ItemTypes type = ItemTypes.Drive)
+		public LocalItem(string fullPath)
 		{
 			var info = new DirectoryInfo(fullPath);
 			FullPath = fullPath;
-			ItemType = type;
+			ItemType = ItemTypes.Drive;
 			Name = FixFullPath(fullPath);
 			Size = 0;
 			LastModifiedTime = info.LastWriteTimeUtc;
@@ -43,7 +43,7 @@ namespace DriveExplorer.Models {
 			fullPath = FixFullPath(fullPath);
 			var info = isFolder ? new DirectoryInfo(fullPath) : new FileInfo(fullPath) as FileSystemInfo;
 			FullPath = fullPath;
-			ItemType = ( isFolder ? ItemTypes.Folder : ItemTypes.File);
+			ItemType = (isFolder ? ItemTypes.Folder : ItemTypes.File);
 			Name = Path.GetFileName(fullPath);
 			Size = isFolder ? 0 : (info as FileInfo).Length;
 			LastModifiedTime = info.LastWriteTimeUtc;

@@ -113,9 +113,8 @@ namespace DriveExplorer.ViewModels {
 		/// </summary>
 		public ItemVM(IItem item, string localRootPath)
 		{
-			//TODO: root itemVM doesn't need to be a drive
-			if (item.ItemType !=ItemTypes.Drive) {
-				throw new TypeInitializationException(nameof(ItemVM), null);
+			if (item.ItemType == ItemTypes.File) {
+				throw new TypeInitializationException(nameof(ItemVM), new Exception("File cannot be set as a root of a tree view."));
 			}
 			Item = item;
 			if (item.DriveType != DriveTypes.LocalDrive) {

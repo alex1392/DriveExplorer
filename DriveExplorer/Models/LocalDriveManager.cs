@@ -52,7 +52,7 @@ namespace DriveExplorer.Models {
 				RecentPath, DesktopPath, DownloadsPath, DocumentsPath, PicturesPath, MusicPath, VideosPath,
 			};
 			foreach (var path in folderPaths) {
-				var item = new LocalItem(path, ItemTypes.Folder);
+				var item = new LocalItem(path, isFolder: true);
 				GetFolderCompleted?.Invoke(this, item);
 			}
 		}

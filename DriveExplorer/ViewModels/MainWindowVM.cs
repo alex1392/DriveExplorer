@@ -176,7 +176,7 @@ namespace DriveExplorer.ViewModels {
 			}
 			if (localDriveManager != null) {
 				localDriveManager.GetLocalDrives();
-				//localDriveManager.GetUserFolders();
+				localDriveManager.GetUserFolders();
 			}
 			if (oneDriveManager != null) {
 				await oneDriveManager.AutoLoginAsync().ConfigureAwait(true);
