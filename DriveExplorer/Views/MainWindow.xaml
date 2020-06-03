@@ -1,20 +1,21 @@
-﻿<Window x:Class="DriveExplorer.Views.MainWindow"
-				xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-				xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-				xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-				xmlns:fa="http://schemas.fontawesome.io/icons/"
-				xmlns:views="clr-namespace:DriveExplorer.Views"
-				xmlns:vm="clr-namespace:DriveExplorer.ViewModels"
-				xmlns:mvvm="clr-namespace:Cyc.Mvvm.Commands;assembly=Cyc.Mvvm"
-				xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-				xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
-				xmlns:fd="clr-namespace:Cyc.FluentDesign;assembly=Cyc.FluentDesign"
-				mc:Ignorable="d"
-				Style="{StaticResource RevealWindowStyle}"
-				Title="Drive Explorer"
-				Height="450"
-				Width="800">
+﻿<fd:RevealWindow x:Class="DriveExplorer.Views.MainWindow"
+								 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+								 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+								 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+								 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+								 xmlns:fa="http://schemas.fontawesome.io/icons/"
+								 xmlns:views="clr-namespace:DriveExplorer.Views"
+								 xmlns:vm="clr-namespace:DriveExplorer.ViewModels"
+								 xmlns:mvvm="clr-namespace:Cyc.Mvvm.Commands;assembly=Cyc.Mvvm"
+								 xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+								 xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+								 xmlns:fd="clr-namespace:Cyc.FluentDesign;assembly=Cyc.FluentDesign"
+								 mc:Ignorable="d"
+								 Style="{StaticResource RevealWindowStyle}"
+								 WindowStyle="None"
+								 Title="Drive Explorer"
+								 Height="450"
+								 Width="800">
 	<Grid fw:PointerTracker.Enabled="True">
 		<Grid>
 			<Grid.ColumnDefinitions>
@@ -135,10 +136,10 @@
 						</Style>
 					</ListBox.ItemContainerStyle>
 					<ListBox.ItemsPanel>
-					<ItemsPanelTemplate>
-						<WrapPanel />
-					</ItemsPanelTemplate>
-				</ListBox.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel Orientation="Vertical" />
+						</ItemsPanelTemplate>
+					</ListBox.ItemsPanel>
 					<ListBox.ItemTemplate>
 						<DataTemplate DataType="{x:Type vm:ItemVM}">
 							<StackPanel Orientation="Horizontal">
@@ -168,4 +169,4 @@
 											 MouseLeftButtonDown="SpinnerBorder_MouseLeftButtonDown" />
 		</Border>
 	</Grid>
-</Window>
+</fd:RevealWindow>
