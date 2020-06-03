@@ -122,7 +122,7 @@ namespace DriveExplorer.ViewModels {
 				if (this.localDriveManager == null) {
 					Console.WriteLine($"{typeof(LocalDriveManager)} is not attached to {this.GetType()}.");
 				} else {
-					localDriveManager.GetDriveCompleted += (_, item) => AddTreeItemVM(item);
+					localDriveManager.GetFolderCompleted += (_, item) => AddTreeItemVM(item);
 				}
 				if (this.oneDriveManager == null) {
 					Console.WriteLine($"{typeof(OneDriveManager)} is not attached to {this.GetType()}.");
@@ -159,9 +159,9 @@ namespace DriveExplorer.ViewModels {
 			var vm = (sender as ItemVM) ??
 				(sender as ListBoxItem).DataContext as ItemVM ??
 				throw new ArgumentException("invalid sender");
-			if (vm.Item.Type.Is(ItemTypes.Folders)) {
+			if (vm.Item.ItemType.IsMember(ItemTypes.Folders)) {
 				await CurrentItemFolderSelectedAsync(vm).ConfigureAwait(false);
-			} else if (vm.Item.Type == ItemTypes.File) {
+			} else if (vm.Item.ItemType==ItemTypes.File) {
 				await CurrentItemFileSelectedAsync(vm).ConfigureAwait(false);
 			} else {
 				throw new InvalidOperationException();
@@ -176,11 +176,7 @@ namespace DriveExplorer.ViewModels {
 			}
 			if (localDriveManager != null) {
 				localDriveManager.GetLocalDrives();
-				var desktopPath = localDriveManager.GetDesktop();
-				//var desktopVM = CreatePath(desktopPath);
-				//StartupItemVM = desktopVM;
-				//await TreeItemSelectedAsync(StartupItemVM).ConfigureAwait(true);
-				await NavigateToPathAsync(desktopPath).ConfigureAwait(true);
+				//localDriveManager.GetUserFolders();
 			}
 			if (oneDriveManager != null) {
 				await oneDriveManager.AutoLoginAsync().ConfigureAwait(true);
@@ -216,10 +212,8 @@ namespace DriveExplorer.ViewModels {
 			var vms = TreeItemVMs;
 			ItemVM vm = null;
 			foreach (var level in levels) {
-				vm = vms.FirstOrDefault(vm => vm.Item.Name == level);
-				if (vm == null) {
-					throw new Exception();
-				}
+				vm = vms.FirstOrDefault(vm => vm.Item.Name == level) ??
+						throw new Exception("Cannot find folder to expand.");
 				await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
 				vms = vm.Children;
 			}

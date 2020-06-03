@@ -15,7 +15,8 @@ namespace DriveExplorer.Models {
 		public DateTimeOffset? LastModifiedTime { get; private set; }
 		public string Name { get; private set; }
 		public long? Size { get; private set; }
-		public ItemTypes Type { get; private set; }
+		public ItemTypes ItemType { get; private set; }
+		public DriveTypes DriveType { get; private set; } = DriveTypes.LocalDrive;
 
 		#endregion Public Properties
 
@@ -24,11 +25,11 @@ namespace DriveExplorer.Models {
 		/// <summary>
 		/// Root constructor
 		/// </summary>
-		public LocalItem(string fullPath)
+		public LocalItem(string fullPath, ItemTypes type = ItemTypes.Drive)
 		{
 			var info = new DirectoryInfo(fullPath);
 			FullPath = fullPath;
-			Type = ItemTypes.LocalDrive;
+			ItemType = type;
 			Name = FixFullPath(fullPath);
 			Size = 0;
 			LastModifiedTime = info.LastWriteTimeUtc;
@@ -42,7 +43,7 @@ namespace DriveExplorer.Models {
 			fullPath = FixFullPath(fullPath);
 			var info = isFolder ? new DirectoryInfo(fullPath) : new FileInfo(fullPath) as FileSystemInfo;
 			FullPath = fullPath;
-			Type = isFolder ? ItemTypes.Folder : ItemTypes.File;
+			ItemType = ( isFolder ? ItemTypes.Folder : ItemTypes.File);
 			Name = Path.GetFileName(fullPath);
 			Size = isFolder ? 0 : (info as FileInfo).Length;
 			LastModifiedTime = info.LastWriteTimeUtc;

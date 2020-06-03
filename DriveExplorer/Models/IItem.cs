@@ -12,7 +12,8 @@ namespace DriveExplorer.Models {
 		DateTimeOffset? LastModifiedTime { get; }
 		string Name { get; }
 		long? Size { get; }
-		ItemTypes Type { get; }
+		ItemTypes ItemType { get; }
+		DriveTypes DriveType { get; }
 
 		#endregion Public Properties
 

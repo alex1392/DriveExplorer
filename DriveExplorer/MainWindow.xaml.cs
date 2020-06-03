@@ -73,13 +73,14 @@ namespace DriveExplorer.Views {
 				throw new InvalidOperationException();
 			}
 			if (e.RightButton == MouseButtonState.Pressed) {
-				switch (itemVM.Item.Type) {
-					case ItemTypes.OneDrive:
+				switch (itemVM.Item.DriveType) {
+					case DriveTypes.OneDrive:
 						await vm.LogoutOneDriveAsync(itemVM.Item).ConfigureAwait(false);
 						break;
-
-					case ItemTypes.GoogleDrive:
+					case DriveTypes.GoogleDrive:
 						await vm.LogoutGoogleDriveAsync(itemVM.Item).ConfigureAwait(false);
+						break;
+					default:
 						break;
 				}
 			}

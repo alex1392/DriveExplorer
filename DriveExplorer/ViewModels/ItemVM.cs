@@ -55,9 +55,9 @@ namespace DriveExplorer.ViewModels {
 		public bool IsCached {
 			get {
 				// check if cache file exist, and the last modified date and file size is matched
-				if (Item.Type.Is(ItemTypes.Folders)) {
+				if (Item.ItemType.IsMember(ItemTypes.Folders)) {
 					return Directory.Exists(CacheFullPath);
-				} else if (Item.Type == ItemTypes.File) {
+				} else if (Item.ItemType == ItemTypes.File) {
 					var info = new FileInfo(CacheFullPath);
 					return info.Exists &&
 						info.Length == Item.Size &&
@@ -113,13 +113,14 @@ namespace DriveExplorer.ViewModels {
 		/// </summary>
 		public ItemVM(IItem item, string localRootPath)
 		{
-			if (!item.Type.Is(ItemTypes.Drives)) {
+			//TODO: root itemVM doesn't need to be a drive
+			if (item.ItemType !=ItemTypes.Drive) {
 				throw new TypeInitializationException(nameof(ItemVM), null);
 			}
 			Item = item;
-			if (!(item.Type == ItemTypes.LocalDrive)) {
+			if (item.DriveType != DriveTypes.LocalDrive) {
 				CacheRootPath = localRootPath;
-				CacheFullPath = Path.Combine(CacheRootPath, Item.Type.ToString(), Item.FullPath);
+				CacheFullPath = Path.Combine(CacheRootPath, Item.ItemType.ToString(), Item.FullPath);
 			} else {
 				CacheFullPath = Item.FullPath;
 			}
@@ -129,8 +130,10 @@ namespace DriveExplorer.ViewModels {
 
 		private void SetIcon()
 		{
-			if (Item.Type.Is(ItemTypes.Folders)) {
-				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{Item.Type}.png"));
+			if (Item.ItemType == ItemTypes.Drive) {
+				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{Item.DriveType}.png"));
+			} else if (Item.ItemType == ItemTypes.Folder) {
+				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{Item.ItemType}.png"));
 			} else if (IsCached) {
 				var icon = System.Drawing.Icon.ExtractAssociatedIcon(CacheFullPath);
 				Icon = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
@@ -154,7 +157,7 @@ namespace DriveExplorer.ViewModels {
 			BeforeExpand += parent.BeforeExpand;
 			Expanded += parent.Expanded;
 
-			if (Item.Type.Is(ItemTypes.Folders)) {
+			if (Item.ItemType.IsMember(ItemTypes.Folders)) {
 				CacheFolder();
 			}
 			SetIcon();
@@ -193,7 +196,7 @@ namespace DriveExplorer.ViewModels {
 		{
 			return other != null &&
 				Item.Name == other.Item.Name &&
-				Item.Type == other.Item.Type &&
+				Item.ItemType == other.Item.ItemType &&
 				Item.FullPath == other.Item.FullPath;
 		}
 
@@ -266,7 +269,7 @@ namespace DriveExplorer.ViewModels {
 
 		private async Task ExpandAsync()
 		{
-			if (!Item.Type.Is(ItemTypes.Folders)) {
+			if (!Item.ItemType.IsMember(ItemTypes.Folders)) {
 				return;
 			}
 			if (haveExpanded) {

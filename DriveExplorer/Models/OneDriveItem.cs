@@ -25,8 +25,10 @@ namespace DriveExplorer.Models {
 		public DateTimeOffset? LastModifiedTime { get; private set; }
 		public string Name { get; private set; }
 		public long? Size { get; private set; }
-		public ItemTypes Type { get; private set; }
+		public ItemTypes ItemType { get; private set; }
 		public IAccount UserAccount { get; private set; }
+
+		public DriveTypes DriveType { get; private set; } = DriveTypes.OneDrive;
 
 		#endregion Public Properties
 
@@ -39,7 +41,7 @@ namespace DriveExplorer.Models {
 		{
 			this.microsoftApiManager = microsoftApiManager;
 			Name = account.Username;
-			Type = ItemTypes.OneDrive;
+			ItemType =  ItemTypes.Drive;
 			FullPath = account.Username;
 			UserAccount = account;
 			Id = driveItem.Id;
@@ -54,7 +56,7 @@ namespace DriveExplorer.Models {
 		{
 			microsoftApiManager = parent.microsoftApiManager;
 			Name = driveItem.Name;
-			Type = IsFolder(driveItem) ? ItemTypes.Folder : ItemTypes.File;
+			ItemType = (IsFolder(driveItem) ? ItemTypes.Folder : ItemTypes.File);
 			FullPath = Path.Combine(parent.FullPath, driveItem.Name);
 			UserAccount = parent.UserAccount;
 			Id = driveItem.Id;

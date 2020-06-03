@@ -26,8 +26,10 @@ namespace DriveExplorer.Models {
 		public DateTimeOffset? LastModifiedTime { get; private set; }
 		public string Name { get; private set; }
 		public long? Size { get; private set; }
-		public ItemTypes Type { get; private set; }
+		public ItemTypes ItemType { get; private set; }
+		public DriveTypes DriveType { get; private set; } = DriveTypes.GoogleDrive;
 		public string UserId { get; private set; }
+
 
 		#endregion Public Properties
 
@@ -40,7 +42,7 @@ namespace DriveExplorer.Models {
 		{
 			var user = about.User;
 			this.googleApiManager = googleApiManager;
-			Type = ItemTypes.GoogleDrive;
+			ItemType = ItemTypes.Drive;
 			Name = user.EmailAddress;
 			FullPath = user.EmailAddress;
 			UserId = userId;
@@ -55,7 +57,7 @@ namespace DriveExplorer.Models {
 		public GoogleDriveItem(GoogleDriveItem parent, File driveItem)
 		{
 			googleApiManager = parent.googleApiManager;
-			Type = IsFolder(driveItem) ? ItemTypes.Folder : ItemTypes.File;
+			ItemType = (IsFolder(driveItem) ? ItemTypes.Folder : ItemTypes.File);
 			Name = driveItem.Name;
 			FullPath = Path.Combine(parent.FullPath, driveItem.Name);
 			UserId = parent.UserId;
