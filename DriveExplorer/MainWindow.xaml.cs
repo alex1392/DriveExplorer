@@ -91,7 +91,7 @@ namespace DriveExplorer.Views {
 			if (vm.IsBusy) {
 				return;
 			}
-			await vm.TreeItemSelectedAsync(sender, e).ConfigureAwait(false);
+			await vm.TreeItemSelectedAsync(sender, e).ConfigureAwait(true);
 			(sender as TreeViewItem).BringIntoView();
 		}
 
