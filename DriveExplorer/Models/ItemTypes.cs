@@ -41,17 +41,17 @@ namespace DriveExplorer.Models {
 	[Flags]
 	public enum ItemTypes {
 		Unknown = 0,
-		Folder,
-		File ,
-		Drive,
+		Folder = 1,
+		File = 1 << 1,
+		Drive = 1 << 2,
 		Folders = Drive | Folder,
 	}
 
 	[Flags]
 	public enum DriveTypes {
 		Unknown = 0,
-		LocalDrive,
-		OneDrive,
-		GoogleDrive,
+		LocalDrive = 1,
+		OneDrive = 1 << 1,
+		GoogleDrive = 1 << 2,
 	}
 }
