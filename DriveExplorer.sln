@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp1", "WpfApp1\WpfApp1.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cyc.FluentDesign", "Cyc\Cyc.FluentDesign\Cyc.FluentDesign.csproj", "{BF1F329D-2A66-48F8-BD93-96F95C9024F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataVirtualization", "..\..\OneDrive - National Chiao Tung University\Coding\WPF\Demos\DataVirtualization\DataVirtualization.csproj", "{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +115,16 @@ Global
 		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Microsoft|Any CPU.Build.0 = Release|Any CPU
 		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF1F329D-2A66-48F8-BD93-96F95C9024F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Google|Any CPU.ActiveCfg = Release|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Google|Any CPU.Build.0 = Release|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Local|Any CPU.ActiveCfg = Release|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Local|Any CPU.Build.0 = Release|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Microsoft|Any CPU.ActiveCfg = Release|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Microsoft|Any CPU.Build.0 = Release|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE37F2AF-95C2-4EB7-A0F7-E47FE04C1F89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

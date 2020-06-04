@@ -11,6 +11,7 @@
 								 xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
 								 xmlns:fd="clr-namespace:Cyc.FluentDesign;assembly=Cyc.FluentDesign"
 								 mc:Ignorable="d"
+								 d:DataContext="{d:DesignInstance Type=vm:MainWindowVM, IsDesignTimeCreatable=True}"
 								 Style="{StaticResource RevealWindowStyle}"
 								 EnableNotifyIconButton="True"
 								 EnableTopMostButton="True"
@@ -68,6 +69,8 @@
 									ItemsSource="{Binding TreeItemVMs}"
 									Background="Transparent"
 									BorderThickness="0"
+									VirtualizingStackPanel.IsVirtualizing="True"
+									VirtualizingStackPanel.VirtualizationMode="Recycling"
 									Margin="5">
 					<TreeView.ItemContainerStyle>
 						<Style TargetType="TreeViewItem">
@@ -80,7 +83,7 @@
 							<Setter Property="IsSelected"
 											Value="{Binding IsSelected, Mode=TwoWay}" />
 							<Setter Property="Visibility"
-											Value="{Binding Item.Type, Converter={x:Static views:TypeVisibilityConverter.Instance}}" />
+											Value="{Binding Item.ItemType, Converter={x:Static views:TypeVisibilityConverter.Instance}}" />
 						</Style>
 					</TreeView.ItemContainerStyle>
 					<TreeView.ItemTemplate>
@@ -103,7 +106,7 @@
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>
 							<StackPanel Orientation="Horizontal"
-													Height="30" />
+																			Height="30" />
 						</ItemsPanelTemplate>
 					</ListBox.ItemsPanel>
 					<ListBox.ItemContainerStyle>
@@ -141,7 +144,7 @@
 					</ListBox.ItemContainerStyle>
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>
-							<StackPanel Orientation="Vertical" />
+							<VirtualizingStackPanel Orientation="Vertical"/>
 						</ItemsPanelTemplate>
 					</ListBox.ItemsPanel>
 					<ListBox.ItemTemplate>

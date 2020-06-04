@@ -86,6 +86,13 @@ namespace DriveExplorer.ViewModels {
 		#endregion Public Properties
 
 		#region Public Constructors
+		/// <summary>
+		/// For xaml design time 
+		/// </summary>
+		public MainWindowVM()
+		{
+
+		}
 
 		public MainWindowVM(
 			IDispatcher dispatcher,
