@@ -19,7 +19,7 @@ namespace DriveExplorer.Views {
 
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-		var type = (ItemTypes)value;
+			var type = (ItemTypes)value;
 			return type.IsMember(ItemTypes.Folders) ?
 				Visibility.Visible : Visibility.Collapsed;
 		}

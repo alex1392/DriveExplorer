@@ -136,17 +136,19 @@
 								 Background="Transparent"
 								 BorderThickness="0"
 								 Grid.Column="1">
+					<ListBox.ItemsPanel>
+						<ItemsPanelTemplate>
+							<VirtualizingStackPanel Orientation="Vertical" 
+																			IsVirtualizing="True"
+																			VirtualizationMode="Recycling"/>
+						</ItemsPanelTemplate>
+					</ListBox.ItemsPanel>
 					<ListBox.ItemContainerStyle>
 						<Style TargetType="ListBoxItem">
 							<EventSetter Event="MouseDoubleClick"
 													 Handler="ListBoxItem_MouseDoubleClick" />
 						</Style>
 					</ListBox.ItemContainerStyle>
-					<ListBox.ItemsPanel>
-						<ItemsPanelTemplate>
-							<VirtualizingStackPanel Orientation="Vertical"/>
-						</ItemsPanelTemplate>
-					</ListBox.ItemsPanel>
 					<ListBox.ItemTemplate>
 						<DataTemplate DataType="{x:Type vm:ItemVM}">
 							<StackPanel Orientation="Horizontal">

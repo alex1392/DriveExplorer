@@ -43,7 +43,7 @@ namespace DriveExplorer.Models {
 			fullPath = FixFullPath(fullPath);
 			var info = isFolder ? new DirectoryInfo(fullPath) : new FileInfo(fullPath) as FileSystemInfo;
 			FullPath = fullPath;
-			ItemType = (isFolder ? ItemTypes.Folder : ItemTypes.File);
+			ItemType = isFolder ? ItemTypes.Folder : ItemTypes.File;
 			Name = Path.GetFileName(fullPath);
 			Size = isFolder ? 0 : (info as FileInfo).Length;
 			LastModifiedTime = info.LastWriteTimeUtc;
