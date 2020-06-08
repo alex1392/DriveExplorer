@@ -1,5 +1,5 @@
 ﻿using Cyc.Standard;
-
+using DataVirtualization;
 using DriveExplorer.Models;
 
 using System;
@@ -43,7 +43,7 @@ namespace DriveExplorer.ViewModels {
 		#endregion Public Events
 
 		#region Public Properties
-		public ObservableCollection<ItemVM> CurrentItemVMs => CurrentFolder?.Children;
+		public VirtualizingCollection<ItemVM> CurrentItemVMs => CurrentFolder?.Children;
 
 		public List<ItemVM> PathItemVMs {
 			get {
@@ -213,19 +213,19 @@ namespace DriveExplorer.ViewModels {
 			return parentVM;
 		}
 
-		private async Task NavigateToPathAsync(string fullpath)
-		{
-			var levels = fullpath.Split(Path.DirectorySeparatorChar).ToList();
-			var vms = TreeItemVMs;
-			ItemVM vm = null;
-			foreach (var level in levels) {
-				vm = vms.FirstOrDefault(vm => vm.Item.Name == level) ??
-						throw new Exception("Cannot find folder to expand.");
-				await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
-				vms = vm.Children;
-			}
-			await vm.SetIsSelectedAsync(true).ConfigureAwait(false);
-		}
+		//private async Task NavigateToPathAsync(string fullpath)
+		//{
+		//	var levels = fullpath.Split(Path.DirectorySeparatorChar).ToList();
+		//	var vms = TreeItemVMs;
+		//	ItemVM vm = null;
+		//	foreach (var level in levels) {
+		//		vm = vms.FirstOrDefault(vm => vm.Item.Name == level) ??
+		//				throw new Exception("Cannot find folder to expand.");
+		//		await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
+		//		vms = vm.Children;
+		//	}
+		//	await vm.SetIsSelectedAsync(true).ConfigureAwait(false);
+		//}
 
 		public async Task LoginGoogleDriveAsync()
 		{

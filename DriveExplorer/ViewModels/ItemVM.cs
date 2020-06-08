@@ -1,4 +1,5 @@
-﻿using DriveExplorer.Models;
+﻿using DataVirtualization;
+using DriveExplorer.Models;
 
 using System;
 using System.Collections.Generic;
@@ -47,10 +48,13 @@ namespace DriveExplorer.ViewModels {
 
 		public string CacheRootPath { get; private set; }
 
-		public ObservableCollection<ItemVM> Children { get; private set; } = new ObservableCollection<ItemVM>
-		{
-			null // add dummyItem for the expansion indicator
-        };
+		//public ObservableCollection<ItemVM> Children { get; private set; } = new ObservableCollection<ItemVM>
+		//{
+		//	null // add dummyItem for the expansion indicator
+		//      };
+
+		public VirtualizingCollection<ItemVM> Children { get; set; }
+
 
 		public bool IsCached {
 			get {
@@ -101,6 +105,7 @@ namespace DriveExplorer.ViewModels {
 		}
 
 		public IItem Item { get; private set; }
+		internal ItemVMChildrenProvider ChildrenProvider { get; }
 		public ItemVM Parent { get; }
 		public ImageSource Icon { get; private set; }
 
@@ -132,6 +137,8 @@ namespace DriveExplorer.ViewModels {
 			}
 			CacheFolder();
 			SetIcon();
+			ChildrenProvider = new ItemVMChildrenProvider(this);
+			Children = new VirtualizingCollection<ItemVM>(ChildrenProvider);
 		}
 
 		private void SetIcon()
@@ -213,7 +220,7 @@ namespace DriveExplorer.ViewModels {
 			hashCode = hashCode * -1521134295 + haveExpanded.GetHashCode();
 			hashCode = hashCode * -1521134295 + isSelected.GetHashCode();
 			hashCode = hashCode * -1521134295 + EqualityComparer<IItem>.Default.GetHashCode(Item);
-			hashCode = hashCode * -1521134295 + EqualityComparer<ObservableCollection<ItemVM>>.Default.GetHashCode(Children);
+			//hashCode = hashCode * -1521134295 + EqualityComparer<ObservableCollection<ItemVM>>.Default.GetHashCode(Children);
 			return hashCode;
 		}
 
@@ -282,7 +289,7 @@ namespace DriveExplorer.ViewModels {
 				return;
 			}
 			BeforeExpand?.Invoke(this, null);
-			await DoExpand();
+			//await DoExpand();
 			Expanded?.Invoke(this, null);
 
 			async Task DoExpand()

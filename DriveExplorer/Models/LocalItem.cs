@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataVirtualization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace DriveExplorer.Models {
 		public ItemTypes ItemType { get; private set; }
 		public DriveTypes DriveType { get; private set; } = DriveTypes.LocalDrive;
 
-		public IChildrenProvider<IItem> ChildrenProvider { get; private set; }
+		public IItemsProvider<IItem> ChildrenProvider { get; private set; }
 
 		#endregion Public Properties
 
@@ -50,7 +51,9 @@ namespace DriveExplorer.Models {
 			Name = Path.GetFileName(fullPath);
 			Size = isFolder ? 0 : (info as FileInfo).Length;
 			LastModifiedTime = info.LastWriteTimeUtc;
-			ChildrenProvider = new LocalChildrenProvider(this);
+			if (isFolder) {
+				ChildrenProvider = new LocalChildrenProvider(this);
+			}
 		}
 
 		#endregion Public Constructors

@@ -1,5 +1,5 @@
 ﻿using Cyc.MicrosoftApi;
-
+using DataVirtualization;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 
@@ -30,7 +30,7 @@ namespace DriveExplorer.Models {
 
 		public DriveTypes DriveType { get; private set; } = DriveTypes.OneDrive;
 
-		public IChildrenProvider<IItem> ChildrenProvider => throw new NotImplementedException();
+		public IItemsProvider<IItem> ChildrenProvider => throw new NotImplementedException();
 
 		#endregion Public Properties
 

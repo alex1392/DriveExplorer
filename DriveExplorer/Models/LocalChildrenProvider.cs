@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DataVirtualization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace DriveExplorer.Models {
-	public class LocalChildrenProvider : IChildrenProvider<IItem> {
+	public class LocalChildrenProvider : IItemsProvider<IItem> {
 		private LocalItem localItem;
 		private readonly string[] filePaths;
 		private readonly string[] folderPaths;
@@ -12,16 +13,21 @@ namespace DriveExplorer.Models {
 		public LocalChildrenProvider(LocalItem parent)
 		{
 			this.localItem = parent;
-			filePaths = Directory.GetFiles(parent.FullPath);
-			folderPaths = Directory.GetDirectories(parent.FullPath);
+			try {
+				filePaths = Directory.GetFiles(parent.FullPath);
+				folderPaths = Directory.GetDirectories(parent.FullPath);
+			} catch (UnauthorizedAccessException) {
+				filePaths = new string[] { };
+				folderPaths = new string[] { };
+			}
 		}
 
-		public int Count()
+		public int FetchCount()
 		{
 			return filePaths.Length + folderPaths.Length;
 		}
 
-		public IList<IItem> Fetch(int startIndex, int pageSize)
+		public IList<IItem> FetchRange(int startIndex, int pageSize)
 		{
 			startIndex = Math.Max(0, startIndex);
 			return folderPaths.Skip(startIndex)

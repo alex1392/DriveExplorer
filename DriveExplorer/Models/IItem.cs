@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataVirtualization;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ namespace DriveExplorer.Models {
 	public interface IItem {
 
 		#region Public Properties
-		IChildrenProvider<IItem> ChildrenProvider { get; }
+		IItemsProvider<IItem> ChildrenProvider { get; }
 		string FullPath { get; }
 		DateTimeOffset? LastModifiedTime { get; }
 		string Name { get; }
