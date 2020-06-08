@@ -227,6 +227,7 @@
     </Compile>
     <Compile Include="Models\GoogleDriveItem.cs" />
     <Compile Include="Models\GoogleDriveManager.cs" />
+    <Compile Include="Models\IChildrenProvider.cs" />
     <Compile Include="Models\IDriveManager.cs" />
     <Compile Include="Models\LocalDriveManager.cs" />
     <Compile Include="Models\NavigationManager.cs" />
