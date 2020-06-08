@@ -229,6 +229,7 @@
     <Compile Include="Models\GoogleDriveManager.cs" />
     <Compile Include="Models\IChildrenProvider.cs" />
     <Compile Include="Models\IDriveManager.cs" />
+    <Compile Include="Models\LocalChildrenProvider.cs" />
     <Compile Include="Models\LocalDriveManager.cs" />
     <Compile Include="Models\NavigationManager.cs" />
     <Compile Include="ViewModels\Commands\NextPageCommand.cs" />

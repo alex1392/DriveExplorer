@@ -7,7 +7,7 @@ namespace DriveExplorer.Models {
 	public interface IItem {
 
 		#region Public Properties
-
+		IChildrenProvider<IItem> ChildrenProvider { get; }
 		string FullPath { get; }
 		DateTimeOffset? LastModifiedTime { get; }
 		string Name { get; }

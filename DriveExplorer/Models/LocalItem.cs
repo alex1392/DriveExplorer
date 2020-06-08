@@ -18,6 +18,8 @@ namespace DriveExplorer.Models {
 		public ItemTypes ItemType { get; private set; }
 		public DriveTypes DriveType { get; private set; } = DriveTypes.LocalDrive;
 
+		public IChildrenProvider<IItem> ChildrenProvider { get; private set; }
+
 		#endregion Public Properties
 
 		#region Public Constructors
@@ -33,6 +35,7 @@ namespace DriveExplorer.Models {
 			Name = FixFullPath(fullPath);
 			Size = 0;
 			LastModifiedTime = info.LastWriteTimeUtc;
+			ChildrenProvider = new LocalChildrenProvider(this);
 		}
 
 		/// <summary>
@@ -47,6 +50,7 @@ namespace DriveExplorer.Models {
 			Name = Path.GetFileName(fullPath);
 			Size = isFolder ? 0 : (info as FileInfo).Length;
 			LastModifiedTime = info.LastWriteTimeUtc;
+			ChildrenProvider = new LocalChildrenProvider(this);
 		}
 
 		#endregion Public Constructors

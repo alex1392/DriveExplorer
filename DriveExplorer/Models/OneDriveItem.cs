@@ -30,6 +30,8 @@ namespace DriveExplorer.Models {
 
 		public DriveTypes DriveType { get; private set; } = DriveTypes.OneDrive;
 
+		public IChildrenProvider<IItem> ChildrenProvider => throw new NotImplementedException();
+
 		#endregion Public Properties
 
 		#region Public Constructors
