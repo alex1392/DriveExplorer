@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 
 namespace DriveExplorer.ViewModels {
 
-	public class ItemVM : INotifyPropertyChanged, IEquatable<ItemVM> {
+	public class ItemVM : INotifyPropertyChanged {
 
 		#region Private Fields
 
@@ -48,13 +48,12 @@ namespace DriveExplorer.ViewModels {
 
 		public string CacheRootPath { get; private set; }
 
-		//public ObservableCollection<ItemVM> Children { get; private set; } = new ObservableCollection<ItemVM>
-		//{
-		//	null // add dummyItem for the expansion indicator
-		//      };
-
 		public VirtualizingCollection<ItemVM> Children { get; set; }
 
+		public ObservableCollection<ItemVM> SubFolders { get; set; } = new ObservableCollection<ItemVM>
+		{
+			null,
+		};
 
 		public bool IsCached {
 			get {
@@ -105,7 +104,7 @@ namespace DriveExplorer.ViewModels {
 		}
 
 		public IItem Item { get; private set; }
-		internal ItemVMChildrenProvider ChildrenProvider { get; }
+		public ItemVMChildrenProvider ChildrenProvider { get; }
 		public ItemVM Parent { get; }
 		public ImageSource Icon { get; private set; }
 
@@ -138,21 +137,7 @@ namespace DriveExplorer.ViewModels {
 			CacheFolder();
 			SetIcon();
 			ChildrenProvider = new ItemVMChildrenProvider(this);
-			Children = new VirtualizingCollection<ItemVM>(ChildrenProvider);
-		}
-
-		private void SetIcon()
-		{
-			if (Item.ItemType == ItemTypes.Drive) {
-				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{Item.DriveType}.png"));
-			} else if (Item.ItemType == ItemTypes.Folder) {
-				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{Item.ItemType}.png"));
-			} else if (IsCached) {
-				var icon = System.Drawing.Icon.ExtractAssociatedIcon(CacheFullPath);
-				Icon = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-			} else {
-				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/file.png"));
-			}
+			Children = new VirtualizingCollection<ItemVM>(ChildrenProvider, 10);
 		}
 
 		/// <summary>
@@ -172,6 +157,8 @@ namespace DriveExplorer.ViewModels {
 
 			if (Item.ItemType.IsMember(ItemTypes.Folders)) {
 				CacheFolder();
+				ChildrenProvider = new ItemVMChildrenProvider(this);
+				Children = new VirtualizingCollection<ItemVM>(ChildrenProvider, 10);
 			}
 			SetIcon();
 		}
@@ -179,16 +166,6 @@ namespace DriveExplorer.ViewModels {
 		#endregion Public Constructors
 
 		#region Public Methods
-
-		public static bool operator !=(ItemVM left, ItemVM right)
-		{
-			return !(left == right);
-		}
-
-		public static bool operator ==(ItemVM left, ItemVM right)
-		{
-			return EqualityComparer<ItemVM>.Default.Equals(left, right);
-		}
 
 		public async Task CacheFileAsync()
 		{
@@ -198,30 +175,6 @@ namespace DriveExplorer.ViewModels {
 			await Item.DownloadAsync(CacheFullPath).ConfigureAwait(false);
 			// set file info
 			File.SetLastWriteTimeUtc(CacheFullPath, Item.LastModifiedTime.Value.LocalDateTime);
-		}
-
-		public override bool Equals(object obj)
-		{
-			return Equals(obj as ItemVM);
-		}
-
-		public bool Equals(ItemVM other)
-		{
-			return other != null &&
-				Item.Name == other.Item.Name &&
-				Item.ItemType == other.Item.ItemType &&
-				Item.FullPath == other.Item.FullPath;
-		}
-
-		public override int GetHashCode()
-		{
-			var hashCode = 424228742;
-			hashCode = hashCode * -1521134295 + isExpanded.GetHashCode();
-			hashCode = hashCode * -1521134295 + haveExpanded.GetHashCode();
-			hashCode = hashCode * -1521134295 + isSelected.GetHashCode();
-			hashCode = hashCode * -1521134295 + EqualityComparer<IItem>.Default.GetHashCode(Item);
-			//hashCode = hashCode * -1521134295 + EqualityComparer<ObservableCollection<ItemVM>>.Default.GetHashCode(Children);
-			return hashCode;
 		}
 
 		/// <summary>
@@ -248,19 +201,6 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
-		/// <summary>
-		/// Attach certain child without expand it
-		/// </summary>
-		public ItemVM AttachChild(IItem item)
-		{
-			if (HasDummyItem) {
-				Children.Clear();
-			}
-			var itemVM = new ItemVM(item, this);
-			Children.Add(itemVM);
-			return itemVM;
-		}
-
 		public override string ToString()
 		{
 			return $"{Item.Name}, Items: {Children.Count}";
@@ -269,7 +209,19 @@ namespace DriveExplorer.ViewModels {
 		#endregion Public Methods
 
 		#region Private Methods
-
+		private void SetIcon()
+		{
+			if (Item.ItemType == ItemTypes.Drive) {
+				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{Item.DriveType}.png"));
+			} else if (Item.ItemType == ItemTypes.Folder) {
+				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/{Item.ItemType}.png"));
+			} else if (IsCached) {
+				var icon = System.Drawing.Icon.ExtractAssociatedIcon(CacheFullPath);
+				Icon = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+			} else {
+				Icon = new BitmapImage(new Uri($"pack://application:,,,/DriveExplorer;component/Resources/file.png"));
+			}
+		}
 		private void CacheFolder()
 		{
 			if (IsLocal) {
@@ -289,38 +241,46 @@ namespace DriveExplorer.ViewModels {
 				return;
 			}
 			BeforeExpand?.Invoke(this, null);
-			//await DoExpand();
+			await DoExpand();
 			Expanded?.Invoke(this, null);
 
 			async Task DoExpand()
 			{
 				haveExpanded = true;
 				if (HasDummyItem) {
-					Children.Clear(); // clear dummy item
+					SubFolders.Clear(); // clear dummy item
 				}
 				// attach children
-				await foreach (var item in Item.GetChildrenAsync().ConfigureAwait(true)) {
+				await foreach (var item in Item.GetSubFolderAsync().ConfigureAwait(true)) {
 					// item with the same name is not allowed
-					if (!Children.Any(vm => vm.Item.Name == item.Name)) {
-						Children.Add(new ItemVM(item, this));
+					if (!SubFolders.Any(vm => vm.Item.Name == item.Name)) {
+						SubFolders.Add(new ItemVM(item, this));
 					}
 				}
 				if (!IsLocal) {
 					// delete any folder is not consistent with cloud
 					Directory.GetDirectories(CacheFullPath)
-						.Where(path => !Children.Any(vm => vm.CacheFullPath == path))
+						.Where(path => !SubFolders.Any(vm => vm.CacheFullPath == path))
 						.ToList()
 						.ForEach(path => Directory.Delete(path, recursive: true));
 				}
 			}
 		}
-		public bool HasDummyItem => Children.Count == 1 && Children[0] == null;
+		public bool HasDummyItem => SubFolders.Count == 1 && SubFolders[0] == null;
 
 		private async Task SelectAsync()
 		{
 			BeforeSelect?.Invoke(this, null);
 
-			await Task.CompletedTask;
+			if (Parent != null && !Parent.HasDummyItem) {
+				var itemVM = Parent.SubFolders.FirstOrDefault(vm =>
+					   vm.Item.Name == this.Item.Name &&
+					   vm != this);
+				if (itemVM != null) {
+					await itemVM.SetIsSelectedAsync(true);
+				}
+			}
+			//await Task.CompletedTask;
 
 			Selected?.Invoke(this, null);
 		}

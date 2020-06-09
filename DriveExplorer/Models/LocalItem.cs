@@ -67,6 +67,23 @@ namespace DriveExplorer.Models {
 			return Task.CompletedTask;
 		}
 
+		public async IAsyncEnumerable<IItem> GetSubFolderAsync()
+		{
+			IEnumerable<string> folders;
+			try {
+				folders = Directory.GetDirectories(FullPath);
+			} catch (UnauthorizedAccessException ex) {
+				MessageBox.Show(ex.Message);
+				yield break;
+			} catch (IOException ex) {
+				MessageBox.Show(ex.Message);
+				yield break;
+			}
+			foreach (var path in folders) {
+				yield return new LocalItem(path, true);
+			}
+		}
+
 		public async IAsyncEnumerable<IItem> GetChildrenAsync()
 		{
 			IEnumerable<string> files;
@@ -87,6 +104,11 @@ namespace DriveExplorer.Models {
 			foreach (var path in files) {
 				yield return new LocalItem(path, false);
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"{FullPath}";
 		}
 
 		#endregion Public Methods

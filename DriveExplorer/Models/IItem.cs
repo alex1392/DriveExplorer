@@ -23,6 +23,7 @@ namespace DriveExplorer.Models {
 		Task DownloadAsync(string localPath);
 
 		IAsyncEnumerable<IItem> GetChildrenAsync();
+		IAsyncEnumerable<IItem> GetSubFolderAsync();
 
 		#endregion Public Methods
 	}

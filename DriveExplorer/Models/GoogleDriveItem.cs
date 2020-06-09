@@ -94,6 +94,11 @@ namespace DriveExplorer.Models {
 			return child.MimeType.Contains("folder");
 		}
 
+		public IAsyncEnumerable<IItem> GetSubFolderAsync()
+		{
+			throw new NotImplementedException();
+		}
+
 		#endregion Private Methods
 	}
 }

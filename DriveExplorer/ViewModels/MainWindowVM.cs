@@ -193,25 +193,6 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
-		private ItemVM CreatePath(string fullpath)
-		{
-			var levels = fullpath.Split(Path.DirectorySeparatorChar).ToList();
-			var root = levels[0];
-			levels.RemoveAt(0);
-
-			var parentVM = TreeItemVMs.FirstOrDefault(vm => vm.Item.Name == root);
-			if (parentVM == null) {
-				throw new Exception("Cannot find root for desktop path.");
-			}
-			var currentpath = root;
-			foreach (var level in levels) {
-				currentpath = string.Join(Path.DirectorySeparatorChar.ToString() ,currentpath, level);
-				parentVM = parentVM.Children.FirstOrDefault(vm =>
-					vm?.Item.Name == level) ??
-					parentVM.AttachChild(new LocalItem(currentpath, true));
-			}
-			return parentVM;
-		}
 
 		//private async Task NavigateToPathAsync(string fullpath)
 		//{

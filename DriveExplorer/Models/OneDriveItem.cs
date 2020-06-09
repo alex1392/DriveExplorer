@@ -94,6 +94,11 @@ namespace DriveExplorer.Models {
 			return driveItem.Folder != null;
 		}
 
+		public IAsyncEnumerable<IItem> GetSubFolderAsync()
+		{
+			throw new NotImplementedException();
+		}
+
 		#endregion Private Methods
 	}
 }
