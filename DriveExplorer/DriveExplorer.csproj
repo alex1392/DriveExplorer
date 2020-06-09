@@ -228,14 +228,18 @@
     <Compile Include="Models\GoogleDriveItem.cs" />
     <Compile Include="Models\GoogleDriveManager.cs" />
     <Compile Include="Models\IDriveManager.cs" />
+    <Compile Include="DataVirtualization\IItemsProvider.cs" />
+    <Compile Include="Models\LocalChildrenProvider.cs" />
     <Compile Include="Models\LocalDriveManager.cs" />
     <Compile Include="Models\NavigationManager.cs" />
+    <Compile Include="DataVirtualization\VirtualizingCollection.cs" />
     <Compile Include="ViewModels\Commands\NextPageCommand.cs" />
     <Compile Include="Models\OneDriveManager.cs" />
     <Compile Include="ViewModels\Commands\ParentFolderCommand.cs" />
     <Compile Include="ViewModels\Commands\PreviousPageCommand.cs" />
     <Compile Include="ViewModels\ApplicationDispatcher.cs" />
     <Compile Include="ViewModels\IDispatcher.cs" />
+    <Compile Include="ViewModels\ItemVMChildrenProvider.cs" />
     <Compile Include="Views\AddDrivePopupWindow.xaml.cs">
       <DependentUpon>AddDrivePopupWindow.xaml</DependentUpon>
     </Compile>

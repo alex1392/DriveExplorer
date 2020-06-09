@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataVirtualization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace DriveExplorer.Models {
 		public ItemTypes ItemType { get; private set; }
 		public DriveTypes DriveType { get; private set; } = DriveTypes.LocalDrive;
 
+		public IItemsProvider<IItem> ChildrenProvider { get; private set; }
+
 		#endregion Public Properties
 
 		#region Public Constructors
@@ -33,6 +36,7 @@ namespace DriveExplorer.Models {
 			Name = FixFullPath(fullPath);
 			Size = 0;
 			LastModifiedTime = info.LastWriteTimeUtc;
+			ChildrenProvider = new LocalChildrenProvider(this);
 		}
 
 		/// <summary>
@@ -47,6 +51,9 @@ namespace DriveExplorer.Models {
 			Name = Path.GetFileName(fullPath);
 			Size = isFolder ? 0 : (info as FileInfo).Length;
 			LastModifiedTime = info.LastWriteTimeUtc;
+			if (isFolder) {
+				ChildrenProvider = new LocalChildrenProvider(this);
+			}
 		}
 
 		#endregion Public Constructors
@@ -58,6 +65,23 @@ namespace DriveExplorer.Models {
 			// this should never be executed
 			// or simply just do nothing
 			return Task.CompletedTask;
+		}
+
+		public async IAsyncEnumerable<IItem> GetSubFolderAsync()
+		{
+			IEnumerable<string> folders;
+			try {
+				folders = Directory.GetDirectories(FullPath);
+			} catch (UnauthorizedAccessException ex) {
+				MessageBox.Show(ex.Message);
+				yield break;
+			} catch (IOException ex) {
+				MessageBox.Show(ex.Message);
+				yield break;
+			}
+			foreach (var path in folders) {
+				yield return new LocalItem(path, true);
+			}
 		}
 
 		public async IAsyncEnumerable<IItem> GetChildrenAsync()
@@ -80,6 +104,11 @@ namespace DriveExplorer.Models {
 			foreach (var path in files) {
 				yield return new LocalItem(path, false);
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"{FullPath}";
 		}
 
 		#endregion Public Methods

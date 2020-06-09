@@ -82,13 +82,11 @@
 											Value="{Binding IsExpanded, Mode=TwoWay}" />
 							<Setter Property="IsSelected"
 											Value="{Binding IsSelected, Mode=TwoWay}" />
-							<Setter Property="Visibility"
-											Value="{Binding Item.ItemType, Converter={x:Static views:TypeVisibilityConverter.Instance}}" />
 						</Style>
 					</TreeView.ItemContainerStyle>
 					<TreeView.ItemTemplate>
 						<HierarchicalDataTemplate DataType="{x:Type vm:ItemVM}"
-																			ItemsSource="{Binding Children}">
+																			ItemsSource="{Binding SubFolders}">
 							<TextBox Text="{Binding Item.Name, Mode=OneWay}"
 											 IsEnabled="False"
 											 Style="{StaticResource TextBoxRevealStyle}" />

@@ -1,5 +1,5 @@
 ﻿using Cyc.MicrosoftApi;
-
+using DataVirtualization;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 
@@ -29,6 +29,8 @@ namespace DriveExplorer.Models {
 		public IAccount UserAccount { get; private set; }
 
 		public DriveTypes DriveType { get; private set; } = DriveTypes.OneDrive;
+
+		public IItemsProvider<IItem> ChildrenProvider => throw new NotImplementedException();
 
 		#endregion Public Properties
 
@@ -90,6 +92,11 @@ namespace DriveExplorer.Models {
 		private static bool IsFolder(DriveItem driveItem)
 		{
 			return driveItem.Folder != null;
+		}
+
+		public IAsyncEnumerable<IItem> GetSubFolderAsync()
+		{
+			throw new NotImplementedException();
 		}
 
 		#endregion Private Methods

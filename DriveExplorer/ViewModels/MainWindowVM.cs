@@ -1,5 +1,5 @@
 ﻿using Cyc.Standard;
-
+using DataVirtualization;
 using DriveExplorer.Models;
 
 using System;
@@ -43,7 +43,7 @@ namespace DriveExplorer.ViewModels {
 		#endregion Public Events
 
 		#region Public Properties
-		public ObservableCollection<ItemVM> CurrentItemVMs => CurrentFolder?.Children;
+		public VirtualizingCollection<ItemVM> CurrentItemVMs => CurrentFolder?.Children;
 
 		public List<ItemVM> PathItemVMs {
 			get {
@@ -193,39 +193,20 @@ namespace DriveExplorer.ViewModels {
 			}
 		}
 
-		private ItemVM CreatePath(string fullpath)
-		{
-			var levels = fullpath.Split(Path.DirectorySeparatorChar).ToList();
-			var root = levels[0];
-			levels.RemoveAt(0);
 
-			var parentVM = TreeItemVMs.FirstOrDefault(vm => vm.Item.Name == root);
-			if (parentVM == null) {
-				throw new Exception("Cannot find root for desktop path.");
-			}
-			var currentpath = root;
-			foreach (var level in levels) {
-				currentpath = string.Join(Path.DirectorySeparatorChar.ToString() ,currentpath, level);
-				parentVM = parentVM.Children.FirstOrDefault(vm =>
-					vm?.Item.Name == level) ??
-					parentVM.AttachChild(new LocalItem(currentpath, true));
-			}
-			return parentVM;
-		}
-
-		private async Task NavigateToPathAsync(string fullpath)
-		{
-			var levels = fullpath.Split(Path.DirectorySeparatorChar).ToList();
-			var vms = TreeItemVMs;
-			ItemVM vm = null;
-			foreach (var level in levels) {
-				vm = vms.FirstOrDefault(vm => vm.Item.Name == level) ??
-						throw new Exception("Cannot find folder to expand.");
-				await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
-				vms = vm.Children;
-			}
-			await vm.SetIsSelectedAsync(true).ConfigureAwait(false);
-		}
+		//private async Task NavigateToPathAsync(string fullpath)
+		//{
+		//	var levels = fullpath.Split(Path.DirectorySeparatorChar).ToList();
+		//	var vms = TreeItemVMs;
+		//	ItemVM vm = null;
+		//	foreach (var level in levels) {
+		//		vm = vms.FirstOrDefault(vm => vm.Item.Name == level) ??
+		//				throw new Exception("Cannot find folder to expand.");
+		//		await vm.SetIsExpandedAsync(true).ConfigureAwait(true);
+		//		vms = vm.Children;
+		//	}
+		//	await vm.SetIsSelectedAsync(true).ConfigureAwait(false);
+		//}
 
 		public async Task LoginGoogleDriveAsync()
 		{

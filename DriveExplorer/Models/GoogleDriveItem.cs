@@ -1,5 +1,5 @@
 ﻿using Cyc.GoogleApi;
-
+using DataVirtualization;
 using Google.Apis.Drive.v3.Data;
 
 using System;
@@ -29,6 +29,8 @@ namespace DriveExplorer.Models {
 		public ItemTypes ItemType { get; private set; }
 		public DriveTypes DriveType { get; private set; } = DriveTypes.GoogleDrive;
 		public string UserId { get; private set; }
+
+		public IItemsProvider<IItem> ChildrenProvider => throw new NotImplementedException();
 
 
 		#endregion Public Properties
@@ -90,6 +92,11 @@ namespace DriveExplorer.Models {
 		{
 			// application/vnd.google-apps.folder
 			return child.MimeType.Contains("folder");
+		}
+
+		public IAsyncEnumerable<IItem> GetSubFolderAsync()
+		{
+			throw new NotImplementedException();
 		}
 
 		#endregion Private Methods

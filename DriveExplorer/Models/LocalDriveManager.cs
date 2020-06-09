@@ -49,7 +49,7 @@ namespace DriveExplorer.Models {
 		{
 			var folderPaths = new[]
 			{
-				RecentPath, DesktopPath, DownloadsPath, DocumentsPath, PicturesPath, MusicPath, VideosPath,
+				RecentPath, /*DesktopPath, DownloadsPath, DocumentsPath, PicturesPath, MusicPath, VideosPath,*/
 			};
 			foreach (var path in folderPaths) {
 				var item = new LocalItem(path, isFolder: true);
